@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Advanced Neural Network Builder</title>
+  <style>
+    :root {
+      --primary: #4f46e5;
+      --primary-hover: #4338ca;
+      --secondary: #e11d48;
+      --secondary-hover: #be123c;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --neutral: #6b7280;
+      --neutral-light: #f3f4f6;
+      --neutral-dark: #1f2937;
+      --white: #ffffff;
+      --black: #000000;
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      line-height: 1.6;
+      color: var(--neutral-dark);
+      background-color: #f9fafb;
+      padding: 0;
+      margin: 0;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 1rem;
+    }
+    
+    header {
+      background-color: var(--primary);
+      color: white;
+      padding: 1rem 0;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    
+    header h1 {
+      margin: 0;
+      font-size: 1.5rem;
+    }
+    
+    h1, h2, h3, h4 {
+      margin-bottom: 1rem;
+    }
+    
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+    
+    @media (min-width: 768px) {
+      .grid-2 {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      
+      .grid-3 {
+        grid-template-columns: repeat(3, 1fr);
+      }
+      
+      .grid-4 {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+    
+    .card {
+      background-color: white;
+      border-radius: 0.5rem;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+    }
+    
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    
+    .card-header h2 {
+      margin-bottom: 0;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+    }
+    
+    input, select, textarea {
+      width: 100%;
+      padding: 0.5rem;
+      border: 1px solid #d1d5db;
+      border-radius: 0.375rem;
+      margin-bottom: 1rem;
+    }
+    
+    input[type="checkbox"], input[type="radio"] {
+      width: auto;
+      margin-right: 0.5rem;
+    }
+    
+    button {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 0.375rem;
+      cursor: pointer;
+      font-weight: 500;
+      transition: background-color 0.2s;
+    }
+    
+    button:hover {
+      background-color: var(--primary-hover);
+    }
+    
+    button.secondary {
+      background-color: var(--secondary);
+    }
+    
+    button.secondary:hover {
+      background-color: var(--secondary-hover);
+    }
+    
+    button.success {
+      background-color: var(--success);
+    }
+    
+    button.warning {
+      background-color: var(--warning);
+    }
+    
+    button.danger {
+      background-color: var(--danger);
+    }
+    
+    button.small {
+      padding: 0.25rem 0.5rem;
+      font-size: 0.875rem;
+    }
+    
+    .flex {
+      display: flex;
+    }
+    
+    .space-between {
+      justify-content: space-between;
+    }
+    
+    .align-center {
+      align-items: center;
+    }
+    
+    .ml-2 {
+      margin-left: 0.5rem;
+    }
+    
+    .mb-4 {
+      margin-bottom: 1rem;
+    }
+    
+    .layer-card {
+      border: 1px solid #e5e7eb;
+      border-radius: 0.5rem;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      position: relative;
+    }
+    
+    .layer-tools {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.5rem;
+      display: flex;
+      gap: 0.5rem;
+    }
+    
+    .badge {
+      display: inline-block;
+      padding: 0.25rem 0.5rem;
+      border-radius: 0.375rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      margin-right: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .badge-blue {
+      background-color: #dbeafe;
+      color: #1e40af;
+    }
+    
+    .badge-green {
+      background-color: #d1fae5;
+      color: #065f46;
+    }
+    
+    .badge-red {
+      background-color: #fee2e2;
+      color: #b91c1c;
+    }
+    
+    .badge-yellow {
+      background-color: #fef3c7;
+      color: #92400e;
+    }
+    
+    .badge-purple {
+      background-color: #ede9fe;
+      color: #5b21b6;
+    }
+    
+    .tab-container {
+      margin-bottom: 1rem;
+    }
+    
+    .tabs {
+      display: flex;
+      border-bottom: 1px solid #e5e7eb;
+      margin-bottom: 1rem;
+    }
+    
+    .tab {
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+    }
+    
+    .tab.active {
+      border-bottom: 2px solid var(--primary);
+      color: var(--primary);
+      font-weight: 500;
+    }
+    
+    .tab-content {
+      display: none;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+    
+    .code-container {
+      background-color: #1f2937;
+      color: #e5e7eb;
+      padding: 1rem;
+      border-radius: 0.5rem;
+      overflow-x: auto;
+      font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+      font-size: 0.875rem;
+      line-height: 1.5;
+      white-space: pre;
+    }
+    
+    .help-text {
+      font-size: 0.875rem;
+      color: var(--neutral);
+      margin-bottom: 0.5rem;
+    }
+    
+    .tooltip {
+      position: relative;
+      display: inline-block;
+      cursor: help;
+    }
+    
+    .tooltip .tooltip-text {
+      visibility: hidden;
+      width: 200px;
+      background-color: var(--neutral-dark);
+      color: white;
+      text-align: center;
+      border-radius: 0.375rem;
+      padding: 0.5rem;
+      position: absolute;
+      z-index: 1;
+      bottom: 125%;
+      left: 50%;
+      transform: translateX(-50%);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    
+    .tooltip:hover .tooltip-text {
+      visibility: visible;
+      opacity: 1;
+    }
+    
+    .architecture-diagram {
+      width: 100%;
+      height: 200px;
+      background-color: var(--neutral-light);
+      border-radius: 0.5rem;
+      overflow: hidden;
+      margin-bottom: 1rem;
+    }
+    
+    #architecture-svg {
+      width: 100%;
+      height: 100%;
+    }
+    
+    .range-with-value {
+      display: flex;
+      align-items: center;
+    }
+    
+    .range-with-value input[type="range"] {
+      flex: 1;
+      margin-right: 0.5rem;
+      margin-bottom: 0;
+    }
+    
+    .range-value {
+      width: 50px;
+      text-align: center;
+    }
+    
+    .alert {
+      padding: 0.75rem 1rem;
+      border-radius: 0.375rem;
+      margin-bottom: 1rem;
+    }
+    
+    .alert-info {
+      background-color: #dbeafe;
+      color: #1e40af;
+      border-left: 4px solid #3b82f6;
+    }
+    
+    .alert-warning {
+      background-color: #fef3c7;
+      color: #92400e;
+      border-left: 4px solid #f59e0b;
+    }
+    
+    .layer-visualizer {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      margin: 1rem 0;
+      overflow-x: auto;
+      padding-bottom: 1rem;
+    }
+    
+    .layer-node {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    
+    .layer-shape {
+      background-color: var(--primary);
+      border-radius: 5px;
+      padding: 0.75rem;
+      color: white;
+      font-weight: bold;
+      text-align: center;
+      min-width: 100px;
+    }
+    
+    .layer-type {
+      font-size: 0.75rem;
+      margin-bottom: 0.25rem;
+    }
+    
+    .layer-details {
+      font-size: 0.75rem;
+      margin-top: 0.25rem;
+    }
+    
+    .layer-line {
+      height: 2px;
+      width: 30px;
+      background-color: var(--neutral);
+    }
+    
+    .collapsible {
+      cursor: pointer;
+    }
+    
+    .collapsible-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease-out;
+    }
+    
+    .expanded .collapsible-content {
+      max-height: 1000px;
+    }
+    
+    .slider-container {
+      display: flex;
+      align-items: center;
+    }
+    
+    .slider-container input {
+      flex: 1;
+    }
+    
+    .slider-value {
+      width: 50px;
+      text-align: right;
+    }
+    
+    .toggle-switch {
+      position: relative;
+      display: inline-block;
+      width: 48px;
+      height: 24px;
+    }
+    
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    
+    .toggle-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: .4s;
+      border-radius: 24px;
+    }
+    
+    .toggle-slider:before {
+      position: absolute;
+      content: "";
+      height: 16px;
+      width: 16px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+    
+    input:checked + .toggle-slider {
+      background-color: var(--primary);
+    }
+    
+    input:checked + .toggle-slider:before {
+      transform: translateX(24px);
+    }
+    
+    .toggle-container {
+      display: flex;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    
+    .toggle-container label {
+      margin-bottom: 0;
+      margin-right: 10px;
+    }
+    
+    /* Visualization styles */
+    .parameter-count {
+      font-size: 0.875rem;
+      margin-bottom: 1rem;
+    }
+    
+    .parameter-count strong {
+      font-size: 1.25rem;
+      color: var(--primary);
+    }
+    
+    /* Preset architecture styles */
+    .preset-card {
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      border: 2px solid transparent;
+    }
+    
+    .preset-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+    
+    .preset-card.selected {
+      border-color: var(--primary);
+    }
+    
+    .model-overview {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+    
+    .performance-metric {
+      flex: 1;
+      min-width: 120px;
+      background-color: var(--neutral-light);
+      padding: 0.75rem;
+      border-radius: 0.5rem;
+      text-align: center;
+    }
+    
+    .metric-value {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--primary);
+    }
+    
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .modal-content {
+      background-color: white;
+      padding: 2rem;
+      border-radius: 0.5rem;
+      max-width: 600px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    
+    .close-modal {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <div class="flex space-between align-center">
+        <h1>Neural Network Architect - Advanced Builder</h1>
+      </div>
+    </div>
+  </header>
+  
+  <div class="container">
+    <div class="card mb-4">
+      <div class="card-header">
+        <h2>Project Setup</h2>
+      </div>
+      <div class="grid grid-2">
+        <div>
+          <label for="project-name">Project Name</label>
+          <input type="text" id="project-name" placeholder="My Neural Network Project">
+          
+          <label for="project-description">Brief Description</label>
+          <textarea id="project-description" rows="2" placeholder="What is this neural network trying to achieve?"></textarea>
+        </div>
+        <div>
+          <label for="task-type">Primary Task</label>
+          <select id="task-type">
+            <option value="classification">Classification</option>
+            <option value="regression">Regression</option>
+            <option value="segmentation">Image Segmentation</option>
+            <option value="object-detection">Object Detection</option>
+            <option value="nlp-classification">NLP Classification</option>
+            <option value="nlp-generation">Text Generation</option>
+            <option value="time-series">Time Series Forecasting</option>
+            <option value="reinforcement">Reinforcement Learning</option>
+            <option value="recommendation">Recommendation System</option>
+            <option value="gan">Generative Adversarial Network</option>
+            <option value="autoencoder">Autoencoder</option>
+            <option value="transfer">Transfer Learning</option>
+            <option value="multimodal">Multimodal Learning</option>
+          </select>
+          
+          <label for="data-type">Main Data Type</label>
+          <select id="data-type">
+            <option value="tabular">Tabular (CSV, Excel)</option>
+            <option value="image">Images</option>
+            <option value="text">Text</option>
+            <option value="audio">Audio</option>
+            <option value="video">Video</option>
+            <option value="time-series">Time Series</option>
+            <option value="graph">Graph/Network Data</option>
+            <option value="mixed">Mixed/Multimodal</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    
+    <div class="tab-container">
+      <div class="tabs">
+        <div class="tab active" data-tab="quick-start">Quick Start</div>
+        <div class="tab" data-tab="architect">Architect</div>
+        <div class="tab" data-tab="hyperparameters">Hyperparameters</div>
+        <div class="tab" data-tab="visualization">Visualization</div>
+        <div class="tab" data-tab="export">Export</div>
+      </div>
+      
+      <div class="tab-content active" id="quick-start">
+        <div class="card">
+          <h2>Start with a Cutting-Edge Architecture</h2>
+          <p class="help-text">Choose a modern architecture as your starting point, then customize it to your needs.</p>
+          
+          <div class="grid grid-3">
+            <div class="preset-card card" data-preset="resnet">
+              <h3>ResNet-based</h3>
+              <p>Deep networks with residual connections to solve the vanishing gradient problem.</p>
+              <div class="badge-container">
+                <span class="badge badge-blue">Image</span>
+                <span class="badge badge-green">Skip Connections</span>
+              </div>
+            </div>
+            
+            <div class="preset-card card" data-preset="transformer">
+              <h3>Transformer-based</h3>
+              <p>Self-attention mechanisms for sequential data processing without recurrence.</p>
+              <div class="badge-container">
+                <span class="badge badge-blue">NLP</span>
+                <span class="badge badge-green">Attention</span>
+              </div>
+            </div>
+            
+            <div class="preset-card card" data-preset="efficientnet">
+              <h3>EfficientNet</h3>
+              <p>Optimized CNN architecture with compound scaling for better efficiency.</p>
+              <div class="badge-container">
+                <span class="badge badge-blue">Image</span>
+                <span class="badge badge-green">Efficient</span>
+              </div>
+            </div>
+            
+            <div class="preset-card card" data-preset="bert">
+              <h3>BERT-style</h3>
+              <p>Bidirectional transformer for language understanding and representation.</p>
+              <div class="badge-container">
+                <span class="badge badge-blue">NLP</span>
+                <span class="badge badge-purple">Bidirectional</span>
+              </div>
+            </div>
+            
+            <div class="preset-card card" data-preset="unet">
+              <h3>U-Net</h3>
+              <p>Encoder-decoder architecture with skip connections for segmentation tasks.</p>
+              <div class="badge-container">
+                <span class="badge badge-blue">Image</span>
+                <span class="badge badge-yellow">Segmentation</span>
+              </div>
+            </div>
+            
+            <div class="preset-card card" data-preset="yolo">
+              <h3>YOLO-style</h3>
+              <p>Single-shot object detection with grid-based predictions.</p>
+              <div class="badge-container">
+                <span class="badge badge-blue">Image</span>
+                <span class="badge badge-red">Object Detection</span>
+              </div>
+            </div>
+            
+            <div class="preset-card card" data-preset="gan">
+              <h3>GAN Architecture</h3>
+              <p>Generator and discriminator networks for generating realistic data.</p>
+              <div class="badge-container">
+                <span class="badge badge-purple">Generative</span>
+                <span class="badge badge-green">Adversarial</span>
+              </div>
+            </div>
+            
+            <div class="preset-card card" data-preset="vae">
+              <h3>Variational Autoencoder</h3>
+              <p>Probabilistic approach to learning compressed representations.</p>
+              <div class="badge-container">
+                <span class="badge badge-purple">Generative</span>
+                <span class="badge badge-yellow">Latent Space</span>
+              </div>
+            </div>
+            
+            <div class="preset-card card" data-preset="custom">
+              <h3>Custom / From Scratch</h3>
+              <p>Build your own architecture from the ground up with full control.</p>
+              <div class="badge-container">
+                <span class="badge badge-blue">Flexible</span>
+                <span class="badge badge-green">Custom</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="tab-content" id="architect">
+        <div class="card">
+          <div class="card-header">
+            <h2>Network Architecture</h2>
+            <button id="add-layer-btn">Add Layer</button>
+          </div>
+          
+          <div class="layer-visualizer" id="layer-visualizer">
+            <!-- Will be filled by JavaScript -->
+          </div>
+          
+          <div id="layers-container">
+            <!-- Layer cards will be added here -->
+            
+            <!-- Input Layer Example -->
+            <div class="layer-card" data-layer-id="input">
+              <div class="layer-tools">
+                <button class="small" disabled>Input</button>
+              </div>
+              <h3>Input Layer</h3>
+              <div class="grid grid-2">
+                <div>
+                  <label for="input-shape">Input Shape</label>
+                  <input type="text" id="input-shape" placeholder="e.g. 224,224,3 for images">
+                  <p class="help-text">Format: height,width,channels for images; sequence_length,features for sequences</p>
+                </div>
+                <div>
+                  <label for="input-preprocessing">Preprocessing</label>
+                  <select id="input-preprocessing">
+                    <option value="none">None</option>
+                    <option value="normalize">Normalize (0-1)</option>
+                    <option value="standardize">Standardize (mean=0, std=1)</option>
+                    <option value="custom">Custom</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Example Hidden Layer (Convolutional) -->
+            <div class="layer-card" data-layer-id="conv1">
+              <div class="layer-tools">
+                <button class="small danger">Remove</button>
+                <button class="small">Duplicate</button>
+              </div>
+              <div class="grid grid-3">
+                <div>
+                  <label for="layer-type-conv1">Layer Type</label>
+                  <select id="layer-type-conv1" class="layer-type-select">
+                    <option value="conv2d">Convolutional 2D</option>
+                    <option value="dense">Dense (Fully Connected)</option>
+                    <option value="lstm">LSTM</option>
+                    <option value="gru">GRU</option>
+                    <option value="attention">Self-Attention</option>
+                    <option value="transformer">Transformer Block</option>
+                    <option value="pooling">Pooling</option>
+                    <option value="dropout">Dropout</option>
+                    <option value="batchnorm">Batch Normalization</option>
+                    <option value="residual">Residual Block</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="layer-units-conv1">Filters/Units</label>
+                  <input type="number" id="layer-units-conv1" value="64" min="1">
+                </div>
+                <div>
+                  <label for="layer-activation-conv1">Activation</label>
+                  <select id="layer-activation-conv1">
+                    <option value="relu">ReLU</option>
+                    <option value="leaky_relu">Leaky ReLU</option>
+                    <option value="selu">SELU</option>
+                    <option value="gelu">GELU (Transformer)</option>
+                    <option value="swish">Swish/SiLU</option>
+                    <option value="mish">Mish</option>
+                    <option value="sigmoid">Sigmoid</option>
+                    <option value="tanh">Tanh</option>
+                    <option value="softmax">Softmax</option>
+                    <option value="none">None</option>
+                  </select>
+                </div>
+              </div>
+              
+              <div class="collapsible-container">
+                <div class="collapsible">
+                  <h4>Advanced Options <span>▼</span></h4>
+                </div>
+                <div class="collapsible-content">
+                  <div class="grid grid-2">
+                    <div>
+                      <label for="kernel-size-conv1">Kernel Size</label>
+                      <select id="kernel-size-conv1">
+                        <option value="3">3x3 (Standard)</option>
+                        <option value="1">1x1 (Dimension Reduction)</option>
+                        <option value="5">5x5 (Wider Field)</option>
+                        <option value="7">7x7 (Large Features)</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label for="strides-conv1">Strides</label>
+                      <select id="strides-conv1">
+                        <option value="1">1x1 (No Downsampling)</option>
+                        <option value="2">2x2 (Spatial Reduction)</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label for="padding-conv1">Padding</label>
+                      <select id="padding-conv1">
+                        <option value="same">Same (Preserve Size)</option>
+                        <option value="valid">Valid (No Padding)</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label for="initializer-conv1">Weight Initializer</label>
+                      <select id="initializer-conv1">
+                        <option value="glorot_uniform">Glorot/Xavier Uniform</option>
+                        <option value="he_normal">He Normal (for ReLU)</option>
+                        <option value="orthogonal">Orthogonal</option>
+                      </select>
+                    </div>
+                    <div class="toggle-container">
+                      <label for="use-bias-conv1">Use Bias</label>
+                      <label class="toggle-switch">
+                        <input type="checkbox" id="use-bias-conv1" checked>
+                        <span class="toggle-slider"></span>
+                      </label>
+                    </div>
+                    <div class="toggle-container">
+                      <label for="add-batchnorm-conv1">Add Batch Normalization</label>
+                      <label class="toggle-switch">
+                        <input type="checkbox" id="add-batchnorm-conv1">
+                        <span class="toggle-slider"></span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Output Layer Example -->
+            <div class="layer-card" data-layer-id="output">
+              <div class="layer-tools">
+                <button class="small" disabled>Output</button>
+              </div>
+              <h3>Output Layer</h3>
+              <div class="grid grid-3">
+                <div>
+                  <label for="output-units">Units/Neurons</label>
+                  <input type="number" id="output-units" value="10" min="1">
+                  <p class="help-text">Number of classes for classification or 1 for regression</p>
+                </div>
+                <div>
+                  <label for="output-activation">Activation Function</label>
+                  <select id="output-activation">
+                    <option value="softmax">Softmax (Multi-class)</option>
+                    <option value="sigmoid">Sigmoid (Binary/Multi-label)</option>
+                    <option value="linear">Linear (Regression)</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="loss-function">Loss Function</label>
+                  <select id="loss-function">
+                    <option value="categorical_crossentropy">Categorical Cross-Entropy</option>
+                    <option value="binary_crossentropy">Binary Cross-Entropy</option>
+                    <option value="sparse_categorical_crossentropy">Sparse Categorical Cross-Entropy</option>
+                    <option value="mse">Mean Squared Error</option>
+                    <option value="mae">Mean Absolute Error</option>
+                    <option value="huber">Huber Loss</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+    <!-- Additional Code Starting at Hyperparameters -->
+
+    <div class="tab-content" id="hyperparameters">
+      <div class="grid grid-2">
+        <div class="card">
+          <h2>Training Configuration</h2>
+          <div class="grid grid-2">
+            <div>
+              <label for="batch-size">Batch Size</label>
+              <select id="batch-size">
+                <option value="16">16</option>
+                <option value="32">32</option>
+                <option value="64">64</option>
+                <option value="128">128</option>
+              </select>
+            </div>
+            <div>
+              <label for="epochs">Epochs</label>
+              <input type="number" id="epochs" value="10" min="1">
+            </div>
+            <div>
+              <label for="learning-rate">Learning Rate</label>
+              <input type="number" id="learning-rate" step="0.0001" value="0.001">
+            </div>
+            <div>
+              <label for="optimizer">Optimizer</label>
+              <select id="optimizer">
+                <option value="adam">Adam</option>
+                <option value="sgd">SGD</option>
+                <option value="rmsprop">RMSProp</option>
+                <option value="adagrad">Adagrad</option>
+              </select>
+            </div>
+          </div>
+          <div class="toggle-container">
+            <label for="data-augmentation">Enable Data Augmentation</label>
+            <label class="toggle-switch">
+              <input type="checkbox" id="data-augmentation">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <div id="data-augmentation-options" style="display: none;">
+            <label for="augmentation-type">Augmentation Type</label>
+            <select id="augmentation-type">
+              <option value="flip">Horizontal/Vertical Flip</option>
+              <option value="rotate">Rotation</option>
+              <option value="zoom">Zoom</option>
+              <option value="shift">Shift</option>
+            </select>
+          </div>
+        </div>
+        <div class="card">
+          <h2>Validation &amp; Callbacks</h2>
+          <div class="grid grid-2">
+            <div>
+              <label for="validation-split">Validation Split (%)</label>
+              <input type="number" id="validation-split" value="20" min="0" max="100">
+            </div>
+            <div>
+              <label for="callback">Select Callback</label>
+              <select id="callback">
+                <option value="early-stopping">Early Stopping</option>
+                <option value="model-checkpoint">Model Checkpoint</option>
+                <option value="reduce-lr">Reduce Learning Rate</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="tab-content" id="visualization">
+      <div class="card">
+        <h2>Model Visualization</h2>
+        <p class="help-text">Preview the architecture and performance metrics of your model.</p>
+        <div class="architecture-diagram" id="architecture-diagram">
+          <!-- Placeholder for architecture SVG or canvas -->
+          <svg id="architecture-svg" viewBox="0 0 400 200">
+            <rect x="50" y="50" width="300" height="100" fill="var(--primary)" />
+            <text x="200" y="110" font-size="20" text-anchor="middle" fill="#ffffff">Model Diagram</text>
+          </svg>
+        </div>
+        <div class="model-overview">
+          <div class="performance-metric">
+            <div class="metric-label">Accuracy</div>
+            <div class="metric-value" id="accuracy-metric">--%</div>
+          </div>
+          <div class="performance-metric">
+            <div class="metric-label">Loss</div>
+            <div class="metric-value" id="loss-metric">--</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="tab-content" id="export">
+      <div class="card">
+        <h2>Export &amp; Save Configuration</h2>
+        <p class="help-text">Save your configuration and export the model architecture in various formats.</p>
+        <div class="grid grid-2">
+          <div>
+            <label for="export-format">Export Format</label>
+            <select id="export-format">
+              <option value="json">JSON</option>
+              <option value="yaml">YAML</option>
+              <option value="xml">XML</option>
+            </select>
+          </div>
+          <div>
+            <label for="save-destination">Save Destination</label>
+            <input type="text" id="save-destination" placeholder="Enter file path or URL">
+          </div>
+        </div>
+        <button id="export-config-btn">Export Configuration</button>
+      </div>
+    </div>
+    
+    <script>
+      // Handle tab switching
+      document.querySelectorAll('.tabs .tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+          document.querySelectorAll('.tabs .tab').forEach(t => t.classList.remove('active'));
+          document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+          tab.classList.add('active');
+          document.getElementById(tab.getAttribute('data-tab')).classList.add('active');
+        });
+      });
+      
+      // Toggle Data Augmentation Options
+      const dataAugCheckbox = document.getElementById('data-augmentation');
+      const dataAugOptions = document.getElementById('data-augmentation-options');
+      dataAugCheckbox.addEventListener('change', () => {
+        dataAugOptions.style.display = dataAugCheckbox.checked ? 'block' : 'none';
+      });
+  </script>
+</body>
+</html>
