@@ -1224,6 +1224,7 @@
                 <th style="padding: 0.5rem; text-align: left; border-bottom: 2px solid var(--neutral);">#</th>
                 <th style="padding: 0.5rem; text-align: left; border-bottom: 2px solid var(--neutral);">Layer Type</th>
                 <th style="padding: 0.5rem; text-align: left; border-bottom: 2px solid var(--neutral);">Configuration</th>
+                <th style="padding: 0.5rem; text-align: left; border-bottom: 2px solid var(--neutral);">Input Shape</th>
                 <th style="padding: 0.5rem; text-align: left; border-bottom: 2px solid var(--neutral);">Output Shape</th>
               </tr>
             </thead>
@@ -2111,11 +2112,15 @@
 
         let html = '';
         networkConfig.layers.forEach((layer, index) => {
+          const outputShape = calculateOutputShape(layer, index);
           html += `
             <div class="layer-node">
               <div class="layer-shape">
                 <div class="layer-type">${layerConfigs[layer.type]?.name || layer.type.toUpperCase()}</div>
                 <div class="layer-details">${getLayerDescription(layer)}</div>
+                <div class="layer-details" style="color: var(--primary); font-size: 0.75rem; margin-top: 0.25rem;">
+                  Output: ${outputShape}
+                </div>
               </div>
             </div>`;
 
@@ -2188,11 +2193,11 @@
         if (!tbody) return;
 
         let html = '';
-        let outputShape = 'Unknown';
 
         networkConfig.layers.forEach((layer, index) => {
           let config = '';
-          outputShape = calculateOutputShape(layer, index);
+          const inputShape = index === 0 ? 'N/A' : formatShape(getLayerInputShape(index) || []);
+          const outputShape = calculateOutputShape(layer, index);
 
           if (layer.type === 'input') {
             config = `Shape: ${layer.shape || 'Not set'}`;
@@ -2221,7 +2226,8 @@
               <td style="padding: 0.5rem;">${index + 1}</td>
               <td style="padding: 0.5rem;"><strong>${layerConfigs[layer.type]?.name || layer.type}</strong></td>
               <td style="padding: 0.5rem; font-size: 0.875rem;">${config}</td>
-              <td style="padding: 0.5rem; color: var(--primary);">${outputShape}</td>
+              <td style="padding: 0.5rem; color: var(--secondary); font-size: 0.875rem;">${inputShape}</td>
+              <td style="padding: 0.5rem; color: var(--primary); font-size: 0.875rem;">${outputShape}</td>
             </tr>
           `;
         });
@@ -2230,29 +2236,151 @@
       }
 
       function calculateOutputShape(layer, index) {
-        // Simplified output shape calculation
-        if (layer.type === 'input' && layer.shape) {
-          return `(${layer.shape})`;
-        } else if (layer.type === 'conv2d') {
-          return `(?, ?, ${layer.filters || 32})`;
-        } else if (layer.type === 'dense') {
-          return `(?, ${layer.units || 128})`;
-        } else if (layer.type === 'lstm' || layer.type === 'gru') {
-          if (layer.returnSequences) {
-            return `(?, seq, ${layer.units || 128})`;
-          } else {
-            return `(?, ${layer.units || 128})`;
-          }
-        } else if (layer.type === 'flatten') {
-          return '(?, flattened)';
-        } else if (layer.type === 'dropout' || layer.type === 'batchnorm') {
-          return 'Same as input';
-        } else if (layer.type === 'pooling') {
-          return '(?, ↓, ↓, channels)';
-        } else if (layer.type === 'globalavgpool') {
-          return '(?, channels)';
+        // Get the input shape for this layer
+        const inputShape = getLayerInputShape(index);
+
+        if (!inputShape || inputShape.length === 0) {
+          return 'Unknown';
         }
-        return 'Dynamic';
+
+        try {
+          const outputShape = inferOutputShape(layer, inputShape);
+          return formatShape(outputShape);
+        } catch (e) {
+          return 'Error';
+        }
+      }
+
+      function getLayerInputShape(layerIndex) {
+        // For the first layer (input), return its defined shape
+        if (layerIndex === 0) {
+          const layer = networkConfig.layers[0];
+          if (layer.type === 'input' && layer.shape) {
+            return parseShape(layer.shape);
+          }
+          return null;
+        }
+
+        // For subsequent layers, return the output shape of the previous layer
+        const prevLayer = networkConfig.layers[layerIndex - 1];
+        const prevInputShape = getLayerInputShape(layerIndex - 1);
+
+        if (!prevInputShape) return null;
+
+        return inferOutputShape(prevLayer, prevInputShape);
+      }
+
+      function parseShape(shapeStr) {
+        // Parse shape string like "224,224,3" or "512,768" into array of numbers
+        if (!shapeStr || typeof shapeStr !== 'string') return null;
+
+        const parts = shapeStr.split(',').map(s => {
+          const num = parseInt(s.trim());
+          return isNaN(num) ? null : num;
+        });
+
+        return parts.every(p => p !== null) ? parts : null;
+      }
+
+      function inferOutputShape(layer, inputShape) {
+        // Infer output shape based on layer type and input shape
+        const type = layer.type;
+
+        if (type === 'input') {
+          return inputShape;
+        }
+
+        if (type === 'conv2d') {
+          // For conv2d: input = [H, W, C_in], output = [H', W', C_out]
+          if (inputShape.length === 3) {
+            const [h, w, c] = inputShape;
+            const stride = layer.strides || 1;
+            const padding = layer.padding || 'same';
+            const filters = layer.filters || 32;
+
+            if (padding === 'same') {
+              return [Math.ceil(h / stride), Math.ceil(w / stride), filters];
+            } else {
+              const kernelSize = layer.kernelSize || 3;
+              const newH = Math.floor((h - kernelSize) / stride) + 1;
+              const newW = Math.floor((w - kernelSize) / stride) + 1;
+              return [newH, newW, filters];
+            }
+          }
+          return inputShape;
+        }
+
+        if (type === 'pooling') {
+          // For pooling: input = [H, W, C], output = [H', W', C]
+          if (inputShape.length === 3) {
+            const [h, w, c] = inputShape;
+            const poolSize = layer.poolSize || 2;
+            const stride = layer.strides || poolSize;
+            return [Math.floor(h / stride), Math.floor(w / stride), c];
+          }
+          return inputShape;
+        }
+
+        if (type === 'globalavgpool') {
+          // For global avg pool: input = [H, W, C], output = [C]
+          if (inputShape.length === 3) {
+            return [inputShape[2]];
+          }
+          return inputShape;
+        }
+
+        if (type === 'flatten') {
+          // Flatten all dimensions into one
+          const totalSize = inputShape.reduce((acc, val) => acc * val, 1);
+          return [totalSize];
+        }
+
+        if (type === 'dense') {
+          // For dense: output = [units]
+          return [layer.units || 128];
+        }
+
+        if (type === 'lstm' || type === 'gru') {
+          // For RNN: input = [seq_len, features], output depends on returnSequences
+          if (inputShape.length === 2) {
+            const units = layer.units || 128;
+            if (layer.returnSequences) {
+              return [inputShape[0], units];
+            } else {
+              return [units];
+            }
+          } else if (inputShape.length === 1) {
+            const units = layer.units || 128;
+            return [units];
+          }
+          return inputShape;
+        }
+
+        if (type === 'transformer' || type === 'attention') {
+          // Transformer preserves input shape
+          return inputShape;
+        }
+
+        if (type === 'dropout' || type === 'batchnorm') {
+          // These layers don't change the shape
+          return inputShape;
+        }
+
+        if (type === 'residual') {
+          // Residual blocks preserve spatial dimensions, change channels
+          if (inputShape.length === 3) {
+            return [inputShape[0], inputShape[1], layer.filters || 64];
+          }
+          return inputShape;
+        }
+
+        // Default: preserve input shape
+        return inputShape;
+      }
+
+      function formatShape(shape) {
+        if (!shape || shape.length === 0) return 'Unknown';
+        return `(${shape.join(', ')})`;
       }
 
       function updateVisualizationDiagram() {
