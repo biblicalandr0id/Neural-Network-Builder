@@ -959,23 +959,74 @@
     
     <div class="tab-content" id="visualization">
       <div class="card">
-        <h2>Model Visualization</h2>
-        <p class="help-text">Preview the architecture and performance metrics of your model.</p>
-        <div class="architecture-diagram" id="architecture-diagram">
-          <!-- Placeholder for architecture SVG or canvas -->
-          <svg id="architecture-svg" viewBox="0 0 400 200">
-            <rect x="50" y="50" width="300" height="100" fill="var(--primary)" />
-            <text x="200" y="110" font-size="20" text-anchor="middle" fill="#ffffff">Model Diagram</text>
-          </svg>
+        <h2>Model Architecture</h2>
+        <p class="help-text">Visual representation of your neural network layers.</p>
+        <div class="layer-visualizer" id="viz-layer-visualizer" style="margin: 2rem 0;">
+          <!-- Dynamically generated layer flow -->
         </div>
+      </div>
+
+      <div class="card">
+        <h2>Model Statistics</h2>
         <div class="model-overview">
           <div class="performance-metric">
-            <div class="metric-label">Accuracy</div>
-            <div class="metric-value" id="accuracy-metric">--%</div>
+            <div class="metric-label">Total Parameters</div>
+            <div class="metric-value" id="accuracy-metric">0</div>
           </div>
           <div class="performance-metric">
-            <div class="metric-label">Loss</div>
-            <div class="metric-value" id="loss-metric">--</div>
+            <div class="metric-label">Estimated Memory</div>
+            <div class="metric-value" id="loss-metric">0 MB</div>
+          </div>
+          <div class="performance-metric">
+            <div class="metric-label">Total Layers</div>
+            <div class="metric-value" id="layer-count-metric">0</div>
+          </div>
+          <div class="performance-metric">
+            <div class="metric-label">Network Depth</div>
+            <div class="metric-value" id="depth-metric">0</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Layer Summary</h2>
+        <div id="layer-summary" style="overflow-x: auto;">
+          <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+              <tr style="background-color: var(--neutral-light);">
+                <th style="padding: 0.5rem; text-align: left; border-bottom: 2px solid var(--neutral);">#</th>
+                <th style="padding: 0.5rem; text-align: left; border-bottom: 2px solid var(--neutral);">Layer Type</th>
+                <th style="padding: 0.5rem; text-align: left; border-bottom: 2px solid var(--neutral);">Configuration</th>
+                <th style="padding: 0.5rem; text-align: left; border-bottom: 2px solid var(--neutral);">Output Shape</th>
+              </tr>
+            </thead>
+            <tbody id="layer-summary-body">
+              <!-- Dynamically generated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Training Configuration Summary</h2>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+          <div>
+            <strong>Batch Size:</strong> <span id="viz-batch-size">32</span>
+          </div>
+          <div>
+            <strong>Epochs:</strong> <span id="viz-epochs">10</span>
+          </div>
+          <div>
+            <strong>Learning Rate:</strong> <span id="viz-lr">0.001</span>
+          </div>
+          <div>
+            <strong>Optimizer:</strong> <span id="viz-optimizer">Adam</span>
+          </div>
+          <div>
+            <strong>Data Augmentation:</strong> <span id="viz-aug">Disabled</span>
+          </div>
+          <div>
+            <strong>Validation Split:</strong> <span id="viz-val-split">20%</span>
           </div>
         </div>
       </div>
@@ -983,8 +1034,8 @@
     
     <div class="tab-content" id="export">
       <div class="card">
-        <h2>Export &amp; Save Configuration</h2>
-        <p class="help-text">Save your configuration and export the model architecture in various formats.</p>
+        <h2>Export Configuration</h2>
+        <p class="help-text">Save your neural network configuration in various formats.</p>
         <div class="grid grid-2">
           <div>
             <label for="export-format">Export Format</label>
@@ -994,17 +1045,1372 @@
               <option value="xml">XML</option>
             </select>
           </div>
-          <div>
-            <label for="save-destination">Save Destination</label>
-            <input type="text" id="save-destination" placeholder="Enter file path or URL">
+          <div style="display: flex; align-items: flex-end;">
+            <button id="export-config-btn" style="width: 100%;">Export Configuration</button>
           </div>
         </div>
-        <button id="export-config-btn">Export Configuration</button>
+      </div>
+
+      <div class="card">
+        <h2>Generate Code</h2>
+        <p class="help-text">Export your architecture as ready-to-use code in popular frameworks.</p>
+        <div class="grid grid-3">
+          <button class="success" onclick="exportCode('pytorch')">
+            <strong>PyTorch</strong><br>
+            <span style="font-size: 0.875rem;">Export as torch.nn</span>
+          </button>
+          <button class="success" onclick="exportCode('keras')">
+            <strong>TensorFlow/Keras</strong><br>
+            <span style="font-size: 0.875rem;">Export as tf.keras</span>
+          </button>
+          <button class="success" onclick="exportCode('jax')">
+            <strong>JAX/Flax</strong><br>
+            <span style="font-size: 0.875rem;">Export as Flax model</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Import Configuration</h2>
+        <p class="help-text">Load a previously saved configuration from JSON file.</p>
+        <input type="file" id="import-file" accept=".json" style="margin-bottom: 1rem;">
+        <button class="secondary" onclick="importConfiguration()">Import from JSON</button>
+      </div>
+
+      <div class="card">
+        <h2>Local Storage</h2>
+        <p class="help-text">Your configuration is automatically saved to browser storage.</p>
+        <div style="display: flex; gap: 1rem;">
+          <button class="warning" onclick="clearLocalStorage()">Clear Saved Data</button>
+          <button onclick="manualSave()">Save Now</button>
+        </div>
       </div>
     </div>
     
     <script>
-      // Handle tab switching
+      // ============================================================================
+      // STATE MANAGEMENT
+      // ============================================================================
+      let networkConfig = {
+        project: {
+          name: '',
+          description: '',
+          taskType: 'classification',
+          dataType: 'image'
+        },
+        layers: [],
+        hyperparameters: {
+          batchSize: 32,
+          epochs: 10,
+          learningRate: 0.001,
+          optimizer: 'adam',
+          dataAugmentation: false,
+          augmentationType: 'flip',
+          validationSplit: 20,
+          callbacks: []
+        }
+      };
+
+      let layerIdCounter = 0;
+
+      // ============================================================================
+      // UTILITY FUNCTIONS
+      // ============================================================================
+
+      function generateLayerId() {
+        return `layer_${layerIdCounter++}`;
+      }
+
+      function getFormValue(id) {
+        const element = document.getElementById(id);
+        if (!element) return null;
+        if (element.type === 'checkbox') return element.checked;
+        if (element.type === 'number') return parseFloat(element.value) || 0;
+        return element.value;
+      }
+
+      function setFormValue(id, value) {
+        const element = document.getElementById(id);
+        if (!element) return;
+        if (element.type === 'checkbox') {
+          element.checked = value;
+        } else {
+          element.value = value;
+        }
+      }
+
+      // ============================================================================
+      // LAYER CONFIGURATIONS BY TYPE
+      // ============================================================================
+
+      const layerConfigs = {
+        conv2d: {
+          name: 'Convolutional 2D',
+          fields: ['filters', 'kernelSize', 'strides', 'padding', 'activation', 'useBias', 'batchNorm', 'initializer']
+        },
+        dense: {
+          name: 'Dense (Fully Connected)',
+          fields: ['units', 'activation', 'useBias', 'dropout', 'initializer']
+        },
+        lstm: {
+          name: 'LSTM',
+          fields: ['units', 'returnSequences', 'dropout', 'recurrentDropout']
+        },
+        gru: {
+          name: 'GRU',
+          fields: ['units', 'returnSequences', 'dropout', 'recurrentDropout']
+        },
+        attention: {
+          name: 'Self-Attention',
+          fields: ['heads', 'keyDim', 'dropout']
+        },
+        transformer: {
+          name: 'Transformer Block',
+          fields: ['heads', 'keyDim', 'ffDim', 'dropout']
+        },
+        pooling: {
+          name: 'Pooling',
+          fields: ['poolType', 'poolSize', 'strides']
+        },
+        dropout: {
+          name: 'Dropout',
+          fields: ['rate']
+        },
+        batchnorm: {
+          name: 'Batch Normalization',
+          fields: ['momentum', 'epsilon']
+        },
+        residual: {
+          name: 'Residual Block',
+          fields: ['filters', 'kernelSize', 'activation']
+        },
+        flatten: {
+          name: 'Flatten',
+          fields: []
+        },
+        globalavgpool: {
+          name: 'Global Average Pooling',
+          fields: []
+        }
+      };
+
+      // ============================================================================
+      // PRESET ARCHITECTURES
+      // ============================================================================
+
+      const presetArchitectures = {
+        resnet: {
+          name: 'ResNet-50',
+          layers: [
+            { type: 'input', shape: '224,224,3' },
+            { type: 'conv2d', filters: 64, kernelSize: 7, strides: 2, activation: 'relu', batchNorm: true },
+            { type: 'pooling', poolType: 'max', poolSize: 3, strides: 2 },
+            { type: 'residual', filters: 64, kernelSize: 3, activation: 'relu' },
+            { type: 'residual', filters: 64, kernelSize: 3, activation: 'relu' },
+            { type: 'residual', filters: 128, kernelSize: 3, activation: 'relu' },
+            { type: 'residual', filters: 256, kernelSize: 3, activation: 'relu' },
+            { type: 'residual', filters: 512, kernelSize: 3, activation: 'relu' },
+            { type: 'globalavgpool' },
+            { type: 'dense', units: 1000, activation: 'softmax' }
+          ]
+        },
+        transformer: {
+          name: 'Transformer Encoder',
+          layers: [
+            { type: 'input', shape: '512,768' },
+            { type: 'transformer', heads: 8, keyDim: 64, ffDim: 2048, dropout: 0.1 },
+            { type: 'transformer', heads: 8, keyDim: 64, ffDim: 2048, dropout: 0.1 },
+            { type: 'transformer', heads: 8, keyDim: 64, ffDim: 2048, dropout: 0.1 },
+            { type: 'globalavgpool' },
+            { type: 'dense', units: 512, activation: 'relu' },
+            { type: 'dropout', rate: 0.3 },
+            { type: 'dense', units: 10, activation: 'softmax' }
+          ]
+        },
+        efficientnet: {
+          name: 'EfficientNet-B0',
+          layers: [
+            { type: 'input', shape: '224,224,3' },
+            { type: 'conv2d', filters: 32, kernelSize: 3, strides: 2, activation: 'swish', batchNorm: true },
+            { type: 'conv2d', filters: 16, kernelSize: 1, activation: 'swish', batchNorm: true },
+            { type: 'conv2d', filters: 24, kernelSize: 3, activation: 'swish', batchNorm: true },
+            { type: 'conv2d', filters: 40, kernelSize: 5, activation: 'swish', batchNorm: true },
+            { type: 'conv2d', filters: 80, kernelSize: 3, activation: 'swish', batchNorm: true },
+            { type: 'conv2d', filters: 112, kernelSize: 5, activation: 'swish', batchNorm: true },
+            { type: 'conv2d', filters: 192, kernelSize: 5, activation: 'swish', batchNorm: true },
+            { type: 'conv2d', filters: 320, kernelSize: 3, activation: 'swish', batchNorm: true },
+            { type: 'globalavgpool' },
+            { type: 'dense', units: 1000, activation: 'softmax' }
+          ]
+        },
+        bert: {
+          name: 'BERT-Base',
+          layers: [
+            { type: 'input', shape: '512,768' },
+            { type: 'transformer', heads: 12, keyDim: 64, ffDim: 3072, dropout: 0.1 },
+            { type: 'transformer', heads: 12, keyDim: 64, ffDim: 3072, dropout: 0.1 },
+            { type: 'transformer', heads: 12, keyDim: 64, ffDim: 3072, dropout: 0.1 },
+            { type: 'transformer', heads: 12, keyDim: 64, ffDim: 3072, dropout: 0.1 },
+            { type: 'dense', units: 768, activation: 'tanh' },
+            { type: 'dense', units: 2, activation: 'softmax' }
+          ]
+        },
+        unet: {
+          name: 'U-Net',
+          layers: [
+            { type: 'input', shape: '256,256,3' },
+            { type: 'conv2d', filters: 64, kernelSize: 3, activation: 'relu', batchNorm: true },
+            { type: 'conv2d', filters: 64, kernelSize: 3, activation: 'relu', batchNorm: true },
+            { type: 'pooling', poolType: 'max', poolSize: 2, strides: 2 },
+            { type: 'conv2d', filters: 128, kernelSize: 3, activation: 'relu', batchNorm: true },
+            { type: 'conv2d', filters: 128, kernelSize: 3, activation: 'relu', batchNorm: true },
+            { type: 'pooling', poolType: 'max', poolSize: 2, strides: 2 },
+            { type: 'conv2d', filters: 256, kernelSize: 3, activation: 'relu', batchNorm: true },
+            { type: 'conv2d', filters: 128, kernelSize: 3, activation: 'relu', batchNorm: true },
+            { type: 'conv2d', filters: 64, kernelSize: 3, activation: 'relu', batchNorm: true },
+            { type: 'conv2d', filters: 1, kernelSize: 1, activation: 'sigmoid' }
+          ]
+        },
+        yolo: {
+          name: 'YOLO-style',
+          layers: [
+            { type: 'input', shape: '416,416,3' },
+            { type: 'conv2d', filters: 32, kernelSize: 3, activation: 'leaky_relu', batchNorm: true },
+            { type: 'pooling', poolType: 'max', poolSize: 2, strides: 2 },
+            { type: 'conv2d', filters: 64, kernelSize: 3, activation: 'leaky_relu', batchNorm: true },
+            { type: 'pooling', poolType: 'max', poolSize: 2, strides: 2 },
+            { type: 'conv2d', filters: 128, kernelSize: 3, activation: 'leaky_relu', batchNorm: true },
+            { type: 'conv2d', filters: 256, kernelSize: 3, activation: 'leaky_relu', batchNorm: true },
+            { type: 'conv2d', filters: 512, kernelSize: 3, activation: 'leaky_relu', batchNorm: true },
+            { type: 'conv2d', filters: 1024, kernelSize: 3, activation: 'leaky_relu', batchNorm: true },
+            { type: 'conv2d', filters: 425, kernelSize: 1, activation: 'linear' }
+          ]
+        },
+        gan: {
+          name: 'GAN Generator',
+          layers: [
+            { type: 'input', shape: '100' },
+            { type: 'dense', units: 256, activation: 'relu', batchNorm: true },
+            { type: 'dense', units: 512, activation: 'relu', batchNorm: true },
+            { type: 'dense', units: 1024, activation: 'relu', batchNorm: true },
+            { type: 'dense', units: 784, activation: 'tanh' }
+          ]
+        },
+        vae: {
+          name: 'Variational Autoencoder',
+          layers: [
+            { type: 'input', shape: '784' },
+            { type: 'dense', units: 512, activation: 'relu' },
+            { type: 'dense', units: 256, activation: 'relu' },
+            { type: 'dense', units: 128, activation: 'relu' },
+            { type: 'dense', units: 20, activation: 'linear' },
+            { type: 'dense', units: 128, activation: 'relu' },
+            { type: 'dense', units: 256, activation: 'relu' },
+            { type: 'dense', units: 512, activation: 'relu' },
+            { type: 'dense', units: 784, activation: 'sigmoid' }
+          ]
+        },
+        custom: {
+          name: 'Custom',
+          layers: [
+            { type: 'input', shape: '224,224,3' },
+            { type: 'conv2d', filters: 32, kernelSize: 3, activation: 'relu' },
+            { type: 'flatten' },
+            { type: 'dense', units: 10, activation: 'softmax' }
+          ]
+        }
+      };
+
+      // ============================================================================
+      // LAYER RENDERING
+      // ============================================================================
+
+      function createLayerHTML(layer, index) {
+        const isInput = layer.type === 'input';
+        const isOutput = index === networkConfig.layers.length - 1 && !isInput;
+
+        let html = `
+          <div class="layer-card" data-layer-id="${layer.id}" data-layer-index="${index}">
+            <div class="layer-tools">`;
+
+        if (isInput) {
+          html += `<button class="small" disabled>Input</button>`;
+        } else if (isOutput) {
+          html += `<button class="small" disabled>Output</button>`;
+        } else {
+          html += `
+            <button class="small danger" onclick="removeLayer('${layer.id}')">Remove</button>
+            <button class="small" onclick="duplicateLayer('${layer.id}')">Duplicate</button>`;
+        }
+
+        html += `</div>`;
+
+        if (isInput) {
+          html += `
+            <h3>Input Layer</h3>
+            <div class="grid grid-2">
+              <div>
+                <label>Input Shape</label>
+                <input type="text" id="shape-${layer.id}" value="${layer.shape || ''}"
+                  onchange="updateLayerProperty('${layer.id}', 'shape', this.value)"
+                  placeholder="e.g. 224,224,3">
+                <p class="help-text">Format: height,width,channels for images; sequence_length,features for sequences</p>
+              </div>
+              <div>
+                <label>Preprocessing</label>
+                <select id="preprocessing-${layer.id}"
+                  onchange="updateLayerProperty('${layer.id}', 'preprocessing', this.value)">
+                  <option value="none" ${layer.preprocessing === 'none' ? 'selected' : ''}>None</option>
+                  <option value="normalize" ${layer.preprocessing === 'normalize' ? 'selected' : ''}>Normalize (0-1)</option>
+                  <option value="standardize" ${layer.preprocessing === 'standardize' ? 'selected' : ''}>Standardize (mean=0, std=1)</option>
+                  <option value="custom" ${layer.preprocessing === 'custom' ? 'selected' : ''}>Custom</option>
+                </select>
+              </div>
+            </div>`;
+        } else {
+          html += `<h3>${layerConfigs[layer.type]?.name || layer.type}</h3>`;
+          html += createLayerFieldsHTML(layer);
+        }
+
+        html += `</div>`;
+        return html;
+      }
+
+      function createLayerFieldsHTML(layer) {
+        let html = '<div class="grid grid-3">';
+
+        // Layer type selector
+        html += `
+          <div>
+            <label>Layer Type</label>
+            <select id="type-${layer.id}" onchange="changeLayerType('${layer.id}', this.value)">`;
+
+        for (const [type, config] of Object.entries(layerConfigs)) {
+          html += `<option value="${type}" ${layer.type === type ? 'selected' : ''}>${config.name}</option>`;
+        }
+
+        html += `</select></div>`;
+
+        // Type-specific fields
+        if (layer.type === 'conv2d') {
+          html += `
+            <div>
+              <label>Filters</label>
+              <input type="number" id="filters-${layer.id}" value="${layer.filters || 32}" min="1"
+                onchange="updateLayerProperty('${layer.id}', 'filters', parseInt(this.value))">
+            </div>
+            <div>
+              <label>Activation</label>
+              <select id="activation-${layer.id}" onchange="updateLayerProperty('${layer.id}', 'activation', this.value)">
+                <option value="relu" ${layer.activation === 'relu' ? 'selected' : ''}>ReLU</option>
+                <option value="leaky_relu" ${layer.activation === 'leaky_relu' ? 'selected' : ''}>Leaky ReLU</option>
+                <option value="selu" ${layer.activation === 'selu' ? 'selected' : ''}>SELU</option>
+                <option value="gelu" ${layer.activation === 'gelu' ? 'selected' : ''}>GELU</option>
+                <option value="swish" ${layer.activation === 'swish' ? 'selected' : ''}>Swish</option>
+                <option value="mish" ${layer.activation === 'mish' ? 'selected' : ''}>Mish</option>
+                <option value="sigmoid" ${layer.activation === 'sigmoid' ? 'selected' : ''}>Sigmoid</option>
+                <option value="tanh" ${layer.activation === 'tanh' ? 'selected' : ''}>Tanh</option>
+                <option value="linear" ${layer.activation === 'linear' ? 'selected' : ''}>Linear</option>
+              </select>
+            </div>
+            <div>
+              <label>Kernel Size</label>
+              <select id="kernelSize-${layer.id}" onchange="updateLayerProperty('${layer.id}', 'kernelSize', parseInt(this.value))">
+                <option value="1" ${layer.kernelSize === 1 ? 'selected' : ''}>1x1</option>
+                <option value="3" ${layer.kernelSize === 3 ? 'selected' : ''}>3x3</option>
+                <option value="5" ${layer.kernelSize === 5 ? 'selected' : ''}>5x5</option>
+                <option value="7" ${layer.kernelSize === 7 ? 'selected' : ''}>7x7</option>
+              </select>
+            </div>
+            <div>
+              <label>Strides</label>
+              <select id="strides-${layer.id}" onchange="updateLayerProperty('${layer.id}', 'strides', parseInt(this.value))">
+                <option value="1" ${layer.strides === 1 ? 'selected' : ''}>1x1</option>
+                <option value="2" ${layer.strides === 2 ? 'selected' : ''}>2x2</option>
+              </select>
+            </div>
+            <div>
+              <label>Padding</label>
+              <select id="padding-${layer.id}" onchange="updateLayerProperty('${layer.id}', 'padding', this.value)">
+                <option value="same" ${layer.padding === 'same' ? 'selected' : ''}>Same</option>
+                <option value="valid" ${layer.padding === 'valid' ? 'selected' : ''}>Valid</option>
+              </select>
+            </div>
+            <div class="toggle-container">
+              <label>Batch Norm</label>
+              <label class="toggle-switch">
+                <input type="checkbox" id="batchNorm-${layer.id}" ${layer.batchNorm ? 'checked' : ''}
+                  onchange="updateLayerProperty('${layer.id}', 'batchNorm', this.checked)">
+                <span class="toggle-slider"></span>
+              </label>
+            </div>`;
+        } else if (layer.type === 'dense') {
+          html += `
+            <div>
+              <label>Units</label>
+              <input type="number" id="units-${layer.id}" value="${layer.units || 128}" min="1"
+                onchange="updateLayerProperty('${layer.id}', 'units', parseInt(this.value))">
+            </div>
+            <div>
+              <label>Activation</label>
+              <select id="activation-${layer.id}" onchange="updateLayerProperty('${layer.id}', 'activation', this.value)">
+                <option value="relu" ${layer.activation === 'relu' ? 'selected' : ''}>ReLU</option>
+                <option value="leaky_relu" ${layer.activation === 'leaky_relu' ? 'selected' : ''}>Leaky ReLU</option>
+                <option value="selu" ${layer.activation === 'selu' ? 'selected' : ''}>SELU</option>
+                <option value="gelu" ${layer.activation === 'gelu' ? 'selected' : ''}>GELU</option>
+                <option value="sigmoid" ${layer.activation === 'sigmoid' ? 'selected' : ''}>Sigmoid</option>
+                <option value="tanh" ${layer.activation === 'tanh' ? 'selected' : ''}>Tanh</option>
+                <option value="softmax" ${layer.activation === 'softmax' ? 'selected' : ''}>Softmax</option>
+                <option value="linear" ${layer.activation === 'linear' ? 'selected' : ''}>Linear</option>
+              </select>
+            </div>`;
+        } else if (layer.type === 'lstm' || layer.type === 'gru') {
+          html += `
+            <div>
+              <label>Units</label>
+              <input type="number" id="units-${layer.id}" value="${layer.units || 128}" min="1"
+                onchange="updateLayerProperty('${layer.id}', 'units', parseInt(this.value))">
+            </div>
+            <div class="toggle-container">
+              <label>Return Sequences</label>
+              <label class="toggle-switch">
+                <input type="checkbox" id="returnSequences-${layer.id}" ${layer.returnSequences ? 'checked' : ''}
+                  onchange="updateLayerProperty('${layer.id}', 'returnSequences', this.checked)">
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+            <div>
+              <label>Dropout</label>
+              <input type="number" id="dropout-${layer.id}" value="${layer.dropout || 0}" min="0" max="1" step="0.1"
+                onchange="updateLayerProperty('${layer.id}', 'dropout', parseFloat(this.value))">
+            </div>`;
+        } else if (layer.type === 'attention' || layer.type === 'transformer') {
+          html += `
+            <div>
+              <label>Attention Heads</label>
+              <input type="number" id="heads-${layer.id}" value="${layer.heads || 8}" min="1"
+                onchange="updateLayerProperty('${layer.id}', 'heads', parseInt(this.value))">
+            </div>
+            <div>
+              <label>Key Dimension</label>
+              <input type="number" id="keyDim-${layer.id}" value="${layer.keyDim || 64}" min="1"
+                onchange="updateLayerProperty('${layer.id}', 'keyDim', parseInt(this.value))">
+            </div>`;
+          if (layer.type === 'transformer') {
+            html += `
+            <div>
+              <label>Feed-Forward Dim</label>
+              <input type="number" id="ffDim-${layer.id}" value="${layer.ffDim || 512}" min="1"
+                onchange="updateLayerProperty('${layer.id}', 'ffDim', parseInt(this.value))">
+            </div>`;
+          }
+          html += `
+            <div>
+              <label>Dropout</label>
+              <input type="number" id="dropout-${layer.id}" value="${layer.dropout || 0.1}" min="0" max="1" step="0.1"
+                onchange="updateLayerProperty('${layer.id}', 'dropout', parseFloat(this.value))">
+            </div>`;
+        } else if (layer.type === 'pooling') {
+          html += `
+            <div>
+              <label>Pool Type</label>
+              <select id="poolType-${layer.id}" onchange="updateLayerProperty('${layer.id}', 'poolType', this.value)">
+                <option value="max" ${layer.poolType === 'max' ? 'selected' : ''}>Max Pooling</option>
+                <option value="avg" ${layer.poolType === 'avg' ? 'selected' : ''}>Average Pooling</option>
+              </select>
+            </div>
+            <div>
+              <label>Pool Size</label>
+              <input type="number" id="poolSize-${layer.id}" value="${layer.poolSize || 2}" min="1"
+                onchange="updateLayerProperty('${layer.id}', 'poolSize', parseInt(this.value))">
+            </div>
+            <div>
+              <label>Strides</label>
+              <input type="number" id="strides-${layer.id}" value="${layer.strides || 2}" min="1"
+                onchange="updateLayerProperty('${layer.id}', 'strides', parseInt(this.value))">
+            </div>`;
+        } else if (layer.type === 'dropout') {
+          html += `
+            <div>
+              <label>Dropout Rate</label>
+              <input type="number" id="rate-${layer.id}" value="${layer.rate || 0.5}" min="0" max="1" step="0.1"
+                onchange="updateLayerProperty('${layer.id}', 'rate', parseFloat(this.value))">
+            </div>`;
+        } else if (layer.type === 'residual') {
+          html += `
+            <div>
+              <label>Filters</label>
+              <input type="number" id="filters-${layer.id}" value="${layer.filters || 64}" min="1"
+                onchange="updateLayerProperty('${layer.id}', 'filters', parseInt(this.value))">
+            </div>
+            <div>
+              <label>Kernel Size</label>
+              <select id="kernelSize-${layer.id}" onchange="updateLayerProperty('${layer.id}', 'kernelSize', parseInt(this.value))">
+                <option value="3" ${layer.kernelSize === 3 ? 'selected' : ''}>3x3</option>
+                <option value="5" ${layer.kernelSize === 5 ? 'selected' : ''}>5x5</option>
+              </select>
+            </div>
+            <div>
+              <label>Activation</label>
+              <select id="activation-${layer.id}" onchange="updateLayerProperty('${layer.id}', 'activation', this.value)">
+                <option value="relu" ${layer.activation === 'relu' ? 'selected' : ''}>ReLU</option>
+                <option value="leaky_relu" ${layer.activation === 'leaky_relu' ? 'selected' : ''}>Leaky ReLU</option>
+              </select>
+            </div>`;
+        }
+
+        html += '</div>';
+        return html;
+      }
+
+      function renderLayers() {
+        const container = document.getElementById('layers-container');
+        container.innerHTML = networkConfig.layers.map((layer, index) =>
+          createLayerHTML(layer, index)
+        ).join('');
+        updateLayerVisualizer();
+        updateStatistics();
+      }
+
+      // ============================================================================
+      // LAYER MANAGEMENT
+      // ============================================================================
+
+      function addLayer(layerType = 'dense', position = -1) {
+        const newLayer = {
+          id: generateLayerId(),
+          type: layerType,
+          ...getDefaultLayerProperties(layerType)
+        };
+
+        if (position === -1 || position >= networkConfig.layers.length - 1) {
+          // Add before output layer if it exists
+          const outputIndex = networkConfig.layers.findIndex(l => l.type === 'output');
+          if (outputIndex !== -1) {
+            networkConfig.layers.splice(outputIndex, 0, newLayer);
+          } else {
+            networkConfig.layers.push(newLayer);
+          }
+        } else {
+          networkConfig.layers.splice(position + 1, 0, newLayer);
+        }
+
+        renderLayers();
+        saveToLocalStorage();
+      }
+
+      function removeLayer(layerId) {
+        networkConfig.layers = networkConfig.layers.filter(l => l.id !== layerId);
+        renderLayers();
+        saveToLocalStorage();
+      }
+
+      function duplicateLayer(layerId) {
+        const layer = networkConfig.layers.find(l => l.id === layerId);
+        if (!layer) return;
+
+        const index = networkConfig.layers.indexOf(layer);
+        const duplicated = {
+          ...JSON.parse(JSON.stringify(layer)),
+          id: generateLayerId()
+        };
+
+        networkConfig.layers.splice(index + 1, 0, duplicated);
+        renderLayers();
+        saveToLocalStorage();
+      }
+
+      function changeLayerType(layerId, newType) {
+        const layer = networkConfig.layers.find(l => l.id === layerId);
+        if (!layer) return;
+
+        layer.type = newType;
+        Object.assign(layer, getDefaultLayerProperties(newType));
+
+        renderLayers();
+        saveToLocalStorage();
+      }
+
+      function updateLayerProperty(layerId, property, value) {
+        const layer = networkConfig.layers.find(l => l.id === layerId);
+        if (!layer) return;
+
+        layer[property] = value;
+        updateLayerVisualizer();
+        updateStatistics();
+        saveToLocalStorage();
+      }
+
+      function getDefaultLayerProperties(layerType) {
+        const defaults = {
+          conv2d: { filters: 32, kernelSize: 3, strides: 1, padding: 'same', activation: 'relu', batchNorm: false },
+          dense: { units: 128, activation: 'relu', dropout: 0 },
+          lstm: { units: 128, returnSequences: true, dropout: 0, recurrentDropout: 0 },
+          gru: { units: 128, returnSequences: true, dropout: 0, recurrentDropout: 0 },
+          attention: { heads: 8, keyDim: 64, dropout: 0.1 },
+          transformer: { heads: 8, keyDim: 64, ffDim: 512, dropout: 0.1 },
+          pooling: { poolType: 'max', poolSize: 2, strides: 2 },
+          dropout: { rate: 0.5 },
+          batchnorm: { momentum: 0.99, epsilon: 0.001 },
+          residual: { filters: 64, kernelSize: 3, activation: 'relu' },
+          flatten: {},
+          globalavgpool: {}
+        };
+
+        return defaults[layerType] || {};
+      }
+
+      // ============================================================================
+      // VISUALIZATION
+      // ============================================================================
+
+      function updateLayerVisualizer() {
+        const visualizer = document.getElementById('layer-visualizer');
+        if (!visualizer) return;
+
+        let html = '';
+        networkConfig.layers.forEach((layer, index) => {
+          html += `
+            <div class="layer-node">
+              <div class="layer-shape">
+                <div class="layer-type">${layerConfigs[layer.type]?.name || layer.type.toUpperCase()}</div>
+                <div class="layer-details">${getLayerDescription(layer)}</div>
+              </div>
+            </div>`;
+
+          if (index < networkConfig.layers.length - 1) {
+            html += '<div class="layer-line"></div>';
+          }
+        });
+
+        visualizer.innerHTML = html;
+      }
+
+      function getLayerDescription(layer) {
+        if (layer.type === 'input') {
+          return layer.shape || 'Input';
+        } else if (layer.type === 'conv2d') {
+          return `${layer.filters || 32}@${layer.kernelSize || 3}x${layer.kernelSize || 3}`;
+        } else if (layer.type === 'dense') {
+          return `${layer.units || 128} units`;
+        } else if (layer.type === 'lstm' || layer.type === 'gru') {
+          return `${layer.units || 128} units`;
+        } else if (layer.type === 'transformer') {
+          return `${layer.heads || 8}h, ${layer.keyDim || 64}d`;
+        } else if (layer.type === 'pooling') {
+          return `${layer.poolType || 'max'} ${layer.poolSize || 2}x${layer.poolSize || 2}`;
+        } else if (layer.type === 'dropout') {
+          return `${(layer.rate || 0.5) * 100}%`;
+        }
+        return '';
+      }
+
+      // ============================================================================
+      // STATISTICS AND VALIDATION
+      // ============================================================================
+
+      function updateStatistics() {
+        const totalParams = calculateTotalParameters();
+        const memoryEstimate = estimateMemory();
+
+        // Update model statistics
+        const accuracyMetric = document.getElementById('accuracy-metric');
+        const lossMetric = document.getElementById('loss-metric');
+        const layerCountMetric = document.getElementById('layer-count-metric');
+        const depthMetric = document.getElementById('depth-metric');
+
+        if (accuracyMetric) {
+          accuracyMetric.textContent = totalParams.toLocaleString();
+        }
+        if (lossMetric) {
+          lossMetric.textContent = `${memoryEstimate} MB`;
+        }
+        if (layerCountMetric) {
+          layerCountMetric.textContent = networkConfig.layers.length;
+        }
+        if (depthMetric) {
+          depthMetric.textContent = networkConfig.layers.length;
+        }
+
+        // Update layer summary table
+        updateLayerSummaryTable();
+
+        // Update visualization layer diagram
+        updateVisualizationDiagram();
+
+        // Update training config summary
+        updateTrainingConfigSummary();
+      }
+
+      function updateLayerSummaryTable() {
+        const tbody = document.getElementById('layer-summary-body');
+        if (!tbody) return;
+
+        let html = '';
+        let outputShape = 'Unknown';
+
+        networkConfig.layers.forEach((layer, index) => {
+          let config = '';
+          outputShape = calculateOutputShape(layer, index);
+
+          if (layer.type === 'input') {
+            config = `Shape: ${layer.shape || 'Not set'}`;
+          } else if (layer.type === 'conv2d') {
+            config = `Filters: ${layer.filters || 32}, Kernel: ${layer.kernelSize || 3}x${layer.kernelSize || 3}, Activation: ${layer.activation || 'relu'}`;
+          } else if (layer.type === 'dense') {
+            config = `Units: ${layer.units || 128}, Activation: ${layer.activation || 'relu'}`;
+          } else if (layer.type === 'lstm' || layer.type === 'gru') {
+            config = `Units: ${layer.units || 128}, Return Seq: ${layer.returnSequences ? 'Yes' : 'No'}`;
+          } else if (layer.type === 'transformer') {
+            config = `Heads: ${layer.heads || 8}, Key Dim: ${layer.keyDim || 64}, FF Dim: ${layer.ffDim || 512}`;
+          } else if (layer.type === 'pooling') {
+            config = `Type: ${layer.poolType || 'max'}, Size: ${layer.poolSize || 2}x${layer.poolSize || 2}`;
+          } else if (layer.type === 'dropout') {
+            config = `Rate: ${(layer.rate || 0.5) * 100}%`;
+          } else if (layer.type === 'flatten') {
+            config = 'Flattens input';
+          } else if (layer.type === 'globalavgpool') {
+            config = 'Global average pooling';
+          } else if (layer.type === 'residual') {
+            config = `Filters: ${layer.filters || 64}, Kernel: ${layer.kernelSize || 3}x${layer.kernelSize || 3}`;
+          }
+
+          html += `
+            <tr style="border-bottom: 1px solid var(--neutral-light);">
+              <td style="padding: 0.5rem;">${index + 1}</td>
+              <td style="padding: 0.5rem;"><strong>${layerConfigs[layer.type]?.name || layer.type}</strong></td>
+              <td style="padding: 0.5rem; font-size: 0.875rem;">${config}</td>
+              <td style="padding: 0.5rem; color: var(--primary);">${outputShape}</td>
+            </tr>
+          `;
+        });
+
+        tbody.innerHTML = html;
+      }
+
+      function calculateOutputShape(layer, index) {
+        // Simplified output shape calculation
+        if (layer.type === 'input' && layer.shape) {
+          return `(${layer.shape})`;
+        } else if (layer.type === 'conv2d') {
+          return `(?, ?, ${layer.filters || 32})`;
+        } else if (layer.type === 'dense') {
+          return `(?, ${layer.units || 128})`;
+        } else if (layer.type === 'lstm' || layer.type === 'gru') {
+          if (layer.returnSequences) {
+            return `(?, seq, ${layer.units || 128})`;
+          } else {
+            return `(?, ${layer.units || 128})`;
+          }
+        } else if (layer.type === 'flatten') {
+          return '(?, flattened)';
+        } else if (layer.type === 'dropout' || layer.type === 'batchnorm') {
+          return 'Same as input';
+        } else if (layer.type === 'pooling') {
+          return '(?, ↓, ↓, channels)';
+        } else if (layer.type === 'globalavgpool') {
+          return '(?, channels)';
+        }
+        return 'Dynamic';
+      }
+
+      function updateVisualizationDiagram() {
+        const visualizer = document.getElementById('viz-layer-visualizer');
+        if (!visualizer) return;
+
+        let html = '';
+        networkConfig.layers.forEach((layer, index) => {
+          html += `
+            <div class="layer-node">
+              <div class="layer-shape">
+                <div class="layer-type">${layerConfigs[layer.type]?.name || layer.type.toUpperCase()}</div>
+                <div class="layer-details">${getLayerDescription(layer)}</div>
+              </div>
+            </div>`;
+
+          if (index < networkConfig.layers.length - 1) {
+            html += '<div class="layer-line"></div>';
+          }
+        });
+
+        visualizer.innerHTML = html;
+      }
+
+      function updateTrainingConfigSummary() {
+        const batchSize = document.getElementById('viz-batch-size');
+        const epochs = document.getElementById('viz-epochs');
+        const lr = document.getElementById('viz-lr');
+        const optimizer = document.getElementById('viz-optimizer');
+        const aug = document.getElementById('viz-aug');
+        const valSplit = document.getElementById('viz-val-split');
+
+        if (batchSize) batchSize.textContent = getFormValue('batch-size') || 32;
+        if (epochs) epochs.textContent = getFormValue('epochs') || 10;
+        if (lr) lr.textContent = getFormValue('learning-rate') || 0.001;
+        if (optimizer) optimizer.textContent = (getFormValue('optimizer') || 'adam').toUpperCase();
+        if (aug) aug.textContent = getFormValue('data-augmentation') ? 'Enabled' : 'Disabled';
+        if (valSplit) valSplit.textContent = `${getFormValue('validation-split') || 20}%`;
+      }
+
+      function calculateTotalParameters() {
+        let total = 0;
+        let prevShape = null;
+
+        networkConfig.layers.forEach((layer, index) => {
+          if (layer.type === 'input' && layer.shape) {
+            const parts = layer.shape.split(',').map(x => parseInt(x.trim()));
+            prevShape = parts;
+          } else if (layer.type === 'conv2d' && prevShape) {
+            const filters = layer.filters || 32;
+            const kernelSize = layer.kernelSize || 3;
+            const inputChannels = prevShape[2] || 3;
+            total += (kernelSize * kernelSize * inputChannels * filters) + (layer.useBias !== false ? filters : 0);
+            prevShape = [prevShape[0], prevShape[1], filters];
+          } else if (layer.type === 'dense') {
+            const units = layer.units || 128;
+            if (prevShape) {
+              const inputSize = prevShape.reduce((a, b) => a * b, 1);
+              total += (inputSize * units) + units;
+            }
+            prevShape = [units];
+          }
+        });
+
+        return total;
+      }
+
+      function estimateMemory() {
+        const params = calculateTotalParameters();
+        const bytesPerParam = 4; // float32
+        const memoryBytes = params * bytesPerParam;
+        const memoryMB = (memoryBytes / (1024 * 1024)).toFixed(1);
+        return memoryMB;
+      }
+
+      // ============================================================================
+      // PRESET ARCHITECTURE LOADING
+      // ============================================================================
+
+      function loadPreset(presetName) {
+        const preset = presetArchitectures[presetName];
+        if (!preset) return;
+
+        networkConfig.layers = [];
+
+        preset.layers.forEach(layerConfig => {
+          const layer = {
+            id: generateLayerId(),
+            ...layerConfig
+          };
+          networkConfig.layers.push(layer);
+        });
+
+        renderLayers();
+        saveToLocalStorage();
+
+        // Switch to architect tab
+        document.querySelector('.tab[data-tab="architect"]').click();
+      }
+
+      // ============================================================================
+      // CODE GENERATION
+      // ============================================================================
+
+      function generatePyTorchCode() {
+        let code = `import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
+class NeuralNetwork(nn.Module):
+    def __init__(self):
+        super(NeuralNetwork, self).__init__()
+        `;
+
+        let layerNum = 0;
+        let prevChannels = 3;
+
+        networkConfig.layers.forEach((layer, index) => {
+          if (layer.type === 'input') {
+            if (layer.shape) {
+              const parts = layer.shape.split(',');
+              if (parts.length >= 3) {
+                prevChannels = parseInt(parts[2]);
+              }
+            }
+          } else if (layer.type === 'conv2d') {
+            const filters = layer.filters || 32;
+            const kernelSize = layer.kernelSize || 3;
+            const stride = layer.strides || 1;
+            const padding = layer.padding === 'same' ? Math.floor(kernelSize / 2) : 0;
+            code += `\n        self.conv${layerNum} = nn.Conv2d(${prevChannels}, ${filters}, kernel_size=${kernelSize}, stride=${stride}, padding=${padding})`;
+            if (layer.batchNorm) {
+              code += `\n        self.bn${layerNum} = nn.BatchNorm2d(${filters})`;
+            }
+            prevChannels = filters;
+            layerNum++;
+          } else if (layer.type === 'dense') {
+            const units = layer.units || 128;
+            code += `\n        self.fc${layerNum} = nn.Linear(in_features, ${units})`;
+            layerNum++;
+          } else if (layer.type === 'lstm') {
+            const units = layer.units || 128;
+            code += `\n        self.lstm${layerNum} = nn.LSTM(input_size, ${units}, batch_first=True)`;
+            layerNum++;
+          } else if (layer.type === 'dropout') {
+            const rate = layer.rate || 0.5;
+            code += `\n        self.dropout${layerNum} = nn.Dropout(${rate})`;
+            layerNum++;
+          }
+        });
+
+        code += `
+
+    def forward(self, x):
+        `;
+
+        layerNum = 0;
+        let needsFlatten = false;
+
+        networkConfig.layers.forEach((layer, index) => {
+          if (layer.type === 'conv2d') {
+            code += `\n        x = self.conv${layerNum}(x)`;
+            if (layer.batchNorm) {
+              code += `\n        x = self.bn${layerNum}(x)`;
+            }
+            const activation = layer.activation || 'relu';
+            if (activation === 'relu') {
+              code += `\n        x = F.relu(x)`;
+            } else if (activation === 'leaky_relu') {
+              code += `\n        x = F.leaky_relu(x)`;
+            } else if (activation === 'sigmoid') {
+              code += `\n        x = torch.sigmoid(x)`;
+            } else if (activation === 'tanh') {
+              code += `\n        x = torch.tanh(x)`;
+            }
+            layerNum++;
+            needsFlatten = true;
+          } else if (layer.type === 'pooling') {
+            const poolSize = layer.poolSize || 2;
+            const stride = layer.strides || 2;
+            if (layer.poolType === 'max') {
+              code += `\n        x = F.max_pool2d(x, kernel_size=${poolSize}, stride=${stride})`;
+            } else {
+              code += `\n        x = F.avg_pool2d(x, kernel_size=${poolSize}, stride=${stride})`;
+            }
+          } else if (layer.type === 'flatten') {
+            code += `\n        x = x.view(x.size(0), -1)`;
+            needsFlatten = false;
+          } else if (layer.type === 'dense') {
+            if (needsFlatten) {
+              code += `\n        x = x.view(x.size(0), -1)`;
+              needsFlatten = false;
+            }
+            code += `\n        x = self.fc${layerNum}(x)`;
+            const activation = layer.activation || 'relu';
+            if (activation === 'relu') {
+              code += `\n        x = F.relu(x)`;
+            } else if (activation === 'sigmoid') {
+              code += `\n        x = torch.sigmoid(x)`;
+            } else if (activation === 'tanh') {
+              code += `\n        x = torch.tanh(x)`;
+            } else if (activation === 'softmax') {
+              code += `\n        x = F.softmax(x, dim=1)`;
+            }
+            layerNum++;
+          } else if (layer.type === 'dropout') {
+            code += `\n        x = self.dropout${layerNum}(x)`;
+            layerNum++;
+          } else if (layer.type === 'globalavgpool') {
+            code += `\n        x = F.adaptive_avg_pool2d(x, (1, 1))`;
+            code += `\n        x = x.view(x.size(0), -1)`;
+            needsFlatten = false;
+          }
+        });
+
+        code += `\n        return x
+
+# Create model instance
+model = NeuralNetwork()
+print(model)
+
+# Training configuration
+criterion = nn.CrossEntropyLoss()
+optimizer = torch.optim.${networkConfig.hyperparameters.optimizer.toUpperCase()}(model.parameters(), lr=${networkConfig.hyperparameters.learningRate})
+`;
+
+        return code;
+      }
+
+      function generateKerasCode() {
+        let code = `import tensorflow as tf
+from tensorflow import keras
+from tensorflow.keras import layers
+
+# Build model
+model = keras.Sequential([
+`;
+
+        networkConfig.layers.forEach((layer, index) => {
+          if (layer.type === 'input' && layer.shape) {
+            code += `    layers.InputLayer(input_shape=(${layer.shape})),\n`;
+          } else if (layer.type === 'conv2d') {
+            const filters = layer.filters || 32;
+            const kernelSize = layer.kernelSize || 3;
+            const strides = layer.strides || 1;
+            const padding = layer.padding || 'same';
+            const activation = layer.activation || 'relu';
+            code += `    layers.Conv2D(${filters}, (${kernelSize}, ${kernelSize}), strides=${strides}, padding='${padding}', activation='${activation}'),\n`;
+            if (layer.batchNorm) {
+              code += `    layers.BatchNormalization(),\n`;
+            }
+          } else if (layer.type === 'dense') {
+            const units = layer.units || 128;
+            const activation = layer.activation || 'relu';
+            code += `    layers.Dense(${units}, activation='${activation}'),\n`;
+          } else if (layer.type === 'lstm') {
+            const units = layer.units || 128;
+            const returnSeq = layer.returnSequences ? 'True' : 'False';
+            code += `    layers.LSTM(${units}, return_sequences=${returnSeq}),\n`;
+          } else if (layer.type === 'gru') {
+            const units = layer.units || 128;
+            const returnSeq = layer.returnSequences ? 'True' : 'False';
+            code += `    layers.GRU(${units}, return_sequences=${returnSeq}),\n`;
+          } else if (layer.type === 'pooling') {
+            const poolSize = layer.poolSize || 2;
+            const strides = layer.strides || 2;
+            if (layer.poolType === 'max') {
+              code += `    layers.MaxPooling2D(pool_size=(${poolSize}, ${poolSize}), strides=${strides}),\n`;
+            } else {
+              code += `    layers.AveragePooling2D(pool_size=(${poolSize}, ${poolSize}), strides=${strides}),\n`;
+            }
+          } else if (layer.type === 'dropout') {
+            const rate = layer.rate || 0.5;
+            code += `    layers.Dropout(${rate}),\n`;
+          } else if (layer.type === 'batchnorm') {
+            code += `    layers.BatchNormalization(),\n`;
+          } else if (layer.type === 'flatten') {
+            code += `    layers.Flatten(),\n`;
+          } else if (layer.type === 'globalavgpool') {
+            code += `    layers.GlobalAveragePooling2D(),\n`;
+          }
+        });
+
+        code += `])
+
+# Compile model
+model.compile(
+    optimizer='${networkConfig.hyperparameters.optimizer}',
+    loss='sparse_categorical_crossentropy',
+    metrics=['accuracy']
+)
+
+# Model summary
+model.summary()
+
+# Training configuration
+batch_size = ${networkConfig.hyperparameters.batchSize}
+epochs = ${networkConfig.hyperparameters.epochs}
+`;
+
+        return code;
+      }
+
+      function generateJAXCode() {
+        let code = `import jax
+import jax.numpy as jnp
+from flax import linen as nn
+
+class NeuralNetwork(nn.Module):
+    @nn.compact
+    def __call__(self, x, training: bool = False):
+`;
+
+        networkConfig.layers.forEach((layer, index) => {
+          if (layer.type === 'conv2d') {
+            const filters = layer.filters || 32;
+            const kernelSize = layer.kernelSize || 3;
+            const strides = layer.strides || 1;
+            code += `        x = nn.Conv(features=${filters}, kernel_size=(${kernelSize}, ${kernelSize}), strides=${strides})(x)\n`;
+            if (layer.batchNorm) {
+              code += `        x = nn.BatchNorm(use_running_average=not training)(x)\n`;
+            }
+            const activation = layer.activation || 'relu';
+            if (activation === 'relu') {
+              code += `        x = nn.relu(x)\n`;
+            }
+          } else if (layer.type === 'dense') {
+            const units = layer.units || 128;
+            code += `        x = nn.Dense(features=${units})(x)\n`;
+            const activation = layer.activation || 'relu';
+            if (activation === 'relu') {
+              code += `        x = nn.relu(x)\n`;
+            } else if (activation === 'softmax') {
+              code += `        x = nn.softmax(x)\n`;
+            }
+          } else if (layer.type === 'dropout') {
+            const rate = layer.rate || 0.5;
+            code += `        x = nn.Dropout(rate=${rate}, deterministic=not training)(x)\n`;
+          } else if (layer.type === 'flatten') {
+            code += `        x = x.reshape((x.shape[0], -1))\n`;
+          }
+        });
+
+        code += `        return x
+
+# Create model
+model = NeuralNetwork()
+`;
+
+        return code;
+      }
+
+      // ============================================================================
+      // EXPORT/IMPORT
+      // ============================================================================
+
+      function exportConfiguration() {
+        const format = getFormValue('export-format');
+        const projectConfig = {
+          ...networkConfig,
+          project: {
+            name: getFormValue('project-name'),
+            description: getFormValue('project-description'),
+            taskType: getFormValue('task-type'),
+            dataType: getFormValue('data-type')
+          },
+          hyperparameters: {
+            batchSize: parseInt(getFormValue('batch-size')),
+            epochs: parseInt(getFormValue('epochs')),
+            learningRate: parseFloat(getFormValue('learning-rate')),
+            optimizer: getFormValue('optimizer'),
+            dataAugmentation: getFormValue('data-augmentation'),
+            augmentationType: getFormValue('augmentation-type'),
+            validationSplit: parseInt(getFormValue('validation-split'))
+          }
+        };
+
+        let content = '';
+        let filename = `neural_network_config`;
+        let mimeType = 'application/json';
+
+        if (format === 'json') {
+          content = JSON.stringify(projectConfig, null, 2);
+          filename += '.json';
+        } else if (format === 'yaml') {
+          content = convertToYAML(projectConfig);
+          filename += '.yaml';
+          mimeType = 'text/yaml';
+        } else if (format === 'xml') {
+          content = convertToXML(projectConfig);
+          filename += '.xml';
+          mimeType = 'application/xml';
+        }
+
+        downloadFile(content, filename, mimeType);
+      }
+
+      function exportCode(framework) {
+        let code = '';
+        let filename = '';
+
+        if (framework === 'pytorch') {
+          code = generatePyTorchCode();
+          filename = 'model_pytorch.py';
+        } else if (framework === 'keras') {
+          code = generateKerasCode();
+          filename = 'model_keras.py';
+        } else if (framework === 'jax') {
+          code = generateJAXCode();
+          filename = 'model_jax.py';
+        }
+
+        downloadFile(code, filename, 'text/x-python');
+      }
+
+      function downloadFile(content, filename, mimeType) {
+        const blob = new Blob([content], { type: mimeType });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }
+
+      function convertToYAML(obj, indent = 0) {
+        let yaml = '';
+        const spaces = '  '.repeat(indent);
+
+        for (const [key, value] of Object.entries(obj)) {
+          if (value === null || value === undefined) continue;
+
+          if (Array.isArray(value)) {
+            yaml += `${spaces}${key}:\n`;
+            value.forEach(item => {
+              if (typeof item === 'object') {
+                yaml += `${spaces}- \n${convertToYAML(item, indent + 2)}`;
+              } else {
+                yaml += `${spaces}- ${item}\n`;
+              }
+            });
+          } else if (typeof value === 'object') {
+            yaml += `${spaces}${key}:\n${convertToYAML(value, indent + 1)}`;
+          } else {
+            yaml += `${spaces}${key}: ${value}\n`;
+          }
+        }
+
+        return yaml;
+      }
+
+      function convertToXML(obj, rootName = 'config') {
+        let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
+        xml += `<${rootName}>\n`;
+        xml += objectToXML(obj, 1);
+        xml += `</${rootName}>`;
+        return xml;
+      }
+
+      function objectToXML(obj, indent = 0) {
+        let xml = '';
+        const spaces = '  '.repeat(indent);
+
+        for (const [key, value] of Object.entries(obj)) {
+          if (value === null || value === undefined) continue;
+
+          if (Array.isArray(value)) {
+            value.forEach(item => {
+              xml += `${spaces}<${key}>\n`;
+              if (typeof item === 'object') {
+                xml += objectToXML(item, indent + 1);
+              } else {
+                xml += `${spaces}  ${item}\n`;
+              }
+              xml += `${spaces}</${key}>\n`;
+            });
+          } else if (typeof value === 'object') {
+            xml += `${spaces}<${key}>\n`;
+            xml += objectToXML(value, indent + 1);
+            xml += `${spaces}</${key}>\n`;
+          } else {
+            xml += `${spaces}<${key}>${value}</${key}>\n`;
+          }
+        }
+
+        return xml;
+      }
+
+      // ============================================================================
+      // LOCAL STORAGE
+      // ============================================================================
+
+      function saveToLocalStorage() {
+        try {
+          localStorage.setItem('neuralNetworkConfig', JSON.stringify(networkConfig));
+        } catch (e) {
+          console.error('Failed to save to localStorage:', e);
+        }
+      }
+
+      function loadFromLocalStorage() {
+        try {
+          const saved = localStorage.getItem('neuralNetworkConfig');
+          if (saved) {
+            const parsed = JSON.parse(saved);
+            if (parsed.layers && parsed.layers.length > 0) {
+              networkConfig = parsed;
+              layerIdCounter = Math.max(...networkConfig.layers.map(l =>
+                parseInt(l.id.replace('layer_', '')) || 0
+              )) + 1;
+              renderLayers();
+              return true;
+            }
+          }
+        } catch (e) {
+          console.error('Failed to load from localStorage:', e);
+        }
+        return false;
+      }
+
+      // ============================================================================
+      // IMPORT AND STORAGE MANAGEMENT
+      // ============================================================================
+
+      function importConfiguration() {
+        const fileInput = document.getElementById('import-file');
+        const file = fileInput.files[0];
+
+        if (!file) {
+          alert('Please select a JSON file to import.');
+          return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          try {
+            const imported = JSON.parse(e.target.result);
+
+            if (imported.layers && Array.isArray(imported.layers)) {
+              // Regenerate layer IDs to avoid conflicts
+              networkConfig = imported;
+              networkConfig.layers.forEach((layer, index) => {
+                layer.id = generateLayerId();
+              });
+
+              // Update form values if project info exists
+              if (imported.project) {
+                setFormValue('project-name', imported.project.name || '');
+                setFormValue('project-description', imported.project.description || '');
+                setFormValue('task-type', imported.project.taskType || 'classification');
+                setFormValue('data-type', imported.project.dataType || 'image');
+              }
+
+              // Update hyperparameters if they exist
+              if (imported.hyperparameters) {
+                setFormValue('batch-size', imported.hyperparameters.batchSize || 32);
+                setFormValue('epochs', imported.hyperparameters.epochs || 10);
+                setFormValue('learning-rate', imported.hyperparameters.learningRate || 0.001);
+                setFormValue('optimizer', imported.hyperparameters.optimizer || 'adam');
+              }
+
+              renderLayers();
+              saveToLocalStorage();
+
+              alert('Configuration imported successfully!');
+
+              // Switch to architect tab to show the loaded architecture
+              document.querySelector('.tab[data-tab="architect"]').click();
+            } else {
+              alert('Invalid configuration file format.');
+            }
+          } catch (error) {
+            alert('Error parsing JSON file: ' + error.message);
+          }
+        };
+
+        reader.readAsText(file);
+      }
+
+      function clearLocalStorage() {
+        if (confirm('Are you sure you want to clear all saved data? This cannot be undone.')) {
+          localStorage.removeItem('neuralNetworkConfig');
+          alert('Saved data cleared. The page will now reload with default configuration.');
+          location.reload();
+        }
+      }
+
+      function manualSave() {
+        saveToLocalStorage();
+        alert('Configuration saved to browser storage!');
+      }
+
+      // ============================================================================
+      // EVENT HANDLERS
+      // ============================================================================
+
+      // Tab switching
       document.querySelectorAll('.tabs .tab').forEach(tab => {
         tab.addEventListener('click', () => {
           document.querySelectorAll('.tabs .tab').forEach(t => t.classList.remove('active'));
@@ -1013,13 +2419,104 @@
           document.getElementById(tab.getAttribute('data-tab')).classList.add('active');
         });
       });
-      
-      // Toggle Data Augmentation Options
+
+      // Data augmentation toggle
       const dataAugCheckbox = document.getElementById('data-augmentation');
       const dataAugOptions = document.getElementById('data-augmentation-options');
       dataAugCheckbox.addEventListener('change', () => {
         dataAugOptions.style.display = dataAugCheckbox.checked ? 'block' : 'none';
       });
-  </script>
+
+      // Add layer button
+      document.getElementById('add-layer-btn').addEventListener('click', () => {
+        addLayer('dense');
+      });
+
+      // Export configuration button
+      document.getElementById('export-config-btn').addEventListener('click', () => {
+        exportConfiguration();
+      });
+
+      // Preset architecture cards
+      document.querySelectorAll('.preset-card').forEach(card => {
+        card.addEventListener('click', () => {
+          const preset = card.getAttribute('data-preset');
+          document.querySelectorAll('.preset-card').forEach(c => c.classList.remove('selected'));
+          card.classList.add('selected');
+          loadPreset(preset);
+        });
+      });
+
+      // Collapsible sections
+      document.addEventListener('click', (e) => {
+        if (e.target.closest('.collapsible')) {
+          const container = e.target.closest('.collapsible-container');
+          if (container) {
+            container.classList.toggle('expanded');
+          }
+        }
+      });
+
+      // Save project info on change
+      ['project-name', 'project-description', 'task-type', 'data-type'].forEach(id => {
+        const element = document.getElementById(id);
+        if (element) {
+          element.addEventListener('change', () => {
+            networkConfig.project[id.replace('project-', '').replace('-', '')] = element.value;
+            saveToLocalStorage();
+          });
+        }
+      });
+
+      // ============================================================================
+      // INITIALIZATION
+      // ============================================================================
+
+      function initializeApp() {
+        // Try to load from localStorage first
+        if (!loadFromLocalStorage()) {
+          // Initialize with default configuration
+          networkConfig.layers = [
+            {
+              id: generateLayerId(),
+              type: 'input',
+              shape: '224,224,3',
+              preprocessing: 'normalize'
+            },
+            {
+              id: generateLayerId(),
+              type: 'conv2d',
+              filters: 32,
+              kernelSize: 3,
+              strides: 1,
+              padding: 'same',
+              activation: 'relu',
+              batchNorm: false
+            },
+            {
+              id: generateLayerId(),
+              type: 'flatten'
+            },
+            {
+              id: generateLayerId(),
+              type: 'dense',
+              units: 10,
+              activation: 'softmax'
+            }
+          ];
+
+          renderLayers();
+        }
+
+        updateStatistics();
+      }
+
+      // Initialize when DOM is ready
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initializeApp);
+      } else {
+        initializeApp();
+      }
+    </script>
 </body>
 </html>
