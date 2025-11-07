@@ -620,7 +620,14 @@
     <div class="container">
       <div class="flex space-between align-center">
         <h1>Neural Network Architect - Advanced Builder</h1>
-        <div style="display: flex; gap: 1rem; align-items: center;">
+        <div style="display: flex; gap: 0.5rem; align-items: center;">
+          <button id="undo-btn" onclick="undo()" class="secondary small" style="cursor: pointer;" disabled title="Nothing to undo">
+            ↶ Undo
+          </button>
+          <button id="redo-btn" onclick="redo()" class="secondary small" style="cursor: pointer;" disabled title="Nothing to redo">
+            ↷ Redo
+          </button>
+          <span style="border-left: 2px solid rgba(255,255,255,0.3); height: 24px; margin: 0 0.5rem;"></span>
           <button onclick="toggleDarkMode()" class="secondary small" style="cursor: pointer;" title="Toggle Dark Mode (Ctrl/Cmd + D)">
             🌓 Dark Mode
           </button>
@@ -1475,6 +1482,73 @@
       let layerIdCounter = 0;
 
       // ============================================================================
+      // UNDO/REDO SYSTEM
+      // ============================================================================
+
+      let historyStack = [];
+      let historyIndex = -1;
+      const MAX_HISTORY = 50;
+      let isUndoRedoOperation = false;
+
+      function saveToHistory() {
+        if (isUndoRedoOperation) return;
+
+        // Remove any future history if we're not at the end
+        if (historyIndex < historyStack.length - 1) {
+          historyStack = historyStack.slice(0, historyIndex + 1);
+        }
+
+        // Add current state to history
+        const snapshot = JSON.parse(JSON.stringify(networkConfig));
+        historyStack.push(snapshot);
+
+        // Limit history size
+        if (historyStack.length > MAX_HISTORY) {
+          historyStack.shift();
+        } else {
+          historyIndex++;
+        }
+
+        updateUndoRedoButtons();
+      }
+
+      function undo() {
+        if (historyIndex > 0) {
+          isUndoRedoOperation = true;
+          historyIndex--;
+          networkConfig = JSON.parse(JSON.stringify(historyStack[historyIndex]));
+          renderLayers();
+          updateUndoRedoButtons();
+          isUndoRedoOperation = false;
+        }
+      }
+
+      function redo() {
+        if (historyIndex < historyStack.length - 1) {
+          isUndoRedoOperation = true;
+          historyIndex++;
+          networkConfig = JSON.parse(JSON.stringify(historyStack[historyIndex]));
+          renderLayers();
+          updateUndoRedoButtons();
+          isUndoRedoOperation = false;
+        }
+      }
+
+      function updateUndoRedoButtons() {
+        const undoBtn = document.getElementById('undo-btn');
+        const redoBtn = document.getElementById('redo-btn');
+
+        if (undoBtn) {
+          undoBtn.disabled = historyIndex <= 0;
+          undoBtn.title = historyIndex > 0 ? `Undo (Ctrl/Cmd + Z) - ${historyIndex} actions` : 'Nothing to undo';
+        }
+        if (redoBtn) {
+          redoBtn.disabled = historyIndex >= historyStack.length - 1;
+          redoBtn.title = historyIndex < historyStack.length - 1 ? `Redo (Ctrl/Cmd + Y)` : 'Nothing to redo';
+        }
+      }
+
+      // ============================================================================
       // UTILITY FUNCTIONS
       // ============================================================================
 
@@ -1957,12 +2031,14 @@
           networkConfig.layers.splice(position + 1, 0, newLayer);
         }
 
+        saveToHistory();
         renderLayers();
         saveToLocalStorage();
       }
 
       function removeLayer(layerId) {
         networkConfig.layers = networkConfig.layers.filter(l => l.id !== layerId);
+        saveToHistory();
         renderLayers();
         saveToLocalStorage();
       }
@@ -1978,6 +2054,7 @@
         };
 
         networkConfig.layers.splice(index + 1, 0, duplicated);
+        saveToHistory();
         renderLayers();
         saveToLocalStorage();
       }
@@ -1989,6 +2066,7 @@
         layer.type = newType;
         Object.assign(layer, getDefaultLayerProperties(newType));
 
+        saveToHistory();
         renderLayers();
         saveToLocalStorage();
       }
@@ -1998,6 +2076,7 @@
         if (!layer) return;
 
         layer[property] = value;
+        saveToHistory();
         updateLayerVisualizer();
         updateStatistics();
         saveToLocalStorage();
@@ -2267,6 +2346,7 @@
           networkConfig.layers.push(layer);
         });
 
+        saveToHistory();
         renderLayers();
         saveToLocalStorage();
 
@@ -2737,6 +2817,7 @@ model = NeuralNetwork()
                 setFormValue('optimizer', imported.hyperparameters.optimizer || 'adam');
               }
 
+              saveToHistory();
               renderLayers();
               saveToLocalStorage();
 
@@ -3256,6 +3337,7 @@ model = NeuralNetwork()
               networkConfig.layers.forEach(layer => {
                 layer.id = generateLayerId();
               });
+              saveToHistory();
               renderLayers();
               alert('Architecture loaded from URL!');
             }
@@ -3403,6 +3485,7 @@ model = NeuralNetwork()
       function loadSnapshot(index) {
         if (architectureSnapshots[index]) {
           networkConfig = JSON.parse(JSON.stringify(architectureSnapshots[index].config));
+          saveToHistory();
           renderLayers();
           alert('Snapshot loaded!');
         }
@@ -3900,26 +3983,41 @@ print("Ready for iOS deployment")
           e.preventDefault();
           toggleDarkMode();
         }
+
+        // Ctrl/Cmd + Z: Undo
+        if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
+          e.preventDefault();
+          undo();
+        }
+
+        // Ctrl/Cmd + Y or Ctrl/Cmd + Shift + Z: Redo
+        if ((e.ctrlKey || e.metaKey) && (e.key === 'y' || (e.key === 'z' && e.shiftKey))) {
+          e.preventDefault();
+          redo();
+        }
       });
 
       function showKeyboardShortcuts() {
         const shortcuts = `
 KEYBOARD SHORTCUTS:
 
-Ctrl/Cmd + S  →  Save architecture snapshot
-Ctrl/Cmd + E  →  Export to PyTorch
-Ctrl/Cmd + D  →  Toggle dark mode
-Ctrl/Cmd + /  →  Show this help
+Editing:
+Ctrl/Cmd + Z       →  Undo layer changes
+Ctrl/Cmd + Y       →  Redo layer changes
+Ctrl/Cmd + S       →  Save architecture snapshot
+
+Actions:
+Ctrl/Cmd + E       →  Export to PyTorch
+Ctrl/Cmd + D       →  Toggle dark mode
+Ctrl/Cmd + /       →  Show this help
 
 Navigation:
-Tab           →  Move between form fields
-Enter         →  Activate buttons
-Esc           →  Close dialogs (when implemented)
+Tab                →  Move between form fields
+Enter              →  Activate buttons
 
-Coming in future updates:
-Ctrl/Cmd + Z  →  Undo layer changes
-Ctrl/Cmd + Y  →  Redo layer changes
-Delete        →  Remove selected layer
+Coming soon:
+Delete             →  Remove selected layer
+Ctrl/Cmd + Click   →  Select multiple layers
 `;
         alert(shortcuts);
       }
@@ -4054,6 +4152,9 @@ Delete        →  Remove selected layer
 
         // Initialize dataset suggestions for default task
         updateDatasetSuggestions('image-classification');
+
+        // Save initial state to history for undo/redo
+        saveToHistory();
       }
 
       // Initialize when DOM is ready
