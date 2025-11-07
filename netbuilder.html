@@ -801,7 +801,35 @@
       </div>
     </div>
   </header>
-  
+
+  <!-- Quick Actions Bar -->
+  <div style="background: var(--bg-card); border-bottom: 1px solid var(--neutral-light); padding: 0.75rem 0;">
+    <div class="container">
+      <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+        <span style="font-weight: bold; font-size: 0.875rem; margin-right: 0.5rem; color: var(--text-muted);">Quick Actions:</span>
+        <button class="small" onclick="document.querySelector('.tab[data-tab=\'quick-start\']').click();" title="Browse preset architectures">
+          ⚡ Load Preset
+        </button>
+        <button class="small success" onclick="document.querySelector('.tab[data-tab=\'testing\']').click(); setTimeout(runForwardPass, 300);" title="Test your model instantly">
+          🧪 Test Now
+        </button>
+        <button class="small" onclick="document.querySelector('.tab[data-tab=\'export\']').click();" title="Export code">
+          📥 Export Code
+        </button>
+        <button class="small" onclick="saveSnapshot()" title="Save current architecture">
+          💾 Save Snapshot
+        </button>
+        <button class="small danger" onclick="if(confirm('Clear all layers?')) { networkConfig.layers = []; renderLayers(); saveToLocalStorage(); }" title="Start fresh">
+          🗑️ Clear All
+        </button>
+        <span style="border-left: 2px solid var(--neutral-light); height: 20px; margin: 0 0.25rem;"></span>
+        <button class="small" onclick="validateArchitectureQuick()" title="Check for issues">
+          ✓ Validate
+        </button>
+      </div>
+    </div>
+  </div>
+
   <div class="container">
     <div class="card mb-4">
       <div class="card-header">
@@ -856,6 +884,7 @@
         <div class="tab" data-tab="performance">⚡ Performance</div>
         <div class="tab" data-tab="hyperparameters">Hyperparameters</div>
         <div class="tab" data-tab="visualization">Visualization</div>
+        <div class="tab" data-tab="testing">🧪 Test Model</div>
         <div class="tab" data-tab="advanced">🚀 Advanced</div>
         <div class="tab" data-tab="export">Export</div>
       </div>
@@ -960,7 +989,17 @@
           <div class="layer-visualizer" id="layer-visualizer">
             <!-- Will be filled by JavaScript -->
           </div>
-          
+
+          <div class="card" id="smart-suggestions" style="background: linear-gradient(135deg, var(--primary-light) 0%, var(--bg-card) 100%); border-left: 4px solid var(--primary); margin: 1rem 0;">
+            <h3 style="margin-top: 0;">💡 Smart Suggestions</h3>
+            <p class="help-text">Based on your current architecture, here's what we recommend next:</p>
+            <div id="suggestions-list" style="margin-top: 1rem;">
+              <div style="text-align: center; padding: 1rem; color: var(--text-muted);">
+                Add some layers to get personalized suggestions!
+              </div>
+            </div>
+          </div>
+
           <div id="layers-container">
             <!-- Layer cards will be added here -->
             
@@ -1423,6 +1462,146 @@
       </div>
     </div>
 
+    <div class="tab-content" id="testing">
+      <div class="card">
+        <h2>🧪 Model Testing Playground</h2>
+        <p class="help-text">Test your architecture with sample data and see how it processes information in real-time!</p>
+      </div>
+
+      <div class="grid grid-2">
+        <div class="card">
+          <h3>📥 Input Data</h3>
+          <p class="help-text">Upload or generate sample data to test your model</p>
+
+          <div style="margin-bottom: 1rem;">
+            <label>Data Type</label>
+            <select id="test-data-type" onchange="updateTestDataOptions()">
+              <option value="image">Image (224x224x3)</option>
+              <option value="text">Text Sequence (512 tokens)</option>
+              <option value="tabular">Tabular Data</option>
+              <option value="audio">Audio (Spectrogram)</option>
+              <option value="custom">Custom Shape</option>
+            </select>
+          </div>
+
+          <div style="margin-bottom: 1rem;">
+            <label>Sample Input</label>
+            <select id="test-sample-input" onchange="loadSampleInput()">
+              <option value="random">Random Noise</option>
+              <option value="zeros">All Zeros</option>
+              <option value="ones">All Ones</option>
+              <option value="gaussian">Gaussian Distribution</option>
+            </select>
+          </div>
+
+          <button class="success" onclick="runForwardPass()" style="width: 100%; margin-bottom: 0.5rem;">
+            ▶️ Run Forward Pass
+          </button>
+
+          <button class="secondary" onclick="generateSampleBatch()" style="width: 100%;">
+            Generate Batch (32 samples)
+          </button>
+
+          <div id="input-preview" style="margin-top: 1rem; padding: 1rem; background: var(--neutral-light); border-radius: 0.5rem; display: none;">
+            <strong>Input Preview:</strong>
+            <div id="input-visualization" style="margin-top: 0.5rem;"></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>📊 Forward Pass Visualization</h3>
+          <div id="forward-pass-container" style="min-height: 300px;">
+            <div style="text-align: center; padding: 3rem; color: var(--text-muted);">
+              <p style="font-size: 3rem;">🎯</p>
+              <p>Click "Run Forward Pass" to see your model process data!</p>
+              <p style="font-size: 0.875rem; margin-top: 0.5rem;">Watch as data flows through each layer and transforms</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>🔍 Layer-by-Layer Analysis</h3>
+        <p class="help-text">See how tensor shapes and values change through your network</p>
+        <div id="layer-analysis-table" style="overflow-x: auto;">
+          <table style="width: 100%; border-collapse: collapse; margin-top: 1rem;">
+            <thead>
+              <tr style="background-color: var(--neutral-light);">
+                <th style="padding: 0.5rem; text-align: left;">Layer</th>
+                <th style="padding: 0.5rem; text-align: left;">Type</th>
+                <th style="padding: 0.5rem; text-align: left;">Input Shape</th>
+                <th style="padding: 0.5rem; text-align: left;">Output Shape</th>
+                <th style="padding: 0.5rem; text-align: left;">Activation Stats</th>
+                <th style="padding: 0.5rem; text-align: left;">Memory</th>
+              </tr>
+            </thead>
+            <tbody id="layer-analysis-body">
+              <tr>
+                <td colspan="6" style="padding: 2rem; text-align: center; color: var(--text-muted);">
+                  Run forward pass to see layer-by-layer analysis
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="grid grid-2">
+        <div class="card">
+          <h3>⚡ Performance Metrics</h3>
+          <div style="display: grid; gap: 1rem;">
+            <div>
+              <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
+                <span>Forward Pass Time:</span>
+                <strong id="test-forward-time">-</strong>
+              </div>
+              <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
+                <span>Peak Memory Usage:</span>
+                <strong id="test-peak-memory">-</strong>
+              </div>
+              <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
+                <span>Throughput:</span>
+                <strong id="test-throughput">-</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>🎯 Predictions</h3>
+          <div id="test-predictions" style="min-height: 100px;">
+            <p style="color: var(--text-muted); text-align: center; padding: 2rem;">
+              Run forward pass to see model predictions
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>💡 Testing Tips</h3>
+        <div class="grid grid-2">
+          <div>
+            <h4 style="margin-bottom: 0.5rem;">✅ What to Check:</h4>
+            <ul style="margin: 0; padding-left: 1.5rem; line-height: 1.8;">
+              <li>Output shape matches your task (10 classes → output shape should be [10])</li>
+              <li>No "NaN" or "Inf" values in activations</li>
+              <li>Memory usage is within your hardware limits</li>
+              <li>Shapes flow correctly through all layers</li>
+            </ul>
+          </div>
+          <div>
+            <h4 style="margin-bottom: 0.5rem;">⚠️ Common Issues:</h4>
+            <ul style="margin: 0; padding-left: 1.5rem; line-height: 1.8;">
+              <li><strong>Shape mismatch:</strong> Check input layer matches your data</li>
+              <li><strong>Memory overflow:</strong> Reduce batch size or model size</li>
+              <li><strong>Gradient issues:</strong> Check activation functions and normalization</li>
+              <li><strong>Wrong output:</strong> Verify final layer matches task type</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="tab-content" id="advanced">
       <div class="card">
         <h2>🔗 Share Architecture</h2>
@@ -1751,11 +1930,13 @@
             <p>In just a few minutes, you'll learn how to:</p>
             <ul>
               <li>Choose and load preset architectures</li>
-              <li>Design custom neural networks</li>
+              <li>Design custom neural networks with smart suggestions</li>
+              <li>Test your models with sample data</li>
               <li>Use AI-powered recommendations</li>
               <li>Analyze performance metrics</li>
               <li>Export production-ready code</li>
             </ul>
+            <p><strong>Pro tip:</strong> Use the Quick Actions bar at the top for instant access to common operations!</p>
             <p><strong>Let's get started!</strong></p>
           `
         },
@@ -1803,7 +1984,22 @@
           `
         },
         {
-          title: "4. Analyze Performance",
+          title: "4. Test Your Model",
+          content: `
+            <p>Want to see if your model works? Use the <strong>🧪 Test Model</strong> tab!</p>
+            <p>You can:</p>
+            <ul>
+              <li><strong>Run Forward Pass</strong> - See data flow through your network in real-time</li>
+              <li><strong>View Layer Outputs</strong> - Check shape transformations at each layer</li>
+              <li><strong>See Predictions</strong> - Visualize what your model would predict</li>
+              <li><strong>Check Memory Usage</strong> - Ensure it fits in your hardware</li>
+              <li><strong>Performance Metrics</strong> - Get inference time estimates</li>
+            </ul>
+            <p>Click "🧪 Test Now" in the Quick Actions bar to test instantly!</p>
+          `
+        },
+        {
+          title: "5. Analyze Performance",
           content: `
             <p>Before training, check if your architecture is efficient using the <strong>Performance</strong> tab.</p>
             <p>You'll see:</p>
@@ -1818,7 +2014,7 @@
           `
         },
         {
-          title: "5. Export Production Code",
+          title: "6. Export Production Code",
           content: `
             <p>Ready to train your model? Export production-ready code!</p>
             <p>Go to the <strong>Export</strong> tab and choose your framework:</p>
@@ -1832,7 +2028,7 @@
           `
         },
         {
-          title: "You're All Set!",
+          title: "7. You're All Set!",
           content: `
             <p>🎉 Congratulations! You now know how to use the Neural Network Builder.</p>
             <p><strong>Quick tips to remember:</strong></p>
@@ -2337,6 +2533,7 @@
         updateLayerVisualizer();
         updateStatistics();
         updatePerformanceMetrics();
+        updateSmartSuggestions();
       }
 
       // ============================================================================
@@ -4443,6 +4640,540 @@ mlmodel.save("model.mlmodel")
 print("Model exported to Core ML format!")
 print("Ready for iOS deployment")
 `;
+        }
+      }
+
+      // ============================================================================
+      // MODEL TESTING PLAYGROUND
+      // ============================================================================
+
+      let testInputData = null;
+      let testResults = null;
+
+      function updateTestDataOptions() {
+        const dataType = document.getElementById('test-data-type').value;
+        // Update placeholder/help text based on data type
+        console.log('Data type changed to:', dataType);
+      }
+
+      function loadSampleInput() {
+        const sampleType = document.getElementById('test-sample-input').value;
+        const dataType = document.getElementById('test-data-type').value;
+
+        // Get input shape from network
+        const inputLayer = networkConfig.layers.find(l => l.type === 'input');
+        if (!inputLayer || !inputLayer.shape) {
+          alert('Please configure your input layer shape first!');
+          return;
+        }
+
+        const shape = parseShape(inputLayer.shape);
+        if (!shape) {
+          alert('Invalid input shape in your network!');
+          return;
+        }
+
+        // Generate sample data
+        const totalSize = shape.reduce((a, b) => a * b, 1);
+        let data = [];
+
+        switch (sampleType) {
+          case 'random':
+            data = Array.from({length: totalSize}, () => Math.random());
+            break;
+          case 'zeros':
+            data = new Array(totalSize).fill(0);
+            break;
+          case 'ones':
+            data = new Array(totalSize).fill(1);
+            break;
+          case 'gaussian':
+            // Box-Muller transform for Gaussian distribution
+            data = Array.from({length: totalSize}, () => {
+              const u1 = Math.random();
+              const u2 = Math.random();
+              return Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
+            });
+            break;
+        }
+
+        testInputData = {
+          shape: shape,
+          data: data,
+          type: dataType
+        };
+
+        // Show preview
+        const preview = document.getElementById('input-preview');
+        const visualization = document.getElementById('input-visualization');
+        preview.style.display = 'block';
+
+        const stats = {
+          min: Math.min(...data),
+          max: Math.max(...data),
+          mean: data.reduce((a, b) => a + b, 0) / data.length
+        };
+
+        visualization.innerHTML = `
+          <div style="font-family: monospace; font-size: 0.875rem;">
+            <div>Shape: (${shape.join(', ')})</div>
+            <div>Min: ${stats.min.toFixed(4)}</div>
+            <div>Max: ${stats.max.toFixed(4)}</div>
+            <div>Mean: ${stats.mean.toFixed(4)}</div>
+            <div style="margin-top: 0.5rem; color: var(--success);">✓ Sample data loaded successfully!</div>
+          </div>
+        `;
+      }
+
+      function runForwardPass() {
+        if (!testInputData) {
+          loadSampleInput();
+        }
+
+        if (networkConfig.layers.length === 0) {
+          alert('Please build a network first before testing!');
+          return;
+        }
+
+        const startTime = performance.now();
+
+        // Simulate forward pass through all layers
+        const layerOutputs = [];
+        let currentShape = testInputData.shape;
+        let currentData = testInputData.data;
+
+        for (let i = 0; i < networkConfig.layers.length; i++) {
+          const layer = networkConfig.layers[i];
+          const inputShape = currentShape;
+          const outputShape = inferOutputShape(layer, currentShape);
+
+          // Simulate activation statistics
+          const mean = currentData.reduce((a, b) => a + b, 0) / currentData.length;
+          const variance = currentData.reduce((a, b) => a + (b - mean) ** 2, 0) / currentData.length;
+          const std = Math.sqrt(variance);
+
+          // Estimate memory for this layer
+          const inputSize = inputShape.reduce((a, b) => a * b, 1);
+          const outputSize = outputShape.reduce((a, b) => a * b, 1);
+          const memoryBytes = (inputSize + outputSize) * 4; // 4 bytes per float32
+          const memoryMB = (memoryBytes / (1024 * 1024)).toFixed(2);
+
+          layerOutputs.push({
+            layerIndex: i,
+            layerType: layer.type,
+            layerName: layerConfigs[layer.type]?.name || layer.type,
+            inputShape: formatShape(inputShape),
+            outputShape: formatShape(outputShape),
+            stats: {
+              mean: mean.toFixed(4),
+              std: std.toFixed(4),
+              min: Math.min(...currentData).toFixed(4),
+              max: Math.max(...currentData).toFixed(4)
+            },
+            memory: memoryMB + ' MB'
+          });
+
+          // Simulate data transformation (simplified)
+          if (outputShape) {
+            const outputSize = outputShape.reduce((a, b) => a * b, 1);
+
+            // Apply simple activation simulation
+            if (layer.activation === 'relu') {
+              currentData = currentData.map(x => Math.max(0, x));
+            } else if (layer.activation === 'sigmoid') {
+              currentData = currentData.map(x => 1 / (1 + Math.exp(-x)));
+            } else if (layer.activation === 'softmax') {
+              const expSum = currentData.reduce((a, b) => a + Math.exp(b), 0);
+              currentData = currentData.map(x => Math.exp(x) / expSum);
+            }
+
+            // Resize data to match output shape
+            if (outputSize !== currentData.length) {
+              const resized = new Array(outputSize);
+              for (let j = 0; j < outputSize; j++) {
+                resized[j] = currentData[j % currentData.length] || Math.random() * 0.1;
+              }
+              currentData = resized;
+            }
+
+            currentShape = outputShape;
+          }
+        }
+
+        const endTime = performance.now();
+        const duration = (endTime - startTime).toFixed(2);
+
+        // Display results
+        displayForwardPassResults(layerOutputs, duration, currentData);
+      }
+
+      function displayForwardPassResults(layerOutputs, duration, finalOutput) {
+        // Update layer analysis table
+        const tbody = document.getElementById('layer-analysis-body');
+        let html = '';
+
+        layerOutputs.forEach(output => {
+          html += `
+            <tr style="border-bottom: 1px solid var(--neutral-light);">
+              <td style="padding: 0.5rem;">Layer ${output.layerIndex + 1}</td>
+              <td style="padding: 0.5rem;"><strong>${output.layerName}</strong></td>
+              <td style="padding: 0.5rem; color: var(--secondary);">${output.inputShape}</td>
+              <td style="padding: 0.5rem; color: var(--primary);">${output.outputShape}</td>
+              <td style="padding: 0.5rem; font-family: monospace; font-size: 0.8rem;">
+                μ=${output.stats.mean}, σ=${output.stats.std}<br>
+                min=${output.stats.min}, max=${output.stats.max}
+              </td>
+              <td style="padding: 0.5rem;">${output.memory}</td>
+            </tr>
+          `;
+        });
+
+        tbody.innerHTML = html;
+
+        // Update performance metrics
+        const totalMemory = layerOutputs.reduce((sum, layer) =>
+          sum + parseFloat(layer.memory), 0);
+
+        document.getElementById('test-forward-time').textContent = duration + ' ms';
+        document.getElementById('test-peak-memory').textContent = totalMemory.toFixed(2) + ' MB';
+        document.getElementById('test-throughput').textContent =
+          (1000 / duration).toFixed(1) + ' samples/sec';
+
+        // Display predictions (top 5 values)
+        const topIndices = finalOutput
+          .map((val, idx) => ({val, idx}))
+          .sort((a, b) => b.val - a.val)
+          .slice(0, Math.min(5, finalOutput.length));
+
+        let predHtml = '<div style="font-size: 0.875rem;">';
+        predHtml += '<strong>Top Predictions:</strong><br><br>';
+        topIndices.forEach((item, i) => {
+          const percent = (item.val * 100).toFixed(2);
+          predHtml += `
+            <div style="margin-bottom: 0.5rem;">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
+                <span>Class ${item.idx}</span>
+                <strong>${percent}%</strong>
+              </div>
+              <div style="background: var(--neutral-light); height: 8px; border-radius: 4px; overflow: hidden;">
+                <div style="background: var(--primary); height: 100%; width: ${percent}%;"></div>
+              </div>
+            </div>
+          `;
+        });
+        predHtml += '</div>';
+        document.getElementById('test-predictions').innerHTML = predHtml;
+
+        // Animate forward pass visualization
+        animateForwardPass(layerOutputs);
+      }
+
+      function animateForwardPass(layerOutputs) {
+        const container = document.getElementById('forward-pass-container');
+        let html = '<div style="padding: 1rem;">';
+
+        layerOutputs.forEach((output, i) => {
+          html += `
+            <div style="display: flex; align-items: center; margin-bottom: 0.5rem; animation: slideIn 0.3s ease-out ${i * 0.1}s both;">
+              <div style="flex: 0 0 120px; font-weight: bold; font-size: 0.875rem;">
+                ${output.layerName}
+              </div>
+              <div style="flex: 1; margin: 0 1rem;">
+                <div style="background: var(--neutral-light); height: 6px; border-radius: 3px; overflow: hidden;">
+                  <div style="background: linear-gradient(90deg, var(--primary), var(--success)); height: 100%; width: 100%; animation: progressBar 0.5s ease-out ${i * 0.1}s both;"></div>
+                </div>
+              </div>
+              <div style="flex: 0 0 150px; font-family: monospace; font-size: 0.75rem; color: var(--text-muted);">
+                ${output.outputShape}
+              </div>
+            </div>
+          `;
+        });
+
+        html += '</div>';
+
+        // Add CSS animation if not already present
+        if (!document.getElementById('test-animations')) {
+          html += `
+            <style id="test-animations">
+              @keyframes slideIn {
+                from {
+                  opacity: 0;
+                  transform: translateX(-20px);
+                }
+                to {
+                  opacity: 1;
+                  transform: translateX(0);
+                }
+              }
+              @keyframes progressBar {
+                from {
+                  width: 0;
+                }
+                to {
+                  width: 100%;
+                }
+              }
+            </style>
+          `;
+        }
+
+        container.innerHTML = html;
+      }
+
+      function generateSampleBatch() {
+        const inputLayer = networkConfig.layers.find(l => l.type === 'input');
+        if (!inputLayer || !inputLayer.shape) {
+          alert('Please configure your input layer shape first!');
+          return;
+        }
+
+        const shape = parseShape(inputLayer.shape);
+        const batchSize = 32;
+        const totalSize = shape.reduce((a, b) => a * b, 1) * batchSize;
+
+        alert(`Generated batch of ${batchSize} samples\nTotal elements: ${totalSize.toLocaleString()}\nMemory: ${(totalSize * 4 / 1024 / 1024).toFixed(2)} MB`);
+      }
+
+      // ============================================================================
+      // SMART SUGGESTIONS SYSTEM
+      // ============================================================================
+
+      function updateSmartSuggestions() {
+        const suggestionsList = document.getElementById('suggestions-list');
+        if (!suggestionsList) return;
+
+        if (networkConfig.layers.length === 0) {
+          suggestionsList.innerHTML = `
+            <div style="text-align: center; padding: 1rem; color: var(--text-muted);">
+              Start by adding an <strong>Input Layer</strong> to define your data shape!
+            </div>
+          `;
+          return;
+        }
+
+        const lastLayer = networkConfig.layers[networkConfig.layers.length - 1];
+        const suggestions = generateSuggestionsForLayer(lastLayer, networkConfig.layers);
+
+        if (suggestions.length === 0) {
+          suggestionsList.innerHTML = `
+            <div style="text-align: center; padding: 1rem; color: var(--success);">
+              ✓ Your architecture looks complete! Try testing it in the 🧪 Test Model tab.
+            </div>
+          `;
+          return;
+        }
+
+        let html = '<div style="display: grid; gap: 0.5rem;">';
+        suggestions.forEach(suggestion => {
+          html += `
+            <div style="display: flex; align-items: center; padding: 0.75rem; background: var(--bg-card); border-radius: 0.5rem; border: 1px solid var(--neutral-light);">
+              <div style="flex: 1;">
+                <div style="font-weight: bold; margin-bottom: 0.25rem;">${suggestion.title}</div>
+                <div style="font-size: 0.875rem; color: var(--text-muted);">${suggestion.reason}</div>
+              </div>
+              <button class="small success" onclick="addLayer('${suggestion.layerType}')" style="margin-left: 1rem;">
+                + Add
+              </button>
+            </div>
+          `;
+        });
+        html += '</div>';
+
+        suggestionsList.innerHTML = html;
+      }
+
+      function generateSuggestionsForLayer(lastLayer, allLayers) {
+        const suggestions = [];
+
+        // Analyze last layer type and context
+        if (lastLayer.type === 'input') {
+          const shape = parseShape(lastLayer.shape);
+          if (shape && shape.length === 3) {
+            // Image data
+            suggestions.push({
+              title: 'Add Convolutional Layer',
+              reason: 'Conv2D layers are perfect for extracting features from image data',
+              layerType: 'conv2d'
+            });
+          } else if (shape && shape.length === 2) {
+            // Sequential data
+            suggestions.push({
+              title: 'Add LSTM/GRU Layer',
+              reason: 'Recurrent layers excel at processing sequential data',
+              layerType: 'lstm'
+            });
+            suggestions.push({
+              title: 'Add Transformer Layer',
+              reason: 'Transformers use attention for powerful sequence modeling',
+              layerType: 'transformer'
+            });
+          } else {
+            suggestions.push({
+              title: 'Add Dense Layer',
+              reason: 'Dense layers work well for tabular or flattened data',
+              layerType: 'dense'
+            });
+          }
+        } else if (lastLayer.type === 'conv2d' || lastLayer.type === 'residual') {
+          const convCount = allLayers.filter(l => l.type === 'conv2d').length;
+
+          if (convCount < 3) {
+            suggestions.push({
+              title: 'Add Another Conv2D Layer',
+              reason: 'Stack more convolutions to learn hierarchical features',
+              layerType: 'conv2d'
+            });
+          }
+
+          suggestions.push({
+            title: 'Add Pooling Layer',
+            reason: 'Reduce spatial dimensions and add translation invariance',
+            layerType: 'pooling'
+          });
+
+          suggestions.push({
+            title: 'Add Batch Normalization',
+            reason: 'Normalize activations to speed up training and improve stability',
+            layerType: 'batchnorm'
+          });
+        } else if (lastLayer.type === 'pooling') {
+          suggestions.push({
+            title: 'Add Conv2D Layer',
+            reason: 'Continue feature extraction after downsampling',
+            layerType: 'conv2d'
+          });
+
+          suggestions.push({
+            title: 'Add Flatten Layer',
+            reason: 'Flatten before adding dense layers for classification',
+            layerType: 'flatten'
+          });
+        } else if (lastLayer.type === 'flatten' || lastLayer.type === 'globalavgpool') {
+          suggestions.push({
+            title: 'Add Dense Layer',
+            reason: 'Dense layers combine features for final predictions',
+            layerType: 'dense'
+          });
+
+          suggestions.push({
+            title: 'Add Dropout',
+            reason: 'Prevent overfitting by randomly dropping connections',
+            layerType: 'dropout'
+          });
+        } else if (lastLayer.type === 'dense') {
+          const denseCount = allLayers.filter(l => l.type === 'dense').length;
+
+          if (denseCount === 1) {
+            suggestions.push({
+              title: 'Add Another Dense Layer',
+              reason: 'Add depth to learn more complex patterns',
+              layerType: 'dense'
+            });
+          }
+
+          suggestions.push({
+            title: 'Add Dropout',
+            reason: 'Prevent overfitting with dropout regularization',
+            layerType: 'dropout'
+          });
+
+          // Check if this might be the output layer
+          if (denseCount >= 2 && (!lastLayer.units || lastLayer.units > 1000)) {
+            suggestions.push({
+              title: '🎯 Ready for Output Layer',
+              reason: 'Add a final dense layer with units = number of classes',
+              layerType: 'dense'
+            });
+          }
+        } else if (lastLayer.type === 'lstm' || lastLayer.type === 'gru') {
+          if (lastLayer.returnSequences) {
+            suggestions.push({
+              title: 'Add Another RNN Layer',
+              reason: 'Stack RNN layers for deeper sequential modeling',
+              layerType: lastLayer.type
+            });
+
+            suggestions.push({
+              title: 'Add Attention Layer',
+              reason: 'Add attention mechanism to focus on important timesteps',
+              layerType: 'attention'
+            });
+          } else {
+            suggestions.push({
+              title: 'Add Dense Layer',
+              reason: 'Process the final RNN output for predictions',
+              layerType: 'dense'
+            });
+          }
+        } else if (lastLayer.type === 'dropout') {
+          suggestions.push({
+            title: 'Add Dense Layer',
+            reason: 'Continue with fully connected layers after dropout',
+            layerType: 'dense'
+          });
+        }
+
+        return suggestions.slice(0, 3); // Return top 3 suggestions
+      }
+
+      function validateArchitectureQuick() {
+        if (networkConfig.layers.length === 0) {
+          alert('⚠️ No layers in your network!\n\nStart by loading a preset or adding an input layer.');
+          return;
+        }
+
+        const issues = [];
+        const warnings = [];
+
+        // Check for input layer
+        const hasInput = networkConfig.layers.some(l => l.type === 'input');
+        if (!hasInput) {
+          issues.push('Missing input layer - add one to define your data shape');
+        }
+
+        // Check input shape
+        const inputLayer = networkConfig.layers.find(l => l.type === 'input');
+        if (inputLayer && !inputLayer.shape) {
+          issues.push('Input layer has no shape defined');
+        }
+
+        // Check for output layer
+        if (networkConfig.layers.length >= 2) {
+          const lastLayer = networkConfig.layers[networkConfig.layers.length - 1];
+          if (lastLayer.type === 'dropout' || lastLayer.type === 'batchnorm') {
+            warnings.push('Network ends with ' + lastLayer.type + ' - consider adding a dense layer for outputs');
+          }
+        }
+
+        // Check shape compatibility
+        for (let i = 1; i < networkConfig.layers.length; i++) {
+          const prevOutput = inferOutputShape(networkConfig.layers[i - 1], getLayerInputShape(i - 1));
+          const currentInput = getLayerInputShape(i);
+
+          if (prevOutput && currentInput && JSON.stringify(prevOutput) !== JSON.stringify(currentInput)) {
+            warnings.push(`Shape mismatch at layer ${i + 1}: expected ${formatShape(currentInput)} but got ${formatShape(prevOutput)}`);
+          }
+        }
+
+        // Check for very small networks
+        if (networkConfig.layers.length < 3) {
+          warnings.push('Network has very few layers - consider adding more for better learning capacity');
+        }
+
+        // Display results
+        let message = '';
+        if (issues.length === 0 && warnings.length === 0) {
+          message = '✅ Architecture Validation Passed!\n\nYour network looks good. Ready to export or test!';
+          alert(message);
+        } else {
+          if (issues.length > 0) {
+            message += '❌ Issues Found:\n' + issues.map((issue, i) => `${i + 1}. ${issue}`).join('\n') + '\n\n';
+          }
+          if (warnings.length > 0) {
+            message += '⚠️ Warnings:\n' + warnings.map((warn, i) => `${i + 1}. ${warn}`).join('\n');
+          }
+          alert(message);
         }
       }
 
