@@ -613,9 +613,135 @@
       font-size: 1.5rem;
       cursor: pointer;
     }
+
+    /* Tutorial Overlay */
+    .tutorial-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 10000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .tutorial-overlay.active {
+      display: flex;
+    }
+
+    .tutorial-box {
+      background: var(--bg-card);
+      border-radius: 12px;
+      padding: 2rem;
+      max-width: 600px;
+      width: 90%;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+      animation: tutorialFadeIn 0.3s ease-out;
+    }
+
+    @keyframes tutorialFadeIn {
+      from {
+        opacity: 0;
+        transform: scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    .tutorial-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .tutorial-header h2 {
+      margin: 0;
+      color: var(--primary);
+    }
+
+    .tutorial-close {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: var(--text);
+      opacity: 0.6;
+      transition: opacity 0.2s;
+    }
+
+    .tutorial-close:hover {
+      opacity: 1;
+    }
+
+    .tutorial-content {
+      margin-bottom: 1.5rem;
+      line-height: 1.6;
+    }
+
+    .tutorial-content ul {
+      margin: 1rem 0;
+      padding-left: 1.5rem;
+    }
+
+    .tutorial-content li {
+      margin: 0.5rem 0;
+    }
+
+    .tutorial-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .tutorial-progress {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+    }
+
+    .tutorial-buttons {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .tutorial-highlight {
+      position: fixed;
+      z-index: 9999;
+      pointer-events: none;
+      border: 3px solid var(--primary);
+      border-radius: 8px;
+      box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.7);
+      transition: all 0.3s ease-out;
+    }
   </style>
 </head>
 <body>
+  <!-- Tutorial Overlay -->
+  <div id="tutorial-overlay" class="tutorial-overlay">
+    <div class="tutorial-box">
+      <div class="tutorial-header">
+        <h2 id="tutorial-title">Welcome!</h2>
+        <button class="tutorial-close" onclick="closeTutorial()">×</button>
+      </div>
+      <div class="tutorial-content" id="tutorial-content">
+        <!-- Dynamic content -->
+      </div>
+      <div class="tutorial-footer">
+        <div class="tutorial-progress" id="tutorial-progress">Step 1 of 6</div>
+        <div class="tutorial-buttons">
+          <button id="tutorial-prev" class="secondary" onclick="previousTutorialStep()" style="display: none;">Previous</button>
+          <button id="tutorial-next" class="success" onclick="nextTutorialStep()">Next</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="tutorial-highlight" class="tutorial-highlight" style="display: none;"></div>
+
   <header>
     <div class="container">
       <div class="flex space-between align-center">
@@ -633,6 +759,9 @@
           </button>
           <button onclick="showKeyboardShortcuts()" class="secondary small" style="cursor: pointer;" title="Keyboard Shortcuts (Ctrl/Cmd + /)">
             ⌨️ Shortcuts
+          </button>
+          <button onclick="startTutorial()" class="secondary small" style="cursor: pointer;" title="Start Interactive Tutorial">
+            📖 Tutorial
           </button>
         </div>
       </div>
@@ -1573,6 +1702,164 @@
         } else {
           element.value = value;
         }
+      }
+
+      // ============================================================================
+      // INTERACTIVE TUTORIAL SYSTEM
+      // ============================================================================
+
+      let tutorialStep = 0;
+      const tutorialSteps = [
+        {
+          title: "Welcome to Neural Network Builder!",
+          content: `
+            <p>This interactive tutorial will guide you through the key features of the Neural Network Builder.</p>
+            <p>In just a few minutes, you'll learn how to:</p>
+            <ul>
+              <li>Choose and load preset architectures</li>
+              <li>Design custom neural networks</li>
+              <li>Use AI-powered recommendations</li>
+              <li>Analyze performance metrics</li>
+              <li>Export production-ready code</li>
+            </ul>
+            <p><strong>Let's get started!</strong></p>
+          `
+        },
+        {
+          title: "1. Quick Start with Presets",
+          content: `
+            <p>The fastest way to get started is by using one of our preset architectures.</p>
+            <p>Scroll down to the <strong>Quick Start</strong> section and you'll find popular architectures like:</p>
+            <ul>
+              <li><strong>ResNet</strong> - For image classification</li>
+              <li><strong>Transformer</strong> - For natural language processing</li>
+              <li><strong>EfficientNet</strong> - For mobile deployment</li>
+            </ul>
+            <p>Click any preset card to load a complete, pre-configured architecture instantly.</p>
+          `,
+          highlight: '.card:has(h2:contains("Quick"))'
+        },
+        {
+          title: "2. Build Your Architecture",
+          content: `
+            <p>Once you've loaded a preset (or want to build from scratch), use the <strong>Architect</strong> tab to customize your network.</p>
+            <p>Here you can:</p>
+            <ul>
+              <li><strong>Add layers</strong> - Click "Add Layer" and choose from 12+ layer types</li>
+              <li><strong>Modify parameters</strong> - Adjust filters, units, activation functions, etc.</li>
+              <li><strong>Reorder layers</strong> - Use the layer cards to organize your architecture</li>
+              <li><strong>Remove layers</strong> - Click the "Remove" button on any layer</li>
+            </ul>
+            <p>Try using <strong>Ctrl+Z</strong> to undo and <strong>Ctrl+Y</strong> to redo changes!</p>
+          `
+        },
+        {
+          title: "3. Get AI Recommendations",
+          content: `
+            <p>Not sure which architecture to use? Let AI help you!</p>
+            <p>Go to the <strong>AI Assistant</strong> tab and:</p>
+            <ol>
+              <li>Select your <strong>task type</strong> (image classification, NLP, etc.)</li>
+              <li>Choose your <strong>dataset size</strong> (small, medium, large)</li>
+              <li>Select your <strong>compute resources</strong> (CPU, GPU, TPU)</li>
+              <li>Set your <strong>priority</strong> (speed, accuracy, or balanced)</li>
+              <li>Click <strong>"Generate AI Recommendations"</strong></li>
+            </ol>
+            <p>You'll get 3 architecture suggestions with match scores and explanations!</p>
+          `
+        },
+        {
+          title: "4. Analyze Performance",
+          content: `
+            <p>Before training, check if your architecture is efficient using the <strong>Performance</strong> tab.</p>
+            <p>You'll see:</p>
+            <ul>
+              <li><strong>FLOPs</strong> - Computational complexity</li>
+              <li><strong>Inference time</strong> - How fast predictions will be</li>
+              <li><strong>Device compatibility</strong> - Mobile, Edge, Browser support</li>
+              <li><strong>Layer breakdown</strong> - Which layers are most expensive</li>
+              <li><strong>Optimization tips</strong> - Suggestions to improve performance</li>
+            </ul>
+            <p>This helps you optimize before spending hours training!</p>
+          `
+        },
+        {
+          title: "5. Export Production Code",
+          content: `
+            <p>Ready to train your model? Export production-ready code!</p>
+            <p>Go to the <strong>Export</strong> tab and choose your framework:</p>
+            <ul>
+              <li><strong>PyTorch</strong> - Complete model class with forward pass</li>
+              <li><strong>Keras</strong> - Sequential or Functional API code</li>
+              <li><strong>JAX/Flax</strong> - Functional neural network code</li>
+            </ul>
+            <p>Also export to mobile formats (TFLite, CoreML, ONNX) or deployment configs (Docker, Kubernetes, FastAPI)!</p>
+            <p><strong>Tip:</strong> Use keyboard shortcuts! Press <strong>Ctrl/Cmd + /</strong> to see all shortcuts.</p>
+          `
+        },
+        {
+          title: "You're All Set!",
+          content: `
+            <p>🎉 Congratulations! You now know how to use the Neural Network Builder.</p>
+            <p><strong>Quick tips to remember:</strong></p>
+            <ul>
+              <li>Start with <strong>presets</strong> and customize them</li>
+              <li>Use <strong>AI validation</strong> to catch mistakes early</li>
+              <li>Check <strong>performance metrics</strong> before training</li>
+              <li>Use <strong>Undo/Redo</strong> (Ctrl+Z / Ctrl+Y) freely</li>
+              <li>Save important architectures as <strong>snapshots</strong> (Advanced tab)</li>
+              <li>Share designs with your team using <strong>URL sharing</strong></li>
+            </ul>
+            <p>Ready to build amazing neural networks? Click "Finish" to start!</p>
+            <p style="margin-top: 1.5rem; padding: 1rem; background: var(--primary-light); border-radius: 0.5rem;">
+              💡 <strong>Need help later?</strong> Click the "Tutorial" button in the header anytime to review these steps!
+            </p>
+          `
+        }
+      ];
+
+      function startTutorial() {
+        tutorialStep = 0;
+        showTutorialStep();
+        document.getElementById('tutorial-overlay').classList.add('active');
+      }
+
+      function closeTutorial() {
+        document.getElementById('tutorial-overlay').classList.remove('active');
+        document.getElementById('tutorial-highlight').style.display = 'none';
+      }
+
+      function nextTutorialStep() {
+        if (tutorialStep < tutorialSteps.length - 1) {
+          tutorialStep++;
+          showTutorialStep();
+        } else {
+          closeTutorial();
+        }
+      }
+
+      function previousTutorialStep() {
+        if (tutorialStep > 0) {
+          tutorialStep--;
+          showTutorialStep();
+        }
+      }
+
+      function showTutorialStep() {
+        const step = tutorialSteps[tutorialStep];
+        document.getElementById('tutorial-title').textContent = step.title;
+        document.getElementById('tutorial-content').innerHTML = step.content;
+        document.getElementById('tutorial-progress').textContent = `Step ${tutorialStep + 1} of ${tutorialSteps.length}`;
+
+        // Update button visibility
+        const prevBtn = document.getElementById('tutorial-prev');
+        const nextBtn = document.getElementById('tutorial-next');
+
+        prevBtn.style.display = tutorialStep > 0 ? 'inline-block' : 'none';
+        nextBtn.textContent = tutorialStep === tutorialSteps.length - 1 ? 'Finish' : 'Next';
+
+        // Hide highlight for now (can be enhanced later to highlight specific elements)
+        document.getElementById('tutorial-highlight').style.display = 'none';
       }
 
       // ============================================================================
