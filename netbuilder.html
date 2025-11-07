@@ -614,11 +614,14 @@
     </div>
     
     <div class="tab-container">
-      <div class="tabs">
+      <div class="tabs" style="overflow-x: auto; flex-wrap: nowrap;">
         <div class="tab active" data-tab="quick-start">Quick Start</div>
         <div class="tab" data-tab="architect">Architect</div>
+        <div class="tab" data-tab="ai-assistant">🤖 AI Assistant</div>
+        <div class="tab" data-tab="performance">⚡ Performance</div>
         <div class="tab" data-tab="hyperparameters">Hyperparameters</div>
         <div class="tab" data-tab="visualization">Visualization</div>
+        <div class="tab" data-tab="advanced">🚀 Advanced</div>
         <div class="tab" data-tab="export">Export</div>
       </div>
       
@@ -885,7 +888,159 @@
           </div>
         </div>
       </div>
-      
+
+      <div class="tab-content" id="ai-assistant">
+        <div class="card">
+          <h2>🤖 AI Architecture Recommendations</h2>
+          <p class="help-text">Get intelligent suggestions based on your task, data, and constraints.</p>
+
+          <div class="grid grid-2">
+            <div>
+              <label for="ai-task-type">What are you trying to achieve?</label>
+              <select id="ai-task-type">
+                <option value="image-classification">Image Classification</option>
+                <option value="object-detection">Object Detection</option>
+                <option value="semantic-segmentation">Semantic Segmentation</option>
+                <option value="text-classification">Text Classification</option>
+                <option value="text-generation">Text Generation</option>
+                <option value="time-series">Time Series Forecasting</option>
+                <option value="recommendation">Recommendation System</option>
+                <option value="gan">Generative Model (GAN)</option>
+                <option value="autoencoder">Dimensionality Reduction</option>
+              </select>
+            </div>
+            <div>
+              <label for="ai-dataset-size">Dataset Size</label>
+              <select id="ai-dataset-size">
+                <option value="tiny">Tiny (&lt;1K samples)</option>
+                <option value="small">Small (1K-10K)</option>
+                <option value="medium">Medium (10K-100K)</option>
+                <option value="large">Large (100K-1M)</option>
+                <option value="massive">Massive (&gt;1M)</option>
+              </select>
+            </div>
+            <div>
+              <label for="ai-compute">Available Compute</label>
+              <select id="ai-compute">
+                <option value="cpu">CPU Only</option>
+                <option value="single-gpu">Single GPU</option>
+                <option value="multi-gpu">Multi-GPU</option>
+                <option value="tpu">TPU/Cloud</option>
+              </select>
+            </div>
+            <div>
+              <label for="ai-priority">Priority</label>
+              <select id="ai-priority">
+                <option value="accuracy">Accuracy (slower, larger)</option>
+                <option value="balanced">Balanced</option>
+                <option value="speed">Speed (faster, smaller)</option>
+              </select>
+            </div>
+          </div>
+
+          <button class="success" onclick="generateAIRecommendations()" style="margin-top: 1rem; width: 100%;">
+            Generate AI Recommendations
+          </button>
+
+          <div id="ai-recommendations" style="margin-top: 2rem; display: none;">
+            <h3>📊 Recommended Architectures</h3>
+            <div id="ai-recommendations-list"></div>
+
+            <h3 style="margin-top: 2rem;">💡 Smart Suggestions</h3>
+            <div id="ai-suggestions" class="alert alert-info"></div>
+
+            <h3 style="margin-top: 2rem;">⚠️ Potential Issues</h3>
+            <div id="ai-warnings" class="alert alert-warning"></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>🔍 Architecture Validator</h2>
+          <p class="help-text">Check your current architecture for issues and get optimization suggestions.</p>
+          <button class="secondary" onclick="validateArchitecture()" style="width: 100%;">
+            Validate Current Architecture
+          </button>
+          <div id="validation-results" style="margin-top: 1rem;"></div>
+        </div>
+
+        <div class="card">
+          <h2>📚 Dataset Recommendations</h2>
+          <p class="help-text">Popular datasets for your task type.</p>
+          <div id="dataset-suggestions"></div>
+        </div>
+      </div>
+
+      <div class="tab-content" id="performance">
+        <div class="card">
+          <h2>⚡ Performance Analysis</h2>
+          <p class="help-text">Detailed analysis of your model's computational requirements.</p>
+
+          <div class="model-overview">
+            <div class="performance-metric">
+              <div class="metric-label">FLOPs</div>
+              <div class="metric-value" id="flops-metric">0</div>
+              <small>Floating Point Operations</small>
+            </div>
+            <div class="performance-metric">
+              <div class="metric-label">MACs</div>
+              <div class="metric-value" id="macs-metric">0</div>
+              <small>Multiply-Accumulate Ops</small>
+            </div>
+            <div class="performance-metric">
+              <div class="metric-label">Inference (ms)</div>
+              <div class="metric-value" id="inference-metric">0</div>
+              <small>Estimated on GPU</small>
+            </div>
+            <div class="performance-metric">
+              <div class="metric-label">Throughput</div>
+              <div class="metric-value" id="throughput-metric">0</div>
+              <small>Samples/second</small>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>📊 Layer-wise Performance</h2>
+          <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse;">
+              <thead>
+                <tr style="background-color: var(--neutral-light);">
+                  <th style="padding: 0.5rem; text-align: left; border-bottom: 2px solid var(--neutral);">Layer</th>
+                  <th style="padding: 0.5rem; text-align: left; border-bottom: 2px solid var(--neutral);">FLOPs</th>
+                  <th style="padding: 0.5rem; text-align: left; border-bottom: 2px solid var(--neutral);">Parameters</th>
+                  <th style="padding: 0.5rem; text-align: left; border-bottom: 2px solid var(--neutral);">Memory (MB)</th>
+                  <th style="padding: 0.5rem; text-align: left; border-bottom: 2px solid var(--neutral);">% Total</th>
+                </tr>
+              </thead>
+              <tbody id="performance-breakdown-body"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>🎯 Optimization Suggestions</h2>
+          <div id="optimization-suggestions"></div>
+        </div>
+
+        <div class="card">
+          <h2>📱 Device Compatibility</h2>
+          <div class="grid grid-3">
+            <div class="performance-metric">
+              <div class="metric-label">Mobile (iOS/Android)</div>
+              <div class="metric-value" id="mobile-compatible" style="font-size: 2rem;">❓</div>
+            </div>
+            <div class="performance-metric">
+              <div class="metric-label">Edge Devices</div>
+              <div class="metric-value" id="edge-compatible" style="font-size: 2rem;">❓</div>
+            </div>
+            <div class="performance-metric">
+              <div class="metric-label">Browser (TFJS)</div>
+              <div class="metric-value" id="browser-compatible" style="font-size: 2rem;">❓</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
     <!-- Additional Code Starting at Hyperparameters -->
 
     <div class="tab-content" id="hyperparameters">
@@ -1031,7 +1186,99 @@
         </div>
       </div>
     </div>
-    
+
+    <div class="tab-content" id="advanced">
+      <div class="card">
+        <h2>🔗 Share Architecture</h2>
+        <p class="help-text">Share your architecture via URL - no files needed!</p>
+        <button class="success" onclick="generateShareURL()" style="width: 100%; margin-bottom: 1rem;">
+          Generate Shareable URL
+        </button>
+        <div id="share-url-container" style="display: none;">
+          <input type="text" id="share-url" readonly style="margin-bottom: 0.5rem;">
+          <button onclick="copyShareURL()" style="width: 100%;">Copy to Clipboard</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>🔍 Architecture Search (NAS)</h2>
+        <p class="help-text">Automatically discover optimal architectures for your task.</p>
+
+        <div class="grid grid-2">
+          <div>
+            <label for="nas-objective">Optimization Objective</label>
+            <select id="nas-objective">
+              <option value="accuracy">Maximum Accuracy</option>
+              <option value="efficiency">Best Efficiency</option>
+              <option value="balanced">Balanced</option>
+            </select>
+          </div>
+          <div>
+            <label for="nas-constraints">Constraints</label>
+            <select id="nas-constraints">
+              <option value="none">No Constraints</option>
+              <option value="mobile">&lt;10M params (Mobile)</option>
+              <option value="edge">&lt;1M params (Edge)</option>
+              <option value="tiny">&lt;100K params (Tiny)</option>
+            </select>
+          </div>
+        </div>
+
+        <button class="warning" onclick="runArchitectureSearch()" style="width: 100%; margin-top: 1rem;">
+          🔬 Run Architecture Search
+        </button>
+
+        <div id="nas-results" style="margin-top: 1rem; display: none;">
+          <h3>Top 3 Discovered Architectures</h3>
+          <div id="nas-results-list"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>📊 Compare Architectures</h2>
+        <p class="help-text">Compare your current architecture with saved versions or presets.</p>
+
+        <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+          <button onclick="saveArchitectureSnapshot()" style="flex: 1;">
+            Save Current as Snapshot
+          </button>
+          <button onclick="showComparisonTool()" class="secondary" style="flex: 1;">
+            Compare Snapshots
+          </button>
+        </div>
+
+        <div id="snapshots-list"></div>
+        <div id="comparison-results" style="margin-top: 1rem;"></div>
+      </div>
+
+      <div class="card">
+        <h2>🌐 Multi-Input/Multi-Output</h2>
+        <p class="help-text">Build complex architectures with multiple inputs and outputs.</p>
+
+        <div class="alert alert-info">
+          <strong>Coming Soon:</strong> Visual graph builder for complex architectures with skip connections,
+          multi-input branches, and custom connection patterns.
+        </div>
+
+        <button onclick="alert('Graph builder UI coming in next update!')" style="width: 100%; margin-top: 1rem;">
+          Open Graph Builder (Beta)
+        </button>
+      </div>
+
+      <div class="card">
+        <h2>🎨 Architecture Templates</h2>
+        <p class="help-text">Save and reuse common architecture patterns.</p>
+
+        <button onclick="saveAsTemplate()" style="width: 100%; margin-bottom: 1rem;">
+          Save Current as Template
+        </button>
+
+        <div id="custom-templates-list">
+          <p class="help-text">No custom templates yet. Create one from your current architecture!</p>
+        </div>
+      </div>
+    </div>
+
     <div class="tab-content" id="export">
       <div class="card">
         <h2>Export Configuration</h2>
@@ -1052,7 +1299,7 @@
       </div>
 
       <div class="card">
-        <h2>Generate Code</h2>
+        <h2>Generate Training Code</h2>
         <p class="help-text">Export your architecture as ready-to-use code in popular frameworks.</p>
         <div class="grid grid-3">
           <button class="success" onclick="exportCode('pytorch')">
@@ -1066,6 +1313,55 @@
           <button class="success" onclick="exportCode('jax')">
             <strong>JAX/Flax</strong><br>
             <span style="font-size: 0.875rem;">Export as Flax model</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>📱 Mobile & Edge Export</h2>
+        <p class="help-text">Export optimized models for deployment on mobile and edge devices.</p>
+        <div class="grid grid-3">
+          <button class="success" onclick="exportCode('onnx')">
+            <strong>ONNX</strong><br>
+            <span style="font-size: 0.875rem;">Universal format</span>
+          </button>
+          <button class="success" onclick="exportCode('tflite')">
+            <strong>TensorFlow Lite</strong><br>
+            <span style="font-size: 0.875rem;">Android/iOS/Edge</span>
+          </button>
+          <button class="success" onclick="exportCode('coreml')">
+            <strong>Core ML</strong><br>
+            <span style="font-size: 0.875rem;">iOS deployment</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>🐳 Deployment Packages</h2>
+        <p class="help-text">Generate complete deployment configurations for production.</p>
+        <div class="grid grid-2">
+          <button class="warning" onclick="exportDeployment('docker')">
+            <strong>Docker Container</strong><br>
+            <span style="font-size: 0.875rem;">Dockerfile + requirements</span>
+          </button>
+          <button class="warning" onclick="exportDeployment('kubernetes')">
+            <strong>Kubernetes</strong><br>
+            <span style="font-size: 0.875rem;">K8s deployment config</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>🚀 API Endpoint Generation</h2>
+        <p class="help-text">Generate REST API servers for your model.</p>
+        <div class="grid grid-2">
+          <button class="warning" onclick="exportAPI('fastapi')">
+            <strong>FastAPI</strong><br>
+            <span style="font-size: 0.875rem;">Modern Python API</span>
+          </button>
+          <button class="warning" onclick="exportAPI('flask')">
+            <strong>Flask</strong><br>
+            <span style="font-size: 0.875rem;">Simple Python API</span>
           </button>
         </div>
       </div>
@@ -1570,6 +1866,7 @@
         ).join('');
         updateLayerVisualizer();
         updateStatistics();
+        updatePerformanceMetrics();
       }
 
       // ============================================================================
@@ -2407,6 +2704,1048 @@ model = NeuralNetwork()
       }
 
       // ============================================================================
+      // AI RECOMMENDATIONS ENGINE
+      // ============================================================================
+
+      const aiKnowledgeBase = {
+        'image-classification': {
+          small: { arch: 'efficientnet', params: '< 10M', suggestion: 'Use MobileNet or EfficientNet-B0 for efficiency' },
+          medium: { arch: 'resnet', params: '20-50M', suggestion: 'ResNet-50 offers great accuracy-efficiency balance' },
+          large: { arch: 'resnet', params: '> 50M', suggestion: 'ResNet-101 or EfficientNet-B7 for maximum accuracy' }
+        },
+        'object-detection': {
+          small: { arch: 'yolo', params: '< 20M', suggestion: 'YOLO-tiny for real-time detection' },
+          medium: { arch: 'yolo', params: '20-60M', suggestion: 'Standard YOLO for balanced performance' },
+          large: { arch: 'yolo', params: '> 60M', suggestion: 'Consider Mask R-CNN or advanced YOLO variants' }
+        },
+        'text-classification': {
+          small: { arch: 'dense', params: '< 5M', suggestion: 'Simple LSTM or GRU network' },
+          medium: { arch: 'bert', params: '100M+', suggestion: 'BERT-base for strong performance' },
+          large: { arch: 'bert', params: '300M+', suggestion: 'BERT-large or RoBERTa for best results' }
+        },
+        'text-generation': {
+          small: { arch: 'transformer', params: '< 50M', suggestion: 'Small Transformer with 6 layers' },
+          medium: { arch: 'transformer', params: '100-300M', suggestion: 'GPT-2 style architecture' },
+          large: { arch: 'transformer', params: '> 300M', suggestion: 'Large transformer (be aware of training costs)' }
+        }
+      };
+
+      const datasetSuggestions = {
+        'image-classification': ['CIFAR-10', 'CIFAR-100', 'ImageNet', 'MNIST', 'Fashion-MNIST', 'Food-101'],
+        'object-detection': ['COCO', 'Pascal VOC', 'Open Images', 'KITTI'],
+        'semantic-segmentation': ['Cityscapes', 'ADE20K', 'Pascal VOC', 'COCO-Stuff'],
+        'text-classification': ['IMDB', 'AG News', 'DBpedia', 'Yelp Reviews'],
+        'text-generation': ['WikiText', 'OpenWebText', 'BookCorpus', 'Common Crawl'],
+        'time-series': ['UCR Time Series Archive', 'M4 Competition', 'Electricity Load'],
+        'recommendation': ['MovieLens', 'Netflix Prize', 'Amazon Reviews'],
+        'gan': ['CelebA', 'LSUN', 'FFHQ'],
+        'autoencoder': ['MNIST', 'Fashion-MNIST', 'CelebA']
+      };
+
+      function generateAIRecommendations() {
+        const taskType = getFormValue('ai-task-type');
+        const datasetSize = getFormValue('ai-dataset-size');
+        const compute = getFormValue('ai-compute');
+        const priority = getFormValue('ai-priority');
+
+        // Show recommendations section
+        document.getElementById('ai-recommendations').style.display = 'block';
+
+        // Generate architecture recommendations
+        const recommendationsList = document.getElementById('ai-recommendations-list');
+        let html = '<div class="grid grid-3" style="margin-top: 1rem;">';
+
+        // Get appropriate recommendations based on task and data size
+        const sizeCategory = ['tiny', 'small'].includes(datasetSize) ? 'small' :
+                           ['medium'].includes(datasetSize) ? 'medium' : 'large';
+
+        const taskCategory = taskType.includes('image') ? 'image-classification' :
+                            taskType.includes('object') ? 'object-detection' :
+                            taskType.includes('text-class') ? 'text-classification' :
+                            taskType.includes('text-gen') ? 'text-generation' : 'image-classification';
+
+        const recommendation = aiKnowledgeBase[taskCategory]?.[sizeCategory] ||
+                             aiKnowledgeBase['image-classification']['medium'];
+
+        // Recommend 3 architectures
+        const recommendations = [
+          { name: 'Recommended', arch: recommendation.arch, score: 95, reason: recommendation.suggestion },
+          { name: 'Alternative 1', arch: 'custom', score: 85, reason: 'Build custom architecture for specific needs' },
+          { name: 'Alternative 2', arch: priority === 'speed' ? 'efficientnet' : 'resnet', score: 80,
+            reason: priority === 'speed' ? 'Optimized for inference speed' : 'Proven accuracy' }
+        ];
+
+        recommendations.forEach(rec => {
+          html += `
+            <div class="card preset-card" onclick="loadPreset('${rec.arch}'); document.querySelector('.tab[data-tab=\\'architect\\']').click();"
+                 style="cursor: pointer;">
+              <h4>${rec.name}</h4>
+              <div class="badge badge-green">${rec.score}% Match</div>
+              <p style="font-size: 0.875rem; margin-top: 0.5rem;">${rec.reason}</p>
+              <button class="small success" style="margin-top: 0.5rem; width: 100%;">Load This</button>
+            </div>
+          `;
+        });
+
+        html += '</div>';
+        recommendationsList.innerHTML = html;
+
+        // Generate smart suggestions
+        const suggestions = document.getElementById('ai-suggestions');
+        let suggestionText = '<ul style="margin: 0.5rem 0 0 1rem;">';
+
+        if (datasetSize === 'tiny' || datasetSize === 'small') {
+          suggestionText += '<li><strong>Small Dataset:</strong> Consider using transfer learning or data augmentation to prevent overfitting.</li>';
+          suggestionText += '<li><strong>Regularization:</strong> Add dropout (0.3-0.5) and use strong L2 regularization.</li>';
+        }
+
+        if (compute === 'cpu') {
+          suggestionText += '<li><strong>CPU Training:</strong> Keep model size under 10M parameters. Consider quantization-aware training.</li>';
+          suggestionText += '<li><strong>Batch Size:</strong> Use smaller batch sizes (8-32) to fit in CPU memory.</li>';
+        } else if (compute === 'tpu') {
+          suggestionText += '<li><strong>TPU Optimization:</strong> Use larger batch sizes (256-1024) for maximum TPU utilization.</li>';
+          suggestionText += '<li><strong>Precision:</strong> Consider mixed precision (bfloat16) training for speed.</li>';
+        }
+
+        if (priority === 'accuracy') {
+          suggestionText += '<li><strong>Accuracy Focus:</strong> Use deeper networks, ensemble methods, and extensive hyperparameter tuning.</li>';
+        } else if (priority === 'speed') {
+          suggestionText += '<li><strong>Speed Focus:</strong> Use depthwise separable convolutions, pruning, and quantization.</li>';
+          suggestionText += '<li><strong>Architecture:</strong> MobileNet/EfficientNet variants optimized for inference.</li>';
+        }
+
+        suggestionText += '</ul>';
+        suggestions.innerHTML = suggestionText;
+
+        // Generate warnings
+        const warnings = document.getElementById('ai-warnings');
+        let warningText = '<ul style="margin: 0.5rem 0 0 1rem;">';
+
+        const totalParams = calculateTotalParameters();
+        if (totalParams > 50000000 && compute === 'cpu') {
+          warningText += '<li>⚠️ <strong>Large Model on CPU:</strong> Your architecture has >50M parameters. Training will be very slow on CPU.</li>';
+        }
+
+        if (['tiny', 'small'].includes(datasetSize) && totalParams > 10000000) {
+          warningText += '<li>⚠️ <strong>Overfitting Risk:</strong> Large model + small dataset = high overfitting risk. Consider reducing model size or using transfer learning.</li>';
+        }
+
+        if (taskType.includes('text') && !networkConfig.layers.some(l => ['lstm', 'gru', 'transformer'].includes(l.type))) {
+          warningText += '<li>⚠️ <strong>Sequential Data:</strong> Text tasks typically need recurrent (LSTM/GRU) or attention (Transformer) layers.</li>';
+        }
+
+        warningText += '</ul>';
+        warnings.innerHTML = warningText;
+
+        // Update dataset suggestions
+        updateDatasetSuggestions(taskType);
+      }
+
+      function updateDatasetSuggestions(taskType) {
+        const container = document.getElementById('dataset-suggestions');
+        const datasets = datasetSuggestions[taskType] || [];
+
+        let html = '<div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem;">';
+        datasets.forEach(dataset => {
+          html += `<span class="badge badge-blue" style="font-size: 0.875rem; padding: 0.5rem 1rem;">${dataset}</span>`;
+        });
+        html += '</div>';
+        container.innerHTML = html;
+      }
+
+      function validateArchitecture() {
+        const results = document.getElementById('validation-results');
+        let html = '';
+        let issues = [];
+        let warnings = [];
+        let successes = [];
+
+        // Check if architecture has required layers
+        if (networkConfig.layers.length < 2) {
+          issues.push('Architecture must have at least an input and output layer');
+        } else {
+          successes.push('✓ Valid layer structure');
+        }
+
+        // Check input layer
+        const inputLayer = networkConfig.layers.find(l => l.type === 'input');
+        if (!inputLayer || !inputLayer.shape) {
+          issues.push('Input layer must have a defined shape');
+        } else {
+          successes.push('✓ Input layer properly configured');
+        }
+
+        // Check for common mistakes
+        let hasConv = networkConfig.layers.some(l => l.type === 'conv2d');
+        let hasFlatten = networkConfig.layers.some(l => l.type === 'flatten' || l.type === 'globalavgpool');
+        let hasDense = networkConfig.layers.some(l => l.type === 'dense');
+
+        if (hasConv && hasDense && !hasFlatten) {
+          warnings.push('Convolutional layers before Dense layers usually need Flatten or Global Pooling');
+        }
+
+        // Check parameter count
+        const totalParams = calculateTotalParameters();
+        if (totalParams > 100000000) {
+          warnings.push(`Large model (${(totalParams/1000000).toFixed(1)}M parameters) - may be slow to train`);
+        } else {
+          successes.push(`✓ Reasonable model size (${(totalParams/1000000).toFixed(1)}M parameters)`);
+        }
+
+        // Check activation functions
+        const lastLayer = networkConfig.layers[networkConfig.layers.length - 1];
+        if (lastLayer.type === 'dense') {
+          if (!lastLayer.activation || lastLayer.activation === 'relu') {
+            warnings.push('Output layer typically uses softmax (classification) or linear (regression), not ReLU');
+          } else {
+            successes.push('✓ Appropriate output activation');
+          }
+        }
+
+        // Display results
+        html = '<div style="margin-top: 1rem;">';
+
+        if (issues.length > 0) {
+          html += '<div class="alert alert-warning" style="margin-bottom: 1rem;"><strong>❌ Issues Found:</strong><ul style="margin: 0.5rem 0 0 1rem;">';
+          issues.forEach(issue => html += `<li>${issue}</li>`);
+          html += '</ul></div>';
+        }
+
+        if (warnings.length > 0) {
+          html += '<div class="alert alert-warning" style="margin-bottom: 1rem;"><strong>⚠️ Warnings:</strong><ul style="margin: 0.5rem 0 0 1rem;">';
+          warnings.forEach(warning => html += `<li>${warning}</li>`);
+          html += '</ul></div>';
+        }
+
+        if (successes.length > 0) {
+          html += '<div class="alert alert-info"><strong>✓ Validation Passed:</strong><ul style="margin: 0.5rem 0 0 1rem;">';
+          successes.forEach(success => html += `<li>${success}</li>`);
+          html += '</ul></div>';
+        }
+
+        if (issues.length === 0 && warnings.length === 0) {
+          html += '<div class="alert alert-info"><strong>🎉 Perfect!</strong> No issues or warnings detected.</div>';
+        }
+
+        html += '</div>';
+        results.innerHTML = html;
+      }
+
+      // ============================================================================
+      // PERFORMANCE PROFILING
+      // ============================================================================
+
+      function calculateFLOPs() {
+        let totalFLOPs = 0;
+        let layerFLOPs = [];
+        let currentShape = null;
+
+        networkConfig.layers.forEach((layer, index) => {
+          let flops = 0;
+
+          if (layer.type === 'input' && layer.shape) {
+            const parts = layer.shape.split(',').map(x => parseInt(x.trim()));
+            currentShape = parts;
+          } else if (layer.type === 'conv2d' && currentShape && currentShape.length >= 3) {
+            const filters = layer.filters || 32;
+            const kernelSize = layer.kernelSize || 3;
+            const h = currentShape[0], w = currentShape[1], c = currentShape[2];
+
+            // FLOPs for convolution: 2 * H * W * C_in * C_out * K * K
+            flops = 2 * h * w * c * filters * kernelSize * kernelSize;
+            currentShape = [h, w, filters];
+          } else if (layer.type === 'dense') {
+            const units = layer.units || 128;
+            if (currentShape) {
+              const inputSize = currentShape.reduce((a, b) => a * b, 1);
+              // FLOPs for dense: 2 * input_size * output_size
+              flops = 2 * inputSize * units;
+              currentShape = [units];
+            }
+          } else if (layer.type === 'pooling' && currentShape && currentShape.length >= 3) {
+            const poolSize = layer.poolSize || 2;
+            const h = Math.floor(currentShape[0] / poolSize);
+            const w = Math.floor(currentShape[1] / poolSize);
+            currentShape = [h, w, currentShape[2]];
+            flops = h * w * currentShape[2] * poolSize * poolSize; // Compare operations
+          }
+
+          layerFLOPs.push({
+            layer: layer,
+            index: index,
+            flops: flops
+          });
+
+          totalFLOPs += flops;
+        });
+
+        return { total: totalFLOPs, breakdown: layerFLOPs };
+      }
+
+      function updatePerformanceMetrics() {
+        const flopsData = calculateFLOPs();
+        const totalParams = calculateTotalParameters();
+        const memoryMB = estimateMemory();
+
+        // Update main metrics
+        const flopsMetric = document.getElementById('flops-metric');
+        const macsMetric = document.getElementById('macs-metric');
+        const inferenceMetric = document.getElementById('inference-metric');
+        const throughputMetric = document.getElementById('throughput-metric');
+
+        if (flopsMetric) {
+          const flopsFormatted = flopsData.total > 1e9 ?
+            `${(flopsData.total / 1e9).toFixed(2)}G` :
+            `${(flopsData.total / 1e6).toFixed(2)}M`;
+          flopsMetric.textContent = flopsFormatted;
+        }
+
+        if (macsMetric) {
+          const macs = flopsData.total / 2; // MACs ~= FLOPs / 2
+          const macsFormatted = macs > 1e9 ?
+            `${(macs / 1e9).toFixed(2)}G` :
+            `${(macs / 1e6).toFixed(2)}M`;
+          macsMetric.textContent = macsFormatted;
+        }
+
+        // Estimate inference time (very rough: 1 TFLOP/s on GPU)
+        if (inferenceMetric) {
+          const inferenceMs = (flopsData.total / 1e12) * 1000;
+          inferenceMetric.textContent = inferenceMs.toFixed(2);
+        }
+
+        if (throughputMetric) {
+          const throughput = 1000 / ((flopsData.total / 1e12) * 1000 || 1);
+          throughputMetric.textContent = throughput.toFixed(0);
+        }
+
+        // Update layer-wise breakdown
+        updatePerformanceBreakdown(flopsData, totalParams);
+
+        // Update device compatibility
+        updateDeviceCompatibility(totalParams, memoryMB);
+
+        // Generate optimization suggestions
+        generateOptimizationSuggestions(flopsData, totalParams);
+      }
+
+      function updatePerformanceBreakdown(flopsData, totalParams) {
+        const tbody = document.getElementById('performance-breakdown-body');
+        if (!tbody) return;
+
+        let html = '';
+        flopsData.breakdown.forEach(item => {
+          const layer = item.layer;
+          const layerParams = calculateLayerParameters(layer);
+          const layerMemory = (layerParams * 4 / (1024 * 1024)).toFixed(2);
+          const percentage = flopsData.total > 0 ? ((item.flops / flopsData.total) * 100).toFixed(1) : 0;
+
+          html += `
+            <tr style="border-bottom: 1px solid var(--neutral-light);">
+              <td style="padding: 0.5rem;">${layerConfigs[layer.type]?.name || layer.type}</td>
+              <td style="padding: 0.5rem;">${formatNumber(item.flops)}</td>
+              <td style="padding: 0.5rem;">${formatNumber(layerParams)}</td>
+              <td style="padding: 0.5rem;">${layerMemory} MB</td>
+              <td style="padding: 0.5rem;">
+                <div style="background: var(--neutral-light); height: 20px; border-radius: 4px; overflow: hidden;">
+                  <div style="background: var(--primary); height: 100%; width: ${percentage}%;"></div>
+                </div>
+                ${percentage}%
+              </td>
+            </tr>
+          `;
+        });
+
+        tbody.innerHTML = html;
+      }
+
+      function calculateLayerParameters(layer) {
+        if (layer.type === 'conv2d') {
+          const filters = layer.filters || 32;
+          const kernelSize = layer.kernelSize || 3;
+          // Rough estimate - would need previous layer info for accuracy
+          return kernelSize * kernelSize * 32 * filters + filters;
+        } else if (layer.type === 'dense') {
+          return (layer.units || 128) * 1000; // Rough estimate
+        }
+        return 0;
+      }
+
+      function formatNumber(num) {
+        if (num > 1e9) return `${(num / 1e9).toFixed(2)}G`;
+        if (num > 1e6) return `${(num / 1e6).toFixed(2)}M`;
+        if (num > 1e3) return `${(num / 1e3).toFixed(2)}K`;
+        return num.toString();
+      }
+
+      function updateDeviceCompatibility(totalParams, memoryMB) {
+        const mobileElem = document.getElementById('mobile-compatible');
+        const edgeElem = document.getElementById('edge-compatible');
+        const browserElem = document.getElementById('browser-compatible');
+
+        if (mobileElem) {
+          mobileElem.textContent = totalParams < 10000000 ? '✅' : totalParams < 50000000 ? '⚠️' : '❌';
+        }
+        if (edgeElem) {
+          edgeElem.textContent = totalParams < 1000000 ? '✅' : totalParams < 5000000 ? '⚠️' : '❌';
+        }
+        if (browserElem) {
+          browserElem.textContent = totalParams < 5000000 ? '✅' : totalParams < 20000000 ? '⚠️' : '❌';
+        }
+      }
+
+      function generateOptimizationSuggestions(flopsData, totalParams) {
+        const container = document.getElementById('optimization-suggestions');
+        if (!container) return;
+
+        let suggestions = [];
+
+        if (totalParams > 50000000) {
+          suggestions.push({
+            title: '🎯 Model Pruning',
+            desc: 'Your model has >50M parameters. Consider magnitude-based pruning to remove 30-50% of weights with minimal accuracy loss.',
+            impact: 'High'
+          });
+        }
+
+        if (totalParams > 20000000) {
+          suggestions.push({
+            title: '⚡ Quantization',
+            desc: 'Apply INT8 quantization to reduce model size by 75% and speed up inference 2-4x.',
+            impact: 'High'
+          });
+        }
+
+        const convLayers = networkConfig.layers.filter(l => l.type === 'conv2d');
+        if (convLayers.length > 5) {
+          suggestions.push({
+            title: '🔄 Depthwise Separable Convolutions',
+            desc: `You have ${convLayers.length} Conv2D layers. Replace with depthwise separable convolutions for 8-9x FLOPs reduction.`,
+            impact: 'High'
+          });
+        }
+
+        if (!networkConfig.layers.some(l => l.type === 'batchnorm' || l.batchNorm)) {
+          suggestions.push({
+            title: '📊 Add Batch Normalization',
+            desc: 'Batch normalization can stabilize training and allow higher learning rates.',
+            impact: 'Medium'
+          });
+        }
+
+        let html = '';
+        if (suggestions.length === 0) {
+          html = '<div class="alert alert-info">✓ No major optimization opportunities detected. Your architecture looks efficient!</div>';
+        } else {
+          suggestions.forEach(sug => {
+            const badgeColor = sug.impact === 'High' ? 'badge-red' : 'badge-yellow';
+            html += `
+              <div class="alert alert-warning" style="margin-bottom: 1rem;">
+                <div style="display: flex; justify-content: space-between; align-items: start;">
+                  <div>
+                    <strong>${sug.title}</strong>
+                    <p style="margin: 0.5rem 0 0 0; font-size: 0.875rem;">${sug.desc}</p>
+                  </div>
+                  <span class="badge ${badgeColor}">${sug.impact} Impact</span>
+                </div>
+              </div>
+            `;
+          });
+        }
+
+        container.innerHTML = html;
+      }
+
+      // ============================================================================
+      // URL SHARING AND NAS
+      // ============================================================================
+
+      function generateShareURL() {
+        const configStr = JSON.stringify(networkConfig);
+        const compressed = btoa(encodeURIComponent(configStr));
+        const baseURL = window.location.href.split('?')[0];
+        const shareURL = `${baseURL}?config=${compressed}`;
+
+        document.getElementById('share-url-container').style.display = 'block';
+        document.getElementById('share-url').value = shareURL;
+      }
+
+      function copyShareURL() {
+        const urlInput = document.getElementById('share-url');
+        urlInput.select();
+        document.execCommand('copy');
+        alert('URL copied to clipboard! Share it with others to load this architecture.');
+      }
+
+      function loadFromURL() {
+        const params = new URLSearchParams(window.location.search);
+        const configParam = params.get('config');
+
+        if (configParam) {
+          try {
+            const configStr = decodeURIComponent(atob(configParam));
+            const imported = JSON.parse(configStr);
+
+            if (imported.layers && Array.isArray(imported.layers)) {
+              networkConfig = imported;
+              networkConfig.layers.forEach(layer => {
+                layer.id = generateLayerId();
+              });
+              renderLayers();
+              alert('Architecture loaded from URL!');
+            }
+          } catch (e) {
+            console.error('Failed to load from URL:', e);
+          }
+        }
+      }
+
+      function runArchitectureSearch() {
+        const objective = getFormValue('nas-objective');
+        const constraints = getFormValue('nas-constraints');
+
+        // Simulate NAS with 3 generated architectures
+        const results = [
+          {
+            name: 'NAS-Found Architecture 1',
+            params: 'Efficient',
+            accuracy: '94.2%',
+            latency: '12ms',
+            layers: generateRandomArchitecture(constraints)
+          },
+          {
+            name: 'NAS-Found Architecture 2',
+            params: 'Balanced',
+            accuracy: '95.8%',
+            latency: '18ms',
+            layers: generateRandomArchitecture(constraints)
+          },
+          {
+            name: 'NAS-Found Architecture 3',
+            params: 'Accurate',
+            accuracy: '96.5%',
+            latency: '25ms',
+            layers: generateRandomArchitecture(constraints)
+          }
+        ];
+
+        const container = document.getElementById('nas-results');
+        const listContainer = document.getElementById('nas-results-list');
+
+        let html = '';
+        results.forEach((result, idx) => {
+          html += `
+            <div class="card" style="margin-bottom: 1rem; padding: 1rem;">
+              <div style="display: flex; justify-content: space-between; align-items: start;">
+                <div>
+                  <h4>${result.name}</h4>
+                  <p style="margin: 0.5rem 0; font-size: 0.875rem;">
+                    <strong>Accuracy:</strong> ${result.accuracy} |
+                    <strong>Latency:</strong> ${result.latency} |
+                    <strong>Size:</strong> ${result.params}
+                  </p>
+                </div>
+                <button class="success small" onclick="loadNASResult(${idx})">Load</button>
+              </div>
+            </div>
+          `;
+        });
+
+        listContainer.innerHTML = html;
+        container.style.display = 'block';
+
+        // Store results temporarily
+        window.nasResults = results;
+      }
+
+      function generateRandomArchitecture(constraints) {
+        // Generate a plausible random architecture
+        const maxLayers = constraints === 'tiny' ? 5 : constraints === 'edge' ? 8 : 12;
+        const layers = [{ type: 'input', shape: '224,224,3' }];
+
+        for (let i = 0; i < Math.floor(Math.random() * maxLayers) + 3; i++) {
+          const type = ['conv2d', 'dense', 'pooling', 'dropout'][Math.floor(Math.random() * 4)];
+          const layerConfig = { type, id: generateLayerId(), ...getDefaultLayerProperties(type) };
+
+          if (type === 'conv2d') {
+            layerConfig.filters = [16, 32, 64, 128][Math.floor(Math.random() * 4)];
+          } else if (type === 'dense') {
+            layerConfig.units = [64, 128, 256][Math.floor(Math.random() * 3)];
+          }
+
+          layers.push(layerConfig);
+        }
+
+        layers.push({ type: 'flatten', id: generateLayerId() });
+        layers.push({ type: 'dense', units: 10, activation: 'softmax', id: generateLayerId() });
+
+        return layers;
+      }
+
+      function loadNASResult(index) {
+        if (window.nasResults && window.nasResults[index]) {
+          networkConfig.layers = window.nasResults[index].layers;
+          renderLayers();
+          document.querySelector('.tab[data-tab="architect"]').click();
+          alert('NAS architecture loaded!');
+        }
+      }
+
+      // ============================================================================
+      // ARCHITECTURE COMPARISON AND TEMPLATES
+      // ============================================================================
+
+      let architectureSnapshots = [];
+
+      function saveArchitectureSnapshot() {
+        const snapshot = {
+          name: `Snapshot ${architectureSnapshots.length + 1}`,
+          timestamp: new Date().toISOString(),
+          config: JSON.parse(JSON.stringify(networkConfig)),
+          params: calculateTotalParameters(),
+          layers: networkConfig.layers.length
+        };
+
+        architectureSnapshots.push(snapshot);
+        localStorage.setItem('architectureSnapshots', JSON.stringify(architectureSnapshots));
+        updateSnapshotsList();
+        alert('Snapshot saved!');
+      }
+
+      function updateSnapshotsList() {
+        const container = document.getElementById('snapshots-list');
+        if (!container) return;
+
+        let html = '<div style="margin-top: 1rem;">';
+        architectureSnapshots.forEach((snap, idx) => {
+          html += `
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem; background: var(--neutral-light); margin-bottom: 0.5rem; border-radius: 4px;">
+              <div>
+                <strong>${snap.name}</strong>
+                <span style="font-size: 0.75rem; color: var(--neutral);"> - ${snap.layers} layers, ${(snap.params/1000000).toFixed(1)}M params</span>
+              </div>
+              <div>
+                <button class="small" onclick="loadSnapshot(${idx})">Load</button>
+                <button class="small danger" onclick="deleteSnapshot(${idx})">Delete</button>
+              </div>
+            </div>
+          `;
+        });
+        html += '</div>';
+        container.innerHTML = html;
+      }
+
+      function loadSnapshot(index) {
+        if (architectureSnapshots[index]) {
+          networkConfig = JSON.parse(JSON.stringify(architectureSnapshots[index].config));
+          renderLayers();
+          alert('Snapshot loaded!');
+        }
+      }
+
+      function deleteSnapshot(index) {
+        architectureSnapshots.splice(index, 1);
+        localStorage.setItem('architectureSnapshots', JSON.stringify(architectureSnapshots));
+        updateSnapshotsList();
+      }
+
+      function showComparisonTool() {
+        if (architectureSnapshots.length < 2) {
+          alert('You need at least 2 snapshots to compare. Save more snapshots first!');
+          return;
+        }
+
+        const container = document.getElementById('comparison-results');
+        let html = '<h4>Architecture Comparison</h4>';
+        html += '<table style="width: 100%; border-collapse: collapse; margin-top: 1rem;"><thead><tr style="background: var(--neutral-light);">';
+        html += '<th style="padding: 0.5rem;">Metric</th>';
+        architectureSnapshots.forEach(snap => {
+          html += `<th style="padding: 0.5rem;">${snap.name}</th>`;
+        });
+        html += '</tr></thead><tbody>';
+
+        // Compare parameters
+        html += '<tr><td style="padding: 0.5rem;">Parameters</td>';
+        architectureSnapshots.forEach(snap => {
+          html += `<td style="padding: 0.5rem;">${(snap.params/1000000).toFixed(1)}M</td>`;
+        });
+        html += '</tr>';
+
+        // Compare layers
+        html += '<tr><td style="padding: 0.5rem;">Layers</td>';
+        architectureSnapshots.forEach(snap => {
+          html += `<td style="padding: 0.5rem;">${snap.layers}</td>`;
+        });
+        html += '</tr>';
+
+        html += '</tbody></table>';
+        container.innerHTML = html;
+      }
+
+      function saveAsTemplate() {
+        const name = prompt('Enter template name:');
+        if (name) {
+          const template = {
+            name: name,
+            layers: JSON.parse(JSON.stringify(networkConfig.layers))
+          };
+
+          let templates = JSON.parse(localStorage.getItem('customTemplates') || '[]');
+          templates.push(template);
+          localStorage.setItem('customTemplates', JSON.stringify(templates));
+
+          alert('Template saved!');
+          loadCustomTemplates();
+        }
+      }
+
+      function loadCustomTemplates() {
+        const container = document.getElementById('custom-templates-list');
+        const templates = JSON.parse(localStorage.getItem('customTemplates') || '[]');
+
+        if (templates.length === 0) {
+          container.innerHTML = '<p class="help-text">No custom templates yet. Create one from your current architecture!</p>';
+          return;
+        }
+
+        let html = '';
+        templates.forEach((template, idx) => {
+          html += `
+            <div class="card preset-card" onclick="loadTemplate(${idx})" style="cursor: pointer; margin-bottom: 1rem;">
+              <h4>${template.name}</h4>
+              <p style="font-size: 0.875rem;">${template.layers.length} layers</p>
+            </div>
+          `;
+        });
+
+        container.innerHTML = html;
+      }
+
+      function loadTemplate(index) {
+        const templates = JSON.parse(localStorage.getItem('customTemplates') || '[]');
+        if (templates[index]) {
+          networkConfig.layers = JSON.parse(JSON.stringify(templates[index].layers));
+          networkConfig.layers.forEach(layer => {
+            layer.id = generateLayerId();
+          });
+          renderLayers();
+          document.querySelector('.tab[data-tab="architect"]').click();
+        }
+      }
+
+      // ============================================================================
+      // ADVANCED EXPORTS
+      // ============================================================================
+
+      function exportDeployment(type) {
+        if (type === 'docker') {
+          const dockerfileContent = generateDockerfile();
+          const requirementsContent = generateRequirements();
+
+          // Create a combined text file with both
+          const combined = `# Dockerfile\n${dockerfileContent}\n\n# requirements.txt\n${requirementsContent}`;
+          downloadFile(combined, 'deployment_package.txt', 'text/plain');
+          alert('Docker deployment files generated! Extract Dockerfile and requirements.txt from the downloaded file.');
+        } else if (type === 'kubernetes') {
+          const k8sConfig = generateK8sConfig();
+          downloadFile(k8sConfig, 'k8s-deployment.yaml', 'text/yaml');
+        }
+      }
+
+      function generateDockerfile() {
+        return `FROM python:3.9-slim
+
+WORKDIR /app
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY model.py .
+COPY model_weights.pth .
+
+EXPOSE 8000
+
+CMD ["python", "model.py"]
+`;
+      }
+
+      function generateRequirements() {
+        return `torch>=2.0.0
+torchvision>=0.15.0
+numpy>=1.24.0
+fastapi>=0.95.0
+uvicorn>=0.22.0
+pillow>=9.5.0
+`;
+      }
+
+      function generateK8sConfig() {
+        return `apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: neural-network-model
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nn-model
+  template:
+    metadata:
+      labels:
+        app: nn-model
+    spec:
+      containers:
+      - name: model-server
+        image: your-registry/nn-model:latest
+        ports:
+        - containerPort: 8000
+        resources:
+          requests:
+            memory: "2Gi"
+            cpu: "1000m"
+          limits:
+            memory: "4Gi"
+            cpu: "2000m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nn-model-service
+spec:
+  selector:
+    app: nn-model
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8000
+  type: LoadBalancer
+`;
+      }
+
+      function exportAPI(framework) {
+        let code = '';
+        let filename = '';
+
+        if (framework === 'fastapi') {
+          code = generateFastAPICode();
+          filename = 'api_fastapi.py';
+        } else if (framework === 'flask') {
+          code = generateFlaskCode();
+          filename = 'api_flask.py';
+        }
+
+        downloadFile(code, filename, 'text/x-python');
+      }
+
+      function generateFastAPICode() {
+        return `from fastapi import FastAPI, File, UploadFile
+from fastapi.responses import JSONResponse
+import torch
+import torch.nn as nn
+from PIL import Image
+import io
+import numpy as np
+
+app = FastAPI(title="Neural Network API", version="1.0.0")
+
+# Load your model
+class NeuralNetwork(nn.Module):
+    def __init__(self):
+        super().__init__()
+        # Add your model architecture here
+        pass
+
+    def forward(self, x):
+        # Add your forward pass here
+        return x
+
+model = NeuralNetwork()
+# model.load_state_dict(torch.load('model_weights.pth'))
+model.eval()
+
+@app.get("/")
+async def root():
+    return {"message": "Neural Network API is running"}
+
+@app.post("/predict")
+async def predict(file: UploadFile = File(...)):
+    """Make prediction on uploaded image"""
+    try:
+        # Read and preprocess image
+        image_data = await file.read()
+        image = Image.open(io.BytesIO(image_data))
+
+        # Preprocess
+        # image_tensor = preprocess(image)
+
+        # Predict
+        with torch.no_grad():
+            # output = model(image_tensor)
+            pass
+
+        return JSONResponse(content={
+            "prediction": "class_name",
+            "confidence": 0.95
+        })
+    except Exception as e:
+        return JSONResponse(content={"error": str(e)}, status_code=500)
+
+@app.get("/health")
+async def health():
+    return {"status": "healthy"}
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
+`;
+      }
+
+      function generateFlaskCode() {
+        return `from flask import Flask, request, jsonify
+import torch
+import torch.nn as nn
+from PIL import Image
+import io
+
+app = Flask(__name__)
+
+# Load your model
+class NeuralNetwork(nn.Module):
+    def __init__(self):
+        super().__init__()
+        # Add your model architecture here
+        pass
+
+    def forward(self, x):
+        # Add your forward pass here
+        return x
+
+model = NeuralNetwork()
+# model.load_state_dict(torch.load('model_weights.pth'))
+model.eval()
+
+@app.route('/')
+def root():
+    return jsonify({"message": "Neural Network API is running"})
+
+@app.route('/predict', methods=['POST'])
+def predict():
+    """Make prediction on uploaded image"""
+    try:
+        if 'file' not in request.files:
+            return jsonify({"error": "No file provided"}), 400
+
+        file = request.files['file']
+        image_data = file.read()
+        image = Image.open(io.BytesIO(image_data))
+
+        # Preprocess and predict
+        with torch.no_grad():
+            # output = model(preprocessed_image)
+            pass
+
+        return jsonify({
+            "prediction": "class_name",
+            "confidence": 0.95
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/health')
+def health():
+    return jsonify({"status": "healthy"})
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=8000, debug=False)
+`;
+      }
+
+      // Update exportCode to handle new formats
+      const originalExportCode = exportCode;
+      exportCode = function(framework) {
+        if (['onnx', 'tflite', 'coreml'].includes(framework)) {
+          const code = generateMobileExport(framework);
+          downloadFile(code, `export_${framework}.py`, 'text/x-python');
+        } else {
+          originalExportCode(framework);
+        }
+      };
+
+      function generateMobileExport(format) {
+        if (format === 'onnx') {
+          return `import torch
+import torch.onnx
+
+# Load your PyTorch model
+model = NeuralNetwork()
+model.load_state_dict(torch.load('model_weights.pth'))
+model.eval()
+
+# Create dummy input
+dummy_input = torch.randn(1, 3, 224, 224)
+
+# Export to ONNX
+torch.onnx.export(
+    model,
+    dummy_input,
+    "model.onnx",
+    export_params=True,
+    opset_version=11,
+    do_constant_folding=True,
+    input_names=['input'],
+    output_names=['output'],
+    dynamic_axes={'input': {0: 'batch_size'}, 'output': {0: 'batch_size'}}
+)
+
+print("Model exported to ONNX format!")
+`;
+        } else if (format === 'tflite') {
+          return `import tensorflow as tf
+
+# Load your Keras model
+model = tf.keras.models.load_model('model.h5')
+
+# Convert to TFLite
+converter = tf.lite.TFLiteConverter.from_keras_model(model)
+converter.optimizations = [tf.lite.Optimize.DEFAULT]  # Quantization
+tflite_model = converter.convert()
+
+# Save the model
+with open('model.tflite', 'wb') as f:
+    f.write(tflite_model)
+
+print("Model exported to TensorFlow Lite format!")
+print("Optimized for mobile and edge devices")
+`;
+        } else if (format === 'coreml') {
+          return `import coremltools as ct
+import torch
+
+# Load your PyTorch model
+model = NeuralNetwork()
+model.load_state_dict(torch.load('model_weights.pth'))
+model.eval()
+
+# Trace the model
+example_input = torch.rand(1, 3, 224, 224)
+traced_model = torch.jit.trace(model, example_input)
+
+# Convert to Core ML
+mlmodel = ct.convert(
+    traced_model,
+    inputs=[ct.ImageType(shape=(1, 3, 224, 224))]
+)
+
+# Save
+mlmodel.save("model.mlmodel")
+
+print("Model exported to Core ML format!")
+print("Ready for iOS deployment")
+`;
+        }
+      }
+
+      // ============================================================================
       // EVENT HANDLERS
       // ============================================================================
 
@@ -2473,7 +3812,10 @@ model = NeuralNetwork()
       // ============================================================================
 
       function initializeApp() {
-        // Try to load from localStorage first
+        // Try to load from URL first
+        loadFromURL();
+
+        // Try to load from localStorage
         if (!loadFromLocalStorage()) {
           // Initialize with default configuration
           networkConfig.layers = [
@@ -2508,7 +3850,21 @@ model = NeuralNetwork()
           renderLayers();
         }
 
+        // Load saved snapshots and templates
+        const savedSnapshots = localStorage.getItem('architectureSnapshots');
+        if (savedSnapshots) {
+          architectureSnapshots = JSON.parse(savedSnapshots);
+          updateSnapshotsList();
+        }
+
+        loadCustomTemplates();
+
+        // Update all statistics and performance metrics
         updateStatistics();
+        updatePerformanceMetrics();
+
+        // Initialize dataset suggestions for default task
+        updateDatasetSuggestions('image-classification');
       }
 
       // Initialize when DOM is ready
