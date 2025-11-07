@@ -18,8 +18,65 @@
       --neutral-dark: #1f2937;
       --white: #ffffff;
       --black: #000000;
+      --bg-primary: #f9fafb;
+      --bg-card: #ffffff;
+      --text-primary: #1f2937;
+      --text-secondary: #6b7280;
+      --border-color: #e5e7eb;
     }
-    
+
+    /* Dark Mode Theme */
+    [data-theme="dark"] {
+      --primary: #6366f1;
+      --primary-hover: #4f46e5;
+      --neutral-light: #374151;
+      --neutral-dark: #f9fafb;
+      --bg-primary: #111827;
+      --bg-card: #1f2937;
+      --text-primary: #f9fafb;
+      --text-secondary: #d1d5db;
+      --border-color: #374151;
+    }
+
+    [data-theme="dark"] body {
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+    }
+
+    [data-theme="dark"] .card,
+    [data-theme="dark"] .layer-card,
+    [data-theme="dark"] .preset-card {
+      background-color: var(--bg-card);
+      border-color: var(--border-color);
+    }
+
+    [data-theme="dark"] input[type="text"],
+    [data-theme="dark"] input[type="number"],
+    [data-theme="dark"] select,
+    [data-theme="dark"] textarea {
+      background-color: #374151;
+      color: var(--text-primary);
+      border-color: var(--border-color);
+    }
+
+    [data-theme="dark"] .tab {
+      color: var(--text-secondary);
+    }
+
+    [data-theme="dark"] .tab.active {
+      background-color: var(--primary);
+      color: white;
+    }
+
+    [data-theme="dark"] .help-text {
+      color: var(--text-secondary);
+    }
+
+    [data-theme="dark"] .alert {
+      background-color: #374151;
+      border-color: var(--border-color);
+    }
+
     * {
       box-sizing: border-box;
       margin: 0;
@@ -556,13 +613,191 @@
       font-size: 1.5rem;
       cursor: pointer;
     }
+
+    /* Tutorial Overlay */
+    .tutorial-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 10000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .tutorial-overlay.active {
+      display: flex;
+    }
+
+    .tutorial-box {
+      background: var(--bg-card);
+      border-radius: 12px;
+      padding: 2rem;
+      max-width: 600px;
+      width: 90%;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+      animation: tutorialFadeIn 0.3s ease-out;
+    }
+
+    @keyframes tutorialFadeIn {
+      from {
+        opacity: 0;
+        transform: scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    .tutorial-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .tutorial-header h2 {
+      margin: 0;
+      color: var(--primary);
+    }
+
+    .tutorial-close {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: var(--text);
+      opacity: 0.6;
+      transition: opacity 0.2s;
+    }
+
+    .tutorial-close:hover {
+      opacity: 1;
+    }
+
+    .tutorial-content {
+      margin-bottom: 1.5rem;
+      line-height: 1.6;
+    }
+
+    .tutorial-content ul {
+      margin: 1rem 0;
+      padding-left: 1.5rem;
+    }
+
+    .tutorial-content li {
+      margin: 0.5rem 0;
+    }
+
+    .tutorial-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .tutorial-progress {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+    }
+
+    .tutorial-buttons {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .tutorial-highlight {
+      position: fixed;
+      z-index: 9999;
+      pointer-events: none;
+      border: 3px solid var(--primary);
+      border-radius: 8px;
+      box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.7);
+      transition: all 0.3s ease-out;
+    }
+
+    /* Drag and Drop */
+    .layer-card {
+      cursor: grab;
+      transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s;
+    }
+
+    .layer-card.dragging {
+      opacity: 0.5;
+      cursor: grabbing;
+      transform: scale(0.95);
+    }
+
+    .layer-card.drag-over {
+      border-top: 3px solid var(--primary);
+      transform: translateY(5px);
+    }
+
+    .layer-card:active {
+      cursor: grabbing;
+    }
+
+    .drag-handle {
+      cursor: grab;
+      display: inline-block;
+      padding: 0.25rem 0.5rem;
+      margin-right: 0.5rem;
+      opacity: 0.6;
+      user-select: none;
+    }
+
+    .drag-handle:hover {
+      opacity: 1;
+    }
   </style>
 </head>
 <body>
+  <!-- Tutorial Overlay -->
+  <div id="tutorial-overlay" class="tutorial-overlay">
+    <div class="tutorial-box">
+      <div class="tutorial-header">
+        <h2 id="tutorial-title">Welcome!</h2>
+        <button class="tutorial-close" onclick="closeTutorial()">×</button>
+      </div>
+      <div class="tutorial-content" id="tutorial-content">
+        <!-- Dynamic content -->
+      </div>
+      <div class="tutorial-footer">
+        <div class="tutorial-progress" id="tutorial-progress">Step 1 of 6</div>
+        <div class="tutorial-buttons">
+          <button id="tutorial-prev" class="secondary" onclick="previousTutorialStep()" style="display: none;">Previous</button>
+          <button id="tutorial-next" class="success" onclick="nextTutorialStep()">Next</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="tutorial-highlight" class="tutorial-highlight" style="display: none;"></div>
+
   <header>
     <div class="container">
       <div class="flex space-between align-center">
         <h1>Neural Network Architect - Advanced Builder</h1>
+        <div style="display: flex; gap: 0.5rem; align-items: center;">
+          <button id="undo-btn" onclick="undo()" class="secondary small" style="cursor: pointer;" disabled title="Nothing to undo">
+            ↶ Undo
+          </button>
+          <button id="redo-btn" onclick="redo()" class="secondary small" style="cursor: pointer;" disabled title="Nothing to redo">
+            ↷ Redo
+          </button>
+          <span style="border-left: 2px solid rgba(255,255,255,0.3); height: 24px; margin: 0 0.5rem;"></span>
+          <button onclick="toggleDarkMode()" class="secondary small" style="cursor: pointer;" title="Toggle Dark Mode (Ctrl/Cmd + D)">
+            🌓 Dark Mode
+          </button>
+          <button onclick="showKeyboardShortcuts()" class="secondary small" style="cursor: pointer;" title="Keyboard Shortcuts (Ctrl/Cmd + /)">
+            ⌨️ Shortcuts
+          </button>
+          <button onclick="startTutorial()" class="secondary small" style="cursor: pointer;" title="Start Interactive Tutorial">
+            📖 Tutorial
+          </button>
+        </div>
       </div>
     </div>
   </header>
@@ -614,11 +849,14 @@
     </div>
     
     <div class="tab-container">
-      <div class="tabs">
+      <div class="tabs" style="overflow-x: auto; flex-wrap: nowrap;">
         <div class="tab active" data-tab="quick-start">Quick Start</div>
         <div class="tab" data-tab="architect">Architect</div>
+        <div class="tab" data-tab="ai-assistant">🤖 AI Assistant</div>
+        <div class="tab" data-tab="performance">⚡ Performance</div>
         <div class="tab" data-tab="hyperparameters">Hyperparameters</div>
         <div class="tab" data-tab="visualization">Visualization</div>
+        <div class="tab" data-tab="advanced">🚀 Advanced</div>
         <div class="tab" data-tab="export">Export</div>
       </div>
       
@@ -885,7 +1123,159 @@
           </div>
         </div>
       </div>
-      
+
+      <div class="tab-content" id="ai-assistant">
+        <div class="card">
+          <h2>🤖 AI Architecture Recommendations</h2>
+          <p class="help-text">Get intelligent suggestions based on your task, data, and constraints.</p>
+
+          <div class="grid grid-2">
+            <div>
+              <label for="ai-task-type">What are you trying to achieve?</label>
+              <select id="ai-task-type">
+                <option value="image-classification">Image Classification</option>
+                <option value="object-detection">Object Detection</option>
+                <option value="semantic-segmentation">Semantic Segmentation</option>
+                <option value="text-classification">Text Classification</option>
+                <option value="text-generation">Text Generation</option>
+                <option value="time-series">Time Series Forecasting</option>
+                <option value="recommendation">Recommendation System</option>
+                <option value="gan">Generative Model (GAN)</option>
+                <option value="autoencoder">Dimensionality Reduction</option>
+              </select>
+            </div>
+            <div>
+              <label for="ai-dataset-size">Dataset Size</label>
+              <select id="ai-dataset-size">
+                <option value="tiny">Tiny (&lt;1K samples)</option>
+                <option value="small">Small (1K-10K)</option>
+                <option value="medium">Medium (10K-100K)</option>
+                <option value="large">Large (100K-1M)</option>
+                <option value="massive">Massive (&gt;1M)</option>
+              </select>
+            </div>
+            <div>
+              <label for="ai-compute">Available Compute</label>
+              <select id="ai-compute">
+                <option value="cpu">CPU Only</option>
+                <option value="single-gpu">Single GPU</option>
+                <option value="multi-gpu">Multi-GPU</option>
+                <option value="tpu">TPU/Cloud</option>
+              </select>
+            </div>
+            <div>
+              <label for="ai-priority">Priority</label>
+              <select id="ai-priority">
+                <option value="accuracy">Accuracy (slower, larger)</option>
+                <option value="balanced">Balanced</option>
+                <option value="speed">Speed (faster, smaller)</option>
+              </select>
+            </div>
+          </div>
+
+          <button class="success" onclick="generateAIRecommendations()" style="margin-top: 1rem; width: 100%;">
+            Generate AI Recommendations
+          </button>
+
+          <div id="ai-recommendations" style="margin-top: 2rem; display: none;">
+            <h3>📊 Recommended Architectures</h3>
+            <div id="ai-recommendations-list"></div>
+
+            <h3 style="margin-top: 2rem;">💡 Smart Suggestions</h3>
+            <div id="ai-suggestions" class="alert alert-info"></div>
+
+            <h3 style="margin-top: 2rem;">⚠️ Potential Issues</h3>
+            <div id="ai-warnings" class="alert alert-warning"></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>🔍 Architecture Validator</h2>
+          <p class="help-text">Check your current architecture for issues and get optimization suggestions.</p>
+          <button class="secondary" onclick="validateArchitecture()" style="width: 100%;">
+            Validate Current Architecture
+          </button>
+          <div id="validation-results" style="margin-top: 1rem;"></div>
+        </div>
+
+        <div class="card">
+          <h2>📚 Dataset Recommendations</h2>
+          <p class="help-text">Popular datasets for your task type.</p>
+          <div id="dataset-suggestions"></div>
+        </div>
+      </div>
+
+      <div class="tab-content" id="performance">
+        <div class="card">
+          <h2>⚡ Performance Analysis</h2>
+          <p class="help-text">Detailed analysis of your model's computational requirements.</p>
+
+          <div class="model-overview">
+            <div class="performance-metric">
+              <div class="metric-label">FLOPs</div>
+              <div class="metric-value" id="flops-metric">0</div>
+              <small>Floating Point Operations</small>
+            </div>
+            <div class="performance-metric">
+              <div class="metric-label">MACs</div>
+              <div class="metric-value" id="macs-metric">0</div>
+              <small>Multiply-Accumulate Ops</small>
+            </div>
+            <div class="performance-metric">
+              <div class="metric-label">Inference (ms)</div>
+              <div class="metric-value" id="inference-metric">0</div>
+              <small>Estimated on GPU</small>
+            </div>
+            <div class="performance-metric">
+              <div class="metric-label">Throughput</div>
+              <div class="metric-value" id="throughput-metric">0</div>
+              <small>Samples/second</small>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>📊 Layer-wise Performance</h2>
+          <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse;">
+              <thead>
+                <tr style="background-color: var(--neutral-light);">
+                  <th style="padding: 0.5rem; text-align: left; border-bottom: 2px solid var(--neutral);">Layer</th>
+                  <th style="padding: 0.5rem; text-align: left; border-bottom: 2px solid var(--neutral);">FLOPs</th>
+                  <th style="padding: 0.5rem; text-align: left; border-bottom: 2px solid var(--neutral);">Parameters</th>
+                  <th style="padding: 0.5rem; text-align: left; border-bottom: 2px solid var(--neutral);">Memory (MB)</th>
+                  <th style="padding: 0.5rem; text-align: left; border-bottom: 2px solid var(--neutral);">% Total</th>
+                </tr>
+              </thead>
+              <tbody id="performance-breakdown-body"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>🎯 Optimization Suggestions</h2>
+          <div id="optimization-suggestions"></div>
+        </div>
+
+        <div class="card">
+          <h2>📱 Device Compatibility</h2>
+          <div class="grid grid-3">
+            <div class="performance-metric">
+              <div class="metric-label">Mobile (iOS/Android)</div>
+              <div class="metric-value" id="mobile-compatible" style="font-size: 2rem;">❓</div>
+            </div>
+            <div class="performance-metric">
+              <div class="metric-label">Edge Devices</div>
+              <div class="metric-value" id="edge-compatible" style="font-size: 2rem;">❓</div>
+            </div>
+            <div class="performance-metric">
+              <div class="metric-label">Browser (TFJS)</div>
+              <div class="metric-value" id="browser-compatible" style="font-size: 2rem;">❓</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
     <!-- Additional Code Starting at Hyperparameters -->
 
     <div class="tab-content" id="hyperparameters">
@@ -959,32 +1349,176 @@
     
     <div class="tab-content" id="visualization">
       <div class="card">
-        <h2>Model Visualization</h2>
-        <p class="help-text">Preview the architecture and performance metrics of your model.</p>
-        <div class="architecture-diagram" id="architecture-diagram">
-          <!-- Placeholder for architecture SVG or canvas -->
-          <svg id="architecture-svg" viewBox="0 0 400 200">
-            <rect x="50" y="50" width="300" height="100" fill="var(--primary)" />
-            <text x="200" y="110" font-size="20" text-anchor="middle" fill="#ffffff">Model Diagram</text>
-          </svg>
+        <h2>Model Architecture</h2>
+        <p class="help-text">Visual representation of your neural network layers.</p>
+        <div class="layer-visualizer" id="viz-layer-visualizer" style="margin: 2rem 0;">
+          <!-- Dynamically generated layer flow -->
         </div>
+      </div>
+
+      <div class="card">
+        <h2>Model Statistics</h2>
         <div class="model-overview">
           <div class="performance-metric">
-            <div class="metric-label">Accuracy</div>
-            <div class="metric-value" id="accuracy-metric">--%</div>
+            <div class="metric-label">Total Parameters</div>
+            <div class="metric-value" id="accuracy-metric">0</div>
           </div>
           <div class="performance-metric">
-            <div class="metric-label">Loss</div>
-            <div class="metric-value" id="loss-metric">--</div>
+            <div class="metric-label">Estimated Memory</div>
+            <div class="metric-value" id="loss-metric">0 MB</div>
+          </div>
+          <div class="performance-metric">
+            <div class="metric-label">Total Layers</div>
+            <div class="metric-value" id="layer-count-metric">0</div>
+          </div>
+          <div class="performance-metric">
+            <div class="metric-label">Network Depth</div>
+            <div class="metric-value" id="depth-metric">0</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Layer Summary</h2>
+        <div id="layer-summary" style="overflow-x: auto;">
+          <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+              <tr style="background-color: var(--neutral-light);">
+                <th style="padding: 0.5rem; text-align: left; border-bottom: 2px solid var(--neutral);">#</th>
+                <th style="padding: 0.5rem; text-align: left; border-bottom: 2px solid var(--neutral);">Layer Type</th>
+                <th style="padding: 0.5rem; text-align: left; border-bottom: 2px solid var(--neutral);">Configuration</th>
+                <th style="padding: 0.5rem; text-align: left; border-bottom: 2px solid var(--neutral);">Input Shape</th>
+                <th style="padding: 0.5rem; text-align: left; border-bottom: 2px solid var(--neutral);">Output Shape</th>
+              </tr>
+            </thead>
+            <tbody id="layer-summary-body">
+              <!-- Dynamically generated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Training Configuration Summary</h2>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+          <div>
+            <strong>Batch Size:</strong> <span id="viz-batch-size">32</span>
+          </div>
+          <div>
+            <strong>Epochs:</strong> <span id="viz-epochs">10</span>
+          </div>
+          <div>
+            <strong>Learning Rate:</strong> <span id="viz-lr">0.001</span>
+          </div>
+          <div>
+            <strong>Optimizer:</strong> <span id="viz-optimizer">Adam</span>
+          </div>
+          <div>
+            <strong>Data Augmentation:</strong> <span id="viz-aug">Disabled</span>
+          </div>
+          <div>
+            <strong>Validation Split:</strong> <span id="viz-val-split">20%</span>
           </div>
         </div>
       </div>
     </div>
-    
+
+    <div class="tab-content" id="advanced">
+      <div class="card">
+        <h2>🔗 Share Architecture</h2>
+        <p class="help-text">Share your architecture via URL - no files needed!</p>
+        <button class="success" onclick="generateShareURL()" style="width: 100%; margin-bottom: 1rem;">
+          Generate Shareable URL
+        </button>
+        <div id="share-url-container" style="display: none;">
+          <input type="text" id="share-url" readonly style="margin-bottom: 0.5rem;">
+          <button onclick="copyShareURL()" style="width: 100%;">Copy to Clipboard</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>🔍 Architecture Search (NAS)</h2>
+        <p class="help-text">Automatically discover optimal architectures for your task.</p>
+
+        <div class="grid grid-2">
+          <div>
+            <label for="nas-objective">Optimization Objective</label>
+            <select id="nas-objective">
+              <option value="accuracy">Maximum Accuracy</option>
+              <option value="efficiency">Best Efficiency</option>
+              <option value="balanced">Balanced</option>
+            </select>
+          </div>
+          <div>
+            <label for="nas-constraints">Constraints</label>
+            <select id="nas-constraints">
+              <option value="none">No Constraints</option>
+              <option value="mobile">&lt;10M params (Mobile)</option>
+              <option value="edge">&lt;1M params (Edge)</option>
+              <option value="tiny">&lt;100K params (Tiny)</option>
+            </select>
+          </div>
+        </div>
+
+        <button class="warning" onclick="runArchitectureSearch()" style="width: 100%; margin-top: 1rem;">
+          🔬 Run Architecture Search
+        </button>
+
+        <div id="nas-results" style="margin-top: 1rem; display: none;">
+          <h3>Top 3 Discovered Architectures</h3>
+          <div id="nas-results-list"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>📊 Compare Architectures</h2>
+        <p class="help-text">Compare your current architecture with saved versions or presets.</p>
+
+        <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+          <button onclick="saveArchitectureSnapshot()" style="flex: 1;">
+            Save Current as Snapshot
+          </button>
+          <button onclick="showComparisonTool()" class="secondary" style="flex: 1;">
+            Compare Snapshots
+          </button>
+        </div>
+
+        <div id="snapshots-list"></div>
+        <div id="comparison-results" style="margin-top: 1rem;"></div>
+      </div>
+
+      <div class="card">
+        <h2>🌐 Multi-Input/Multi-Output</h2>
+        <p class="help-text">Build complex architectures with multiple inputs and outputs.</p>
+
+        <div class="alert alert-info">
+          <strong>Coming Soon:</strong> Visual graph builder for complex architectures with skip connections,
+          multi-input branches, and custom connection patterns.
+        </div>
+
+        <button onclick="alert('Graph builder UI coming in next update!')" style="width: 100%; margin-top: 1rem;">
+          Open Graph Builder (Beta)
+        </button>
+      </div>
+
+      <div class="card">
+        <h2>🎨 Architecture Templates</h2>
+        <p class="help-text">Save and reuse common architecture patterns.</p>
+
+        <button onclick="saveAsTemplate()" style="width: 100%; margin-bottom: 1rem;">
+          Save Current as Template
+        </button>
+
+        <div id="custom-templates-list">
+          <p class="help-text">No custom templates yet. Create one from your current architecture!</p>
+        </div>
+      </div>
+    </div>
+
     <div class="tab-content" id="export">
       <div class="card">
-        <h2>Export &amp; Save Configuration</h2>
-        <p class="help-text">Save your configuration and export the model architecture in various formats.</p>
+        <h2>Export Configuration</h2>
+        <p class="help-text">Save your neural network configuration in various formats.</p>
         <div class="grid grid-2">
           <div>
             <label for="export-format">Export Format</label>
@@ -994,17 +1528,2929 @@
               <option value="xml">XML</option>
             </select>
           </div>
-          <div>
-            <label for="save-destination">Save Destination</label>
-            <input type="text" id="save-destination" placeholder="Enter file path or URL">
+          <div style="display: flex; align-items: flex-end;">
+            <button id="export-config-btn" style="width: 100%;">Export Configuration</button>
           </div>
         </div>
-        <button id="export-config-btn">Export Configuration</button>
+      </div>
+
+      <div class="card">
+        <h2>Generate Training Code</h2>
+        <p class="help-text">Export your architecture as ready-to-use code in popular frameworks.</p>
+        <div class="grid grid-3">
+          <button class="success" onclick="exportCode('pytorch')">
+            <strong>PyTorch</strong><br>
+            <span style="font-size: 0.875rem;">Export as torch.nn</span>
+          </button>
+          <button class="success" onclick="exportCode('keras')">
+            <strong>TensorFlow/Keras</strong><br>
+            <span style="font-size: 0.875rem;">Export as tf.keras</span>
+          </button>
+          <button class="success" onclick="exportCode('jax')">
+            <strong>JAX/Flax</strong><br>
+            <span style="font-size: 0.875rem;">Export as Flax model</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>📱 Mobile & Edge Export</h2>
+        <p class="help-text">Export optimized models for deployment on mobile and edge devices.</p>
+        <div class="grid grid-3">
+          <button class="success" onclick="exportCode('onnx')">
+            <strong>ONNX</strong><br>
+            <span style="font-size: 0.875rem;">Universal format</span>
+          </button>
+          <button class="success" onclick="exportCode('tflite')">
+            <strong>TensorFlow Lite</strong><br>
+            <span style="font-size: 0.875rem;">Android/iOS/Edge</span>
+          </button>
+          <button class="success" onclick="exportCode('coreml')">
+            <strong>Core ML</strong><br>
+            <span style="font-size: 0.875rem;">iOS deployment</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>🐳 Deployment Packages</h2>
+        <p class="help-text">Generate complete deployment configurations for production.</p>
+        <div class="grid grid-2">
+          <button class="warning" onclick="exportDeployment('docker')">
+            <strong>Docker Container</strong><br>
+            <span style="font-size: 0.875rem;">Dockerfile + requirements</span>
+          </button>
+          <button class="warning" onclick="exportDeployment('kubernetes')">
+            <strong>Kubernetes</strong><br>
+            <span style="font-size: 0.875rem;">K8s deployment config</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>🚀 API Endpoint Generation</h2>
+        <p class="help-text">Generate REST API servers for your model.</p>
+        <div class="grid grid-2">
+          <button class="warning" onclick="exportAPI('fastapi')">
+            <strong>FastAPI</strong><br>
+            <span style="font-size: 0.875rem;">Modern Python API</span>
+          </button>
+          <button class="warning" onclick="exportAPI('flask')">
+            <strong>Flask</strong><br>
+            <span style="font-size: 0.875rem;">Simple Python API</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Import Configuration</h2>
+        <p class="help-text">Load a previously saved configuration from JSON file.</p>
+        <input type="file" id="import-file" accept=".json" style="margin-bottom: 1rem;">
+        <button class="secondary" onclick="importConfiguration()">Import from JSON</button>
+      </div>
+
+      <div class="card">
+        <h2>Local Storage</h2>
+        <p class="help-text">Your configuration is automatically saved to browser storage.</p>
+        <div style="display: flex; gap: 1rem;">
+          <button class="warning" onclick="clearLocalStorage()">Clear Saved Data</button>
+          <button onclick="manualSave()">Save Now</button>
+        </div>
       </div>
     </div>
     
     <script>
-      // Handle tab switching
+      // ============================================================================
+      // STATE MANAGEMENT
+      // ============================================================================
+      let networkConfig = {
+        project: {
+          name: '',
+          description: '',
+          taskType: 'classification',
+          dataType: 'image'
+        },
+        layers: [],
+        hyperparameters: {
+          batchSize: 32,
+          epochs: 10,
+          learningRate: 0.001,
+          optimizer: 'adam',
+          dataAugmentation: false,
+          augmentationType: 'flip',
+          validationSplit: 20,
+          callbacks: []
+        }
+      };
+
+      let layerIdCounter = 0;
+
+      // ============================================================================
+      // UNDO/REDO SYSTEM
+      // ============================================================================
+
+      let historyStack = [];
+      let historyIndex = -1;
+      const MAX_HISTORY = 50;
+      let isUndoRedoOperation = false;
+
+      function saveToHistory() {
+        if (isUndoRedoOperation) return;
+
+        // Remove any future history if we're not at the end
+        if (historyIndex < historyStack.length - 1) {
+          historyStack = historyStack.slice(0, historyIndex + 1);
+        }
+
+        // Add current state to history
+        const snapshot = JSON.parse(JSON.stringify(networkConfig));
+        historyStack.push(snapshot);
+
+        // Limit history size
+        if (historyStack.length > MAX_HISTORY) {
+          historyStack.shift();
+        } else {
+          historyIndex++;
+        }
+
+        updateUndoRedoButtons();
+      }
+
+      function undo() {
+        if (historyIndex > 0) {
+          isUndoRedoOperation = true;
+          historyIndex--;
+          networkConfig = JSON.parse(JSON.stringify(historyStack[historyIndex]));
+          renderLayers();
+          updateUndoRedoButtons();
+          isUndoRedoOperation = false;
+        }
+      }
+
+      function redo() {
+        if (historyIndex < historyStack.length - 1) {
+          isUndoRedoOperation = true;
+          historyIndex++;
+          networkConfig = JSON.parse(JSON.stringify(historyStack[historyIndex]));
+          renderLayers();
+          updateUndoRedoButtons();
+          isUndoRedoOperation = false;
+        }
+      }
+
+      function updateUndoRedoButtons() {
+        const undoBtn = document.getElementById('undo-btn');
+        const redoBtn = document.getElementById('redo-btn');
+
+        if (undoBtn) {
+          undoBtn.disabled = historyIndex <= 0;
+          undoBtn.title = historyIndex > 0 ? `Undo (Ctrl/Cmd + Z) - ${historyIndex} actions` : 'Nothing to undo';
+        }
+        if (redoBtn) {
+          redoBtn.disabled = historyIndex >= historyStack.length - 1;
+          redoBtn.title = historyIndex < historyStack.length - 1 ? `Redo (Ctrl/Cmd + Y)` : 'Nothing to redo';
+        }
+      }
+
+      // ============================================================================
+      // UTILITY FUNCTIONS
+      // ============================================================================
+
+      function generateLayerId() {
+        return `layer_${layerIdCounter++}`;
+      }
+
+      function getFormValue(id) {
+        const element = document.getElementById(id);
+        if (!element) return null;
+        if (element.type === 'checkbox') return element.checked;
+        if (element.type === 'number') return parseFloat(element.value) || 0;
+        return element.value;
+      }
+
+      function setFormValue(id, value) {
+        const element = document.getElementById(id);
+        if (!element) return;
+        if (element.type === 'checkbox') {
+          element.checked = value;
+        } else {
+          element.value = value;
+        }
+      }
+
+      // ============================================================================
+      // INTERACTIVE TUTORIAL SYSTEM
+      // ============================================================================
+
+      let tutorialStep = 0;
+      const tutorialSteps = [
+        {
+          title: "Welcome to Neural Network Builder!",
+          content: `
+            <p>This interactive tutorial will guide you through the key features of the Neural Network Builder.</p>
+            <p>In just a few minutes, you'll learn how to:</p>
+            <ul>
+              <li>Choose and load preset architectures</li>
+              <li>Design custom neural networks</li>
+              <li>Use AI-powered recommendations</li>
+              <li>Analyze performance metrics</li>
+              <li>Export production-ready code</li>
+            </ul>
+            <p><strong>Let's get started!</strong></p>
+          `
+        },
+        {
+          title: "1. Quick Start with Presets",
+          content: `
+            <p>The fastest way to get started is by using one of our preset architectures.</p>
+            <p>Scroll down to the <strong>Quick Start</strong> section and you'll find popular architectures like:</p>
+            <ul>
+              <li><strong>ResNet</strong> - For image classification</li>
+              <li><strong>Transformer</strong> - For natural language processing</li>
+              <li><strong>EfficientNet</strong> - For mobile deployment</li>
+            </ul>
+            <p>Click any preset card to load a complete, pre-configured architecture instantly.</p>
+          `,
+          highlight: '.card:has(h2:contains("Quick"))'
+        },
+        {
+          title: "2. Build Your Architecture",
+          content: `
+            <p>Once you've loaded a preset (or want to build from scratch), use the <strong>Architect</strong> tab to customize your network.</p>
+            <p>Here you can:</p>
+            <ul>
+              <li><strong>Add layers</strong> - Click "Add Layer" and choose from 12+ layer types</li>
+              <li><strong>Modify parameters</strong> - Adjust filters, units, activation functions, etc.</li>
+              <li><strong>Reorder layers</strong> - Use the layer cards to organize your architecture</li>
+              <li><strong>Remove layers</strong> - Click the "Remove" button on any layer</li>
+            </ul>
+            <p>Try using <strong>Ctrl+Z</strong> to undo and <strong>Ctrl+Y</strong> to redo changes!</p>
+          `
+        },
+        {
+          title: "3. Get AI Recommendations",
+          content: `
+            <p>Not sure which architecture to use? Let AI help you!</p>
+            <p>Go to the <strong>AI Assistant</strong> tab and:</p>
+            <ol>
+              <li>Select your <strong>task type</strong> (image classification, NLP, etc.)</li>
+              <li>Choose your <strong>dataset size</strong> (small, medium, large)</li>
+              <li>Select your <strong>compute resources</strong> (CPU, GPU, TPU)</li>
+              <li>Set your <strong>priority</strong> (speed, accuracy, or balanced)</li>
+              <li>Click <strong>"Generate AI Recommendations"</strong></li>
+            </ol>
+            <p>You'll get 3 architecture suggestions with match scores and explanations!</p>
+          `
+        },
+        {
+          title: "4. Analyze Performance",
+          content: `
+            <p>Before training, check if your architecture is efficient using the <strong>Performance</strong> tab.</p>
+            <p>You'll see:</p>
+            <ul>
+              <li><strong>FLOPs</strong> - Computational complexity</li>
+              <li><strong>Inference time</strong> - How fast predictions will be</li>
+              <li><strong>Device compatibility</strong> - Mobile, Edge, Browser support</li>
+              <li><strong>Layer breakdown</strong> - Which layers are most expensive</li>
+              <li><strong>Optimization tips</strong> - Suggestions to improve performance</li>
+            </ul>
+            <p>This helps you optimize before spending hours training!</p>
+          `
+        },
+        {
+          title: "5. Export Production Code",
+          content: `
+            <p>Ready to train your model? Export production-ready code!</p>
+            <p>Go to the <strong>Export</strong> tab and choose your framework:</p>
+            <ul>
+              <li><strong>PyTorch</strong> - Complete model class with forward pass</li>
+              <li><strong>Keras</strong> - Sequential or Functional API code</li>
+              <li><strong>JAX/Flax</strong> - Functional neural network code</li>
+            </ul>
+            <p>Also export to mobile formats (TFLite, CoreML, ONNX) or deployment configs (Docker, Kubernetes, FastAPI)!</p>
+            <p><strong>Tip:</strong> Use keyboard shortcuts! Press <strong>Ctrl/Cmd + /</strong> to see all shortcuts.</p>
+          `
+        },
+        {
+          title: "You're All Set!",
+          content: `
+            <p>🎉 Congratulations! You now know how to use the Neural Network Builder.</p>
+            <p><strong>Quick tips to remember:</strong></p>
+            <ul>
+              <li>Start with <strong>presets</strong> and customize them</li>
+              <li>Use <strong>AI validation</strong> to catch mistakes early</li>
+              <li>Check <strong>performance metrics</strong> before training</li>
+              <li>Use <strong>Undo/Redo</strong> (Ctrl+Z / Ctrl+Y) freely</li>
+              <li>Save important architectures as <strong>snapshots</strong> (Advanced tab)</li>
+              <li>Share designs with your team using <strong>URL sharing</strong></li>
+            </ul>
+            <p>Ready to build amazing neural networks? Click "Finish" to start!</p>
+            <p style="margin-top: 1.5rem; padding: 1rem; background: var(--primary-light); border-radius: 0.5rem;">
+              💡 <strong>Need help later?</strong> Click the "Tutorial" button in the header anytime to review these steps!
+            </p>
+          `
+        }
+      ];
+
+      function startTutorial() {
+        tutorialStep = 0;
+        showTutorialStep();
+        document.getElementById('tutorial-overlay').classList.add('active');
+      }
+
+      function closeTutorial() {
+        document.getElementById('tutorial-overlay').classList.remove('active');
+        document.getElementById('tutorial-highlight').style.display = 'none';
+      }
+
+      function nextTutorialStep() {
+        if (tutorialStep < tutorialSteps.length - 1) {
+          tutorialStep++;
+          showTutorialStep();
+        } else {
+          closeTutorial();
+        }
+      }
+
+      function previousTutorialStep() {
+        if (tutorialStep > 0) {
+          tutorialStep--;
+          showTutorialStep();
+        }
+      }
+
+      function showTutorialStep() {
+        const step = tutorialSteps[tutorialStep];
+        document.getElementById('tutorial-title').textContent = step.title;
+        document.getElementById('tutorial-content').innerHTML = step.content;
+        document.getElementById('tutorial-progress').textContent = `Step ${tutorialStep + 1} of ${tutorialSteps.length}`;
+
+        // Update button visibility
+        const prevBtn = document.getElementById('tutorial-prev');
+        const nextBtn = document.getElementById('tutorial-next');
+
+        prevBtn.style.display = tutorialStep > 0 ? 'inline-block' : 'none';
+        nextBtn.textContent = tutorialStep === tutorialSteps.length - 1 ? 'Finish' : 'Next';
+
+        // Hide highlight for now (can be enhanced later to highlight specific elements)
+        document.getElementById('tutorial-highlight').style.display = 'none';
+      }
+
+      // ============================================================================
+      // LAYER CONFIGURATIONS BY TYPE
+      // ============================================================================
+
+      const layerConfigs = {
+        conv2d: {
+          name: 'Convolutional 2D',
+          fields: ['filters', 'kernelSize', 'strides', 'padding', 'activation', 'useBias', 'batchNorm', 'initializer']
+        },
+        dense: {
+          name: 'Dense (Fully Connected)',
+          fields: ['units', 'activation', 'useBias', 'dropout', 'initializer']
+        },
+        lstm: {
+          name: 'LSTM',
+          fields: ['units', 'returnSequences', 'dropout', 'recurrentDropout']
+        },
+        gru: {
+          name: 'GRU',
+          fields: ['units', 'returnSequences', 'dropout', 'recurrentDropout']
+        },
+        attention: {
+          name: 'Self-Attention',
+          fields: ['heads', 'keyDim', 'dropout']
+        },
+        transformer: {
+          name: 'Transformer Block',
+          fields: ['heads', 'keyDim', 'ffDim', 'dropout']
+        },
+        pooling: {
+          name: 'Pooling',
+          fields: ['poolType', 'poolSize', 'strides']
+        },
+        dropout: {
+          name: 'Dropout',
+          fields: ['rate']
+        },
+        batchnorm: {
+          name: 'Batch Normalization',
+          fields: ['momentum', 'epsilon']
+        },
+        residual: {
+          name: 'Residual Block',
+          fields: ['filters', 'kernelSize', 'activation']
+        },
+        flatten: {
+          name: 'Flatten',
+          fields: []
+        },
+        globalavgpool: {
+          name: 'Global Average Pooling',
+          fields: []
+        }
+      };
+
+      // ============================================================================
+      // PRESET ARCHITECTURES
+      // ============================================================================
+
+      const presetArchitectures = {
+        resnet: {
+          name: 'ResNet-50',
+          layers: [
+            { type: 'input', shape: '224,224,3' },
+            { type: 'conv2d', filters: 64, kernelSize: 7, strides: 2, activation: 'relu', batchNorm: true },
+            { type: 'pooling', poolType: 'max', poolSize: 3, strides: 2 },
+            { type: 'residual', filters: 64, kernelSize: 3, activation: 'relu' },
+            { type: 'residual', filters: 64, kernelSize: 3, activation: 'relu' },
+            { type: 'residual', filters: 128, kernelSize: 3, activation: 'relu' },
+            { type: 'residual', filters: 256, kernelSize: 3, activation: 'relu' },
+            { type: 'residual', filters: 512, kernelSize: 3, activation: 'relu' },
+            { type: 'globalavgpool' },
+            { type: 'dense', units: 1000, activation: 'softmax' }
+          ]
+        },
+        transformer: {
+          name: 'Transformer Encoder',
+          layers: [
+            { type: 'input', shape: '512,768' },
+            { type: 'transformer', heads: 8, keyDim: 64, ffDim: 2048, dropout: 0.1 },
+            { type: 'transformer', heads: 8, keyDim: 64, ffDim: 2048, dropout: 0.1 },
+            { type: 'transformer', heads: 8, keyDim: 64, ffDim: 2048, dropout: 0.1 },
+            { type: 'globalavgpool' },
+            { type: 'dense', units: 512, activation: 'relu' },
+            { type: 'dropout', rate: 0.3 },
+            { type: 'dense', units: 10, activation: 'softmax' }
+          ]
+        },
+        efficientnet: {
+          name: 'EfficientNet-B0',
+          layers: [
+            { type: 'input', shape: '224,224,3' },
+            { type: 'conv2d', filters: 32, kernelSize: 3, strides: 2, activation: 'swish', batchNorm: true },
+            { type: 'conv2d', filters: 16, kernelSize: 1, activation: 'swish', batchNorm: true },
+            { type: 'conv2d', filters: 24, kernelSize: 3, activation: 'swish', batchNorm: true },
+            { type: 'conv2d', filters: 40, kernelSize: 5, activation: 'swish', batchNorm: true },
+            { type: 'conv2d', filters: 80, kernelSize: 3, activation: 'swish', batchNorm: true },
+            { type: 'conv2d', filters: 112, kernelSize: 5, activation: 'swish', batchNorm: true },
+            { type: 'conv2d', filters: 192, kernelSize: 5, activation: 'swish', batchNorm: true },
+            { type: 'conv2d', filters: 320, kernelSize: 3, activation: 'swish', batchNorm: true },
+            { type: 'globalavgpool' },
+            { type: 'dense', units: 1000, activation: 'softmax' }
+          ]
+        },
+        bert: {
+          name: 'BERT-Base',
+          layers: [
+            { type: 'input', shape: '512,768' },
+            { type: 'transformer', heads: 12, keyDim: 64, ffDim: 3072, dropout: 0.1 },
+            { type: 'transformer', heads: 12, keyDim: 64, ffDim: 3072, dropout: 0.1 },
+            { type: 'transformer', heads: 12, keyDim: 64, ffDim: 3072, dropout: 0.1 },
+            { type: 'transformer', heads: 12, keyDim: 64, ffDim: 3072, dropout: 0.1 },
+            { type: 'dense', units: 768, activation: 'tanh' },
+            { type: 'dense', units: 2, activation: 'softmax' }
+          ]
+        },
+        unet: {
+          name: 'U-Net',
+          layers: [
+            { type: 'input', shape: '256,256,3' },
+            { type: 'conv2d', filters: 64, kernelSize: 3, activation: 'relu', batchNorm: true },
+            { type: 'conv2d', filters: 64, kernelSize: 3, activation: 'relu', batchNorm: true },
+            { type: 'pooling', poolType: 'max', poolSize: 2, strides: 2 },
+            { type: 'conv2d', filters: 128, kernelSize: 3, activation: 'relu', batchNorm: true },
+            { type: 'conv2d', filters: 128, kernelSize: 3, activation: 'relu', batchNorm: true },
+            { type: 'pooling', poolType: 'max', poolSize: 2, strides: 2 },
+            { type: 'conv2d', filters: 256, kernelSize: 3, activation: 'relu', batchNorm: true },
+            { type: 'conv2d', filters: 128, kernelSize: 3, activation: 'relu', batchNorm: true },
+            { type: 'conv2d', filters: 64, kernelSize: 3, activation: 'relu', batchNorm: true },
+            { type: 'conv2d', filters: 1, kernelSize: 1, activation: 'sigmoid' }
+          ]
+        },
+        yolo: {
+          name: 'YOLO-style',
+          layers: [
+            { type: 'input', shape: '416,416,3' },
+            { type: 'conv2d', filters: 32, kernelSize: 3, activation: 'leaky_relu', batchNorm: true },
+            { type: 'pooling', poolType: 'max', poolSize: 2, strides: 2 },
+            { type: 'conv2d', filters: 64, kernelSize: 3, activation: 'leaky_relu', batchNorm: true },
+            { type: 'pooling', poolType: 'max', poolSize: 2, strides: 2 },
+            { type: 'conv2d', filters: 128, kernelSize: 3, activation: 'leaky_relu', batchNorm: true },
+            { type: 'conv2d', filters: 256, kernelSize: 3, activation: 'leaky_relu', batchNorm: true },
+            { type: 'conv2d', filters: 512, kernelSize: 3, activation: 'leaky_relu', batchNorm: true },
+            { type: 'conv2d', filters: 1024, kernelSize: 3, activation: 'leaky_relu', batchNorm: true },
+            { type: 'conv2d', filters: 425, kernelSize: 1, activation: 'linear' }
+          ]
+        },
+        gan: {
+          name: 'GAN Generator',
+          layers: [
+            { type: 'input', shape: '100' },
+            { type: 'dense', units: 256, activation: 'relu', batchNorm: true },
+            { type: 'dense', units: 512, activation: 'relu', batchNorm: true },
+            { type: 'dense', units: 1024, activation: 'relu', batchNorm: true },
+            { type: 'dense', units: 784, activation: 'tanh' }
+          ]
+        },
+        vae: {
+          name: 'Variational Autoencoder',
+          layers: [
+            { type: 'input', shape: '784' },
+            { type: 'dense', units: 512, activation: 'relu' },
+            { type: 'dense', units: 256, activation: 'relu' },
+            { type: 'dense', units: 128, activation: 'relu' },
+            { type: 'dense', units: 20, activation: 'linear' },
+            { type: 'dense', units: 128, activation: 'relu' },
+            { type: 'dense', units: 256, activation: 'relu' },
+            { type: 'dense', units: 512, activation: 'relu' },
+            { type: 'dense', units: 784, activation: 'sigmoid' }
+          ]
+        },
+        custom: {
+          name: 'Custom',
+          layers: [
+            { type: 'input', shape: '224,224,3' },
+            { type: 'conv2d', filters: 32, kernelSize: 3, activation: 'relu' },
+            { type: 'flatten' },
+            { type: 'dense', units: 10, activation: 'softmax' }
+          ]
+        }
+      };
+
+      // ============================================================================
+      // LAYER RENDERING
+      // ============================================================================
+
+      function createLayerHTML(layer, index) {
+        const isInput = layer.type === 'input';
+        const isOutput = index === networkConfig.layers.length - 1 && !isInput;
+        const isDraggable = !isInput; // Can't drag input layer
+
+        let html = `
+          <div class="layer-card"
+               data-layer-id="${layer.id}"
+               data-layer-index="${index}"
+               ${isDraggable ? 'draggable="true"' : ''}
+               ondragstart="${isDraggable ? 'handleDragStart(event)' : 'return false;'}"
+               ondragend="${isDraggable ? 'handleDragEnd(event)' : ''}"
+               ondragover="${isDraggable ? 'handleDragOver(event)' : ''}"
+               ondrop="${isDraggable ? 'handleDrop(event)' : ''}">
+            <div class="layer-tools">
+              ${isDraggable ? '<span class="drag-handle" title="Drag to reorder">⋮⋮</span>' : ''}`;
+
+        if (isInput) {
+          html += `<button class="small" disabled>Input</button>`;
+        } else if (isOutput) {
+          html += `<button class="small" disabled>Output</button>`;
+        } else {
+          html += `
+            <button class="small danger" onclick="removeLayer('${layer.id}')">Remove</button>
+            <button class="small" onclick="duplicateLayer('${layer.id}')">Duplicate</button>`;
+        }
+
+        html += `</div>`;
+
+        if (isInput) {
+          html += `
+            <h3>Input Layer</h3>
+            <div class="grid grid-2">
+              <div>
+                <label>Input Shape</label>
+                <input type="text" id="shape-${layer.id}" value="${layer.shape || ''}"
+                  onchange="updateLayerProperty('${layer.id}', 'shape', this.value)"
+                  placeholder="e.g. 224,224,3">
+                <p class="help-text">Format: height,width,channels for images; sequence_length,features for sequences</p>
+              </div>
+              <div>
+                <label>Preprocessing</label>
+                <select id="preprocessing-${layer.id}"
+                  onchange="updateLayerProperty('${layer.id}', 'preprocessing', this.value)">
+                  <option value="none" ${layer.preprocessing === 'none' ? 'selected' : ''}>None</option>
+                  <option value="normalize" ${layer.preprocessing === 'normalize' ? 'selected' : ''}>Normalize (0-1)</option>
+                  <option value="standardize" ${layer.preprocessing === 'standardize' ? 'selected' : ''}>Standardize (mean=0, std=1)</option>
+                  <option value="custom" ${layer.preprocessing === 'custom' ? 'selected' : ''}>Custom</option>
+                </select>
+              </div>
+            </div>`;
+        } else {
+          html += `<h3>${layerConfigs[layer.type]?.name || layer.type}</h3>`;
+          html += createLayerFieldsHTML(layer);
+        }
+
+        html += `</div>`;
+        return html;
+      }
+
+      function createLayerFieldsHTML(layer) {
+        let html = '<div class="grid grid-3">';
+
+        // Layer type selector
+        html += `
+          <div>
+            <label>Layer Type</label>
+            <select id="type-${layer.id}" onchange="changeLayerType('${layer.id}', this.value)">`;
+
+        for (const [type, config] of Object.entries(layerConfigs)) {
+          html += `<option value="${type}" ${layer.type === type ? 'selected' : ''}>${config.name}</option>`;
+        }
+
+        html += `</select></div>`;
+
+        // Type-specific fields
+        if (layer.type === 'conv2d') {
+          html += `
+            <div>
+              <label>Filters</label>
+              <input type="number" id="filters-${layer.id}" value="${layer.filters || 32}" min="1"
+                onchange="updateLayerProperty('${layer.id}', 'filters', parseInt(this.value))">
+            </div>
+            <div>
+              <label>Activation</label>
+              <select id="activation-${layer.id}" onchange="updateLayerProperty('${layer.id}', 'activation', this.value)">
+                <option value="relu" ${layer.activation === 'relu' ? 'selected' : ''}>ReLU</option>
+                <option value="leaky_relu" ${layer.activation === 'leaky_relu' ? 'selected' : ''}>Leaky ReLU</option>
+                <option value="selu" ${layer.activation === 'selu' ? 'selected' : ''}>SELU</option>
+                <option value="gelu" ${layer.activation === 'gelu' ? 'selected' : ''}>GELU</option>
+                <option value="swish" ${layer.activation === 'swish' ? 'selected' : ''}>Swish</option>
+                <option value="mish" ${layer.activation === 'mish' ? 'selected' : ''}>Mish</option>
+                <option value="sigmoid" ${layer.activation === 'sigmoid' ? 'selected' : ''}>Sigmoid</option>
+                <option value="tanh" ${layer.activation === 'tanh' ? 'selected' : ''}>Tanh</option>
+                <option value="linear" ${layer.activation === 'linear' ? 'selected' : ''}>Linear</option>
+              </select>
+            </div>
+            <div>
+              <label>Kernel Size</label>
+              <select id="kernelSize-${layer.id}" onchange="updateLayerProperty('${layer.id}', 'kernelSize', parseInt(this.value))">
+                <option value="1" ${layer.kernelSize === 1 ? 'selected' : ''}>1x1</option>
+                <option value="3" ${layer.kernelSize === 3 ? 'selected' : ''}>3x3</option>
+                <option value="5" ${layer.kernelSize === 5 ? 'selected' : ''}>5x5</option>
+                <option value="7" ${layer.kernelSize === 7 ? 'selected' : ''}>7x7</option>
+              </select>
+            </div>
+            <div>
+              <label>Strides</label>
+              <select id="strides-${layer.id}" onchange="updateLayerProperty('${layer.id}', 'strides', parseInt(this.value))">
+                <option value="1" ${layer.strides === 1 ? 'selected' : ''}>1x1</option>
+                <option value="2" ${layer.strides === 2 ? 'selected' : ''}>2x2</option>
+              </select>
+            </div>
+            <div>
+              <label>Padding</label>
+              <select id="padding-${layer.id}" onchange="updateLayerProperty('${layer.id}', 'padding', this.value)">
+                <option value="same" ${layer.padding === 'same' ? 'selected' : ''}>Same</option>
+                <option value="valid" ${layer.padding === 'valid' ? 'selected' : ''}>Valid</option>
+              </select>
+            </div>
+            <div class="toggle-container">
+              <label>Batch Norm</label>
+              <label class="toggle-switch">
+                <input type="checkbox" id="batchNorm-${layer.id}" ${layer.batchNorm ? 'checked' : ''}
+                  onchange="updateLayerProperty('${layer.id}', 'batchNorm', this.checked)">
+                <span class="toggle-slider"></span>
+              </label>
+            </div>`;
+        } else if (layer.type === 'dense') {
+          html += `
+            <div>
+              <label>Units</label>
+              <input type="number" id="units-${layer.id}" value="${layer.units || 128}" min="1"
+                onchange="updateLayerProperty('${layer.id}', 'units', parseInt(this.value))">
+            </div>
+            <div>
+              <label>Activation</label>
+              <select id="activation-${layer.id}" onchange="updateLayerProperty('${layer.id}', 'activation', this.value)">
+                <option value="relu" ${layer.activation === 'relu' ? 'selected' : ''}>ReLU</option>
+                <option value="leaky_relu" ${layer.activation === 'leaky_relu' ? 'selected' : ''}>Leaky ReLU</option>
+                <option value="selu" ${layer.activation === 'selu' ? 'selected' : ''}>SELU</option>
+                <option value="gelu" ${layer.activation === 'gelu' ? 'selected' : ''}>GELU</option>
+                <option value="sigmoid" ${layer.activation === 'sigmoid' ? 'selected' : ''}>Sigmoid</option>
+                <option value="tanh" ${layer.activation === 'tanh' ? 'selected' : ''}>Tanh</option>
+                <option value="softmax" ${layer.activation === 'softmax' ? 'selected' : ''}>Softmax</option>
+                <option value="linear" ${layer.activation === 'linear' ? 'selected' : ''}>Linear</option>
+              </select>
+            </div>`;
+        } else if (layer.type === 'lstm' || layer.type === 'gru') {
+          html += `
+            <div>
+              <label>Units</label>
+              <input type="number" id="units-${layer.id}" value="${layer.units || 128}" min="1"
+                onchange="updateLayerProperty('${layer.id}', 'units', parseInt(this.value))">
+            </div>
+            <div class="toggle-container">
+              <label>Return Sequences</label>
+              <label class="toggle-switch">
+                <input type="checkbox" id="returnSequences-${layer.id}" ${layer.returnSequences ? 'checked' : ''}
+                  onchange="updateLayerProperty('${layer.id}', 'returnSequences', this.checked)">
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+            <div>
+              <label>Dropout</label>
+              <input type="number" id="dropout-${layer.id}" value="${layer.dropout || 0}" min="0" max="1" step="0.1"
+                onchange="updateLayerProperty('${layer.id}', 'dropout', parseFloat(this.value))">
+            </div>`;
+        } else if (layer.type === 'attention' || layer.type === 'transformer') {
+          html += `
+            <div>
+              <label>Attention Heads</label>
+              <input type="number" id="heads-${layer.id}" value="${layer.heads || 8}" min="1"
+                onchange="updateLayerProperty('${layer.id}', 'heads', parseInt(this.value))">
+            </div>
+            <div>
+              <label>Key Dimension</label>
+              <input type="number" id="keyDim-${layer.id}" value="${layer.keyDim || 64}" min="1"
+                onchange="updateLayerProperty('${layer.id}', 'keyDim', parseInt(this.value))">
+            </div>`;
+          if (layer.type === 'transformer') {
+            html += `
+            <div>
+              <label>Feed-Forward Dim</label>
+              <input type="number" id="ffDim-${layer.id}" value="${layer.ffDim || 512}" min="1"
+                onchange="updateLayerProperty('${layer.id}', 'ffDim', parseInt(this.value))">
+            </div>`;
+          }
+          html += `
+            <div>
+              <label>Dropout</label>
+              <input type="number" id="dropout-${layer.id}" value="${layer.dropout || 0.1}" min="0" max="1" step="0.1"
+                onchange="updateLayerProperty('${layer.id}', 'dropout', parseFloat(this.value))">
+            </div>`;
+        } else if (layer.type === 'pooling') {
+          html += `
+            <div>
+              <label>Pool Type</label>
+              <select id="poolType-${layer.id}" onchange="updateLayerProperty('${layer.id}', 'poolType', this.value)">
+                <option value="max" ${layer.poolType === 'max' ? 'selected' : ''}>Max Pooling</option>
+                <option value="avg" ${layer.poolType === 'avg' ? 'selected' : ''}>Average Pooling</option>
+              </select>
+            </div>
+            <div>
+              <label>Pool Size</label>
+              <input type="number" id="poolSize-${layer.id}" value="${layer.poolSize || 2}" min="1"
+                onchange="updateLayerProperty('${layer.id}', 'poolSize', parseInt(this.value))">
+            </div>
+            <div>
+              <label>Strides</label>
+              <input type="number" id="strides-${layer.id}" value="${layer.strides || 2}" min="1"
+                onchange="updateLayerProperty('${layer.id}', 'strides', parseInt(this.value))">
+            </div>`;
+        } else if (layer.type === 'dropout') {
+          html += `
+            <div>
+              <label>Dropout Rate</label>
+              <input type="number" id="rate-${layer.id}" value="${layer.rate || 0.5}" min="0" max="1" step="0.1"
+                onchange="updateLayerProperty('${layer.id}', 'rate', parseFloat(this.value))">
+            </div>`;
+        } else if (layer.type === 'residual') {
+          html += `
+            <div>
+              <label>Filters</label>
+              <input type="number" id="filters-${layer.id}" value="${layer.filters || 64}" min="1"
+                onchange="updateLayerProperty('${layer.id}', 'filters', parseInt(this.value))">
+            </div>
+            <div>
+              <label>Kernel Size</label>
+              <select id="kernelSize-${layer.id}" onchange="updateLayerProperty('${layer.id}', 'kernelSize', parseInt(this.value))">
+                <option value="3" ${layer.kernelSize === 3 ? 'selected' : ''}>3x3</option>
+                <option value="5" ${layer.kernelSize === 5 ? 'selected' : ''}>5x5</option>
+              </select>
+            </div>
+            <div>
+              <label>Activation</label>
+              <select id="activation-${layer.id}" onchange="updateLayerProperty('${layer.id}', 'activation', this.value)">
+                <option value="relu" ${layer.activation === 'relu' ? 'selected' : ''}>ReLU</option>
+                <option value="leaky_relu" ${layer.activation === 'leaky_relu' ? 'selected' : ''}>Leaky ReLU</option>
+              </select>
+            </div>`;
+        }
+
+        html += '</div>';
+        return html;
+      }
+
+      function renderLayers() {
+        const container = document.getElementById('layers-container');
+        container.innerHTML = networkConfig.layers.map((layer, index) =>
+          createLayerHTML(layer, index)
+        ).join('');
+        updateLayerVisualizer();
+        updateStatistics();
+        updatePerformanceMetrics();
+      }
+
+      // ============================================================================
+      // LAYER MANAGEMENT
+      // ============================================================================
+
+      function addLayer(layerType = 'dense', position = -1) {
+        const newLayer = {
+          id: generateLayerId(),
+          type: layerType,
+          ...getDefaultLayerProperties(layerType)
+        };
+
+        if (position === -1 || position >= networkConfig.layers.length - 1) {
+          // Add before output layer if it exists
+          const outputIndex = networkConfig.layers.findIndex(l => l.type === 'output');
+          if (outputIndex !== -1) {
+            networkConfig.layers.splice(outputIndex, 0, newLayer);
+          } else {
+            networkConfig.layers.push(newLayer);
+          }
+        } else {
+          networkConfig.layers.splice(position + 1, 0, newLayer);
+        }
+
+        saveToHistory();
+        renderLayers();
+        saveToLocalStorage();
+      }
+
+      function removeLayer(layerId) {
+        networkConfig.layers = networkConfig.layers.filter(l => l.id !== layerId);
+        saveToHistory();
+        renderLayers();
+        saveToLocalStorage();
+      }
+
+      function duplicateLayer(layerId) {
+        const layer = networkConfig.layers.find(l => l.id === layerId);
+        if (!layer) return;
+
+        const index = networkConfig.layers.indexOf(layer);
+        const duplicated = {
+          ...JSON.parse(JSON.stringify(layer)),
+          id: generateLayerId()
+        };
+
+        networkConfig.layers.splice(index + 1, 0, duplicated);
+        saveToHistory();
+        renderLayers();
+        saveToLocalStorage();
+      }
+
+      function changeLayerType(layerId, newType) {
+        const layer = networkConfig.layers.find(l => l.id === layerId);
+        if (!layer) return;
+
+        layer.type = newType;
+        Object.assign(layer, getDefaultLayerProperties(newType));
+
+        saveToHistory();
+        renderLayers();
+        saveToLocalStorage();
+      }
+
+      function updateLayerProperty(layerId, property, value) {
+        const layer = networkConfig.layers.find(l => l.id === layerId);
+        if (!layer) return;
+
+        layer[property] = value;
+        saveToHistory();
+        updateLayerVisualizer();
+        updateStatistics();
+        saveToLocalStorage();
+      }
+
+      // ============================================================================
+      // DRAG AND DROP LAYER REORDERING
+      // ============================================================================
+
+      let draggedElement = null;
+      let draggedIndex = null;
+
+      function handleDragStart(event) {
+        draggedElement = event.target.closest('.layer-card');
+        draggedIndex = parseInt(draggedElement.getAttribute('data-layer-index'));
+
+        draggedElement.classList.add('dragging');
+
+        // Set drag data
+        event.dataTransfer.effectAllowed = 'move';
+        event.dataTransfer.setData('text/html', draggedElement.innerHTML);
+      }
+
+      function handleDragEnd(event) {
+        if (draggedElement) {
+          draggedElement.classList.remove('dragging');
+        }
+
+        // Remove drag-over class from all layer cards
+        document.querySelectorAll('.layer-card').forEach(card => {
+          card.classList.remove('drag-over');
+        });
+
+        draggedElement = null;
+        draggedIndex = null;
+      }
+
+      function handleDragOver(event) {
+        if (event.preventDefault) {
+          event.preventDefault();
+        }
+
+        event.dataTransfer.dropEffect = 'move';
+
+        const targetCard = event.target.closest('.layer-card');
+        if (targetCard && targetCard !== draggedElement) {
+          // Remove drag-over from all cards
+          document.querySelectorAll('.layer-card').forEach(card => {
+            card.classList.remove('drag-over');
+          });
+
+          // Add drag-over to target card
+          targetCard.classList.add('drag-over');
+        }
+
+        return false;
+      }
+
+      function handleDrop(event) {
+        if (event.stopPropagation) {
+          event.stopPropagation();
+        }
+
+        event.preventDefault();
+
+        const targetCard = event.target.closest('.layer-card');
+        if (!targetCard || targetCard === draggedElement) {
+          return false;
+        }
+
+        const targetIndex = parseInt(targetCard.getAttribute('data-layer-index'));
+
+        // Don't allow dropping on input layer (index 0)
+        if (targetIndex === 0) {
+          return false;
+        }
+
+        // Reorder the layers
+        reorderLayer(draggedIndex, targetIndex);
+
+        return false;
+      }
+
+      function reorderLayer(fromIndex, toIndex) {
+        if (fromIndex === toIndex || fromIndex === 0) {
+          return; // Can't reorder input layer
+        }
+
+        // Remove the layer from its current position
+        const [movedLayer] = networkConfig.layers.splice(fromIndex, 1);
+
+        // Insert it at the new position
+        networkConfig.layers.splice(toIndex, 0, movedLayer);
+
+        // Save and update
+        saveToHistory();
+        renderLayers();
+        saveToLocalStorage();
+      }
+
+      function getDefaultLayerProperties(layerType) {
+        const defaults = {
+          conv2d: { filters: 32, kernelSize: 3, strides: 1, padding: 'same', activation: 'relu', batchNorm: false },
+          dense: { units: 128, activation: 'relu', dropout: 0 },
+          lstm: { units: 128, returnSequences: true, dropout: 0, recurrentDropout: 0 },
+          gru: { units: 128, returnSequences: true, dropout: 0, recurrentDropout: 0 },
+          attention: { heads: 8, keyDim: 64, dropout: 0.1 },
+          transformer: { heads: 8, keyDim: 64, ffDim: 512, dropout: 0.1 },
+          pooling: { poolType: 'max', poolSize: 2, strides: 2 },
+          dropout: { rate: 0.5 },
+          batchnorm: { momentum: 0.99, epsilon: 0.001 },
+          residual: { filters: 64, kernelSize: 3, activation: 'relu' },
+          flatten: {},
+          globalavgpool: {}
+        };
+
+        return defaults[layerType] || {};
+      }
+
+      // ============================================================================
+      // VISUALIZATION
+      // ============================================================================
+
+      function updateLayerVisualizer() {
+        const visualizer = document.getElementById('layer-visualizer');
+        if (!visualizer) return;
+
+        let html = '';
+        networkConfig.layers.forEach((layer, index) => {
+          const outputShape = calculateOutputShape(layer, index);
+          html += `
+            <div class="layer-node">
+              <div class="layer-shape">
+                <div class="layer-type">${layerConfigs[layer.type]?.name || layer.type.toUpperCase()}</div>
+                <div class="layer-details">${getLayerDescription(layer)}</div>
+                <div class="layer-details" style="color: var(--primary); font-size: 0.75rem; margin-top: 0.25rem;">
+                  Output: ${outputShape}
+                </div>
+              </div>
+            </div>`;
+
+          if (index < networkConfig.layers.length - 1) {
+            html += '<div class="layer-line"></div>';
+          }
+        });
+
+        visualizer.innerHTML = html;
+      }
+
+      function getLayerDescription(layer) {
+        if (layer.type === 'input') {
+          return layer.shape || 'Input';
+        } else if (layer.type === 'conv2d') {
+          return `${layer.filters || 32}@${layer.kernelSize || 3}x${layer.kernelSize || 3}`;
+        } else if (layer.type === 'dense') {
+          return `${layer.units || 128} units`;
+        } else if (layer.type === 'lstm' || layer.type === 'gru') {
+          return `${layer.units || 128} units`;
+        } else if (layer.type === 'transformer') {
+          return `${layer.heads || 8}h, ${layer.keyDim || 64}d`;
+        } else if (layer.type === 'pooling') {
+          return `${layer.poolType || 'max'} ${layer.poolSize || 2}x${layer.poolSize || 2}`;
+        } else if (layer.type === 'dropout') {
+          return `${(layer.rate || 0.5) * 100}%`;
+        }
+        return '';
+      }
+
+      // ============================================================================
+      // STATISTICS AND VALIDATION
+      // ============================================================================
+
+      function updateStatistics() {
+        const totalParams = calculateTotalParameters();
+        const memoryEstimate = estimateMemory();
+
+        // Update model statistics
+        const accuracyMetric = document.getElementById('accuracy-metric');
+        const lossMetric = document.getElementById('loss-metric');
+        const layerCountMetric = document.getElementById('layer-count-metric');
+        const depthMetric = document.getElementById('depth-metric');
+
+        if (accuracyMetric) {
+          accuracyMetric.textContent = totalParams.toLocaleString();
+        }
+        if (lossMetric) {
+          lossMetric.textContent = `${memoryEstimate} MB`;
+        }
+        if (layerCountMetric) {
+          layerCountMetric.textContent = networkConfig.layers.length;
+        }
+        if (depthMetric) {
+          depthMetric.textContent = networkConfig.layers.length;
+        }
+
+        // Update layer summary table
+        updateLayerSummaryTable();
+
+        // Update visualization layer diagram
+        updateVisualizationDiagram();
+
+        // Update training config summary
+        updateTrainingConfigSummary();
+      }
+
+      function updateLayerSummaryTable() {
+        const tbody = document.getElementById('layer-summary-body');
+        if (!tbody) return;
+
+        let html = '';
+
+        networkConfig.layers.forEach((layer, index) => {
+          let config = '';
+          const inputShape = index === 0 ? 'N/A' : formatShape(getLayerInputShape(index) || []);
+          const outputShape = calculateOutputShape(layer, index);
+
+          if (layer.type === 'input') {
+            config = `Shape: ${layer.shape || 'Not set'}`;
+          } else if (layer.type === 'conv2d') {
+            config = `Filters: ${layer.filters || 32}, Kernel: ${layer.kernelSize || 3}x${layer.kernelSize || 3}, Activation: ${layer.activation || 'relu'}`;
+          } else if (layer.type === 'dense') {
+            config = `Units: ${layer.units || 128}, Activation: ${layer.activation || 'relu'}`;
+          } else if (layer.type === 'lstm' || layer.type === 'gru') {
+            config = `Units: ${layer.units || 128}, Return Seq: ${layer.returnSequences ? 'Yes' : 'No'}`;
+          } else if (layer.type === 'transformer') {
+            config = `Heads: ${layer.heads || 8}, Key Dim: ${layer.keyDim || 64}, FF Dim: ${layer.ffDim || 512}`;
+          } else if (layer.type === 'pooling') {
+            config = `Type: ${layer.poolType || 'max'}, Size: ${layer.poolSize || 2}x${layer.poolSize || 2}`;
+          } else if (layer.type === 'dropout') {
+            config = `Rate: ${(layer.rate || 0.5) * 100}%`;
+          } else if (layer.type === 'flatten') {
+            config = 'Flattens input';
+          } else if (layer.type === 'globalavgpool') {
+            config = 'Global average pooling';
+          } else if (layer.type === 'residual') {
+            config = `Filters: ${layer.filters || 64}, Kernel: ${layer.kernelSize || 3}x${layer.kernelSize || 3}`;
+          }
+
+          html += `
+            <tr style="border-bottom: 1px solid var(--neutral-light);">
+              <td style="padding: 0.5rem;">${index + 1}</td>
+              <td style="padding: 0.5rem;"><strong>${layerConfigs[layer.type]?.name || layer.type}</strong></td>
+              <td style="padding: 0.5rem; font-size: 0.875rem;">${config}</td>
+              <td style="padding: 0.5rem; color: var(--secondary); font-size: 0.875rem;">${inputShape}</td>
+              <td style="padding: 0.5rem; color: var(--primary); font-size: 0.875rem;">${outputShape}</td>
+            </tr>
+          `;
+        });
+
+        tbody.innerHTML = html;
+      }
+
+      function calculateOutputShape(layer, index) {
+        // Get the input shape for this layer
+        const inputShape = getLayerInputShape(index);
+
+        if (!inputShape || inputShape.length === 0) {
+          return 'Unknown';
+        }
+
+        try {
+          const outputShape = inferOutputShape(layer, inputShape);
+          return formatShape(outputShape);
+        } catch (e) {
+          return 'Error';
+        }
+      }
+
+      function getLayerInputShape(layerIndex) {
+        // For the first layer (input), return its defined shape
+        if (layerIndex === 0) {
+          const layer = networkConfig.layers[0];
+          if (layer.type === 'input' && layer.shape) {
+            return parseShape(layer.shape);
+          }
+          return null;
+        }
+
+        // For subsequent layers, return the output shape of the previous layer
+        const prevLayer = networkConfig.layers[layerIndex - 1];
+        const prevInputShape = getLayerInputShape(layerIndex - 1);
+
+        if (!prevInputShape) return null;
+
+        return inferOutputShape(prevLayer, prevInputShape);
+      }
+
+      function parseShape(shapeStr) {
+        // Parse shape string like "224,224,3" or "512,768" into array of numbers
+        if (!shapeStr || typeof shapeStr !== 'string') return null;
+
+        const parts = shapeStr.split(',').map(s => {
+          const num = parseInt(s.trim());
+          return isNaN(num) ? null : num;
+        });
+
+        return parts.every(p => p !== null) ? parts : null;
+      }
+
+      function inferOutputShape(layer, inputShape) {
+        // Infer output shape based on layer type and input shape
+        const type = layer.type;
+
+        if (type === 'input') {
+          return inputShape;
+        }
+
+        if (type === 'conv2d') {
+          // For conv2d: input = [H, W, C_in], output = [H', W', C_out]
+          if (inputShape.length === 3) {
+            const [h, w, c] = inputShape;
+            const stride = layer.strides || 1;
+            const padding = layer.padding || 'same';
+            const filters = layer.filters || 32;
+
+            if (padding === 'same') {
+              return [Math.ceil(h / stride), Math.ceil(w / stride), filters];
+            } else {
+              const kernelSize = layer.kernelSize || 3;
+              const newH = Math.floor((h - kernelSize) / stride) + 1;
+              const newW = Math.floor((w - kernelSize) / stride) + 1;
+              return [newH, newW, filters];
+            }
+          }
+          return inputShape;
+        }
+
+        if (type === 'pooling') {
+          // For pooling: input = [H, W, C], output = [H', W', C]
+          if (inputShape.length === 3) {
+            const [h, w, c] = inputShape;
+            const poolSize = layer.poolSize || 2;
+            const stride = layer.strides || poolSize;
+            return [Math.floor(h / stride), Math.floor(w / stride), c];
+          }
+          return inputShape;
+        }
+
+        if (type === 'globalavgpool') {
+          // For global avg pool: input = [H, W, C], output = [C]
+          if (inputShape.length === 3) {
+            return [inputShape[2]];
+          }
+          return inputShape;
+        }
+
+        if (type === 'flatten') {
+          // Flatten all dimensions into one
+          const totalSize = inputShape.reduce((acc, val) => acc * val, 1);
+          return [totalSize];
+        }
+
+        if (type === 'dense') {
+          // For dense: output = [units]
+          return [layer.units || 128];
+        }
+
+        if (type === 'lstm' || type === 'gru') {
+          // For RNN: input = [seq_len, features], output depends on returnSequences
+          if (inputShape.length === 2) {
+            const units = layer.units || 128;
+            if (layer.returnSequences) {
+              return [inputShape[0], units];
+            } else {
+              return [units];
+            }
+          } else if (inputShape.length === 1) {
+            const units = layer.units || 128;
+            return [units];
+          }
+          return inputShape;
+        }
+
+        if (type === 'transformer' || type === 'attention') {
+          // Transformer preserves input shape
+          return inputShape;
+        }
+
+        if (type === 'dropout' || type === 'batchnorm') {
+          // These layers don't change the shape
+          return inputShape;
+        }
+
+        if (type === 'residual') {
+          // Residual blocks preserve spatial dimensions, change channels
+          if (inputShape.length === 3) {
+            return [inputShape[0], inputShape[1], layer.filters || 64];
+          }
+          return inputShape;
+        }
+
+        // Default: preserve input shape
+        return inputShape;
+      }
+
+      function formatShape(shape) {
+        if (!shape || shape.length === 0) return 'Unknown';
+        return `(${shape.join(', ')})`;
+      }
+
+      function updateVisualizationDiagram() {
+        const visualizer = document.getElementById('viz-layer-visualizer');
+        if (!visualizer) return;
+
+        let html = '';
+        networkConfig.layers.forEach((layer, index) => {
+          html += `
+            <div class="layer-node">
+              <div class="layer-shape">
+                <div class="layer-type">${layerConfigs[layer.type]?.name || layer.type.toUpperCase()}</div>
+                <div class="layer-details">${getLayerDescription(layer)}</div>
+              </div>
+            </div>`;
+
+          if (index < networkConfig.layers.length - 1) {
+            html += '<div class="layer-line"></div>';
+          }
+        });
+
+        visualizer.innerHTML = html;
+      }
+
+      function updateTrainingConfigSummary() {
+        const batchSize = document.getElementById('viz-batch-size');
+        const epochs = document.getElementById('viz-epochs');
+        const lr = document.getElementById('viz-lr');
+        const optimizer = document.getElementById('viz-optimizer');
+        const aug = document.getElementById('viz-aug');
+        const valSplit = document.getElementById('viz-val-split');
+
+        if (batchSize) batchSize.textContent = getFormValue('batch-size') || 32;
+        if (epochs) epochs.textContent = getFormValue('epochs') || 10;
+        if (lr) lr.textContent = getFormValue('learning-rate') || 0.001;
+        if (optimizer) optimizer.textContent = (getFormValue('optimizer') || 'adam').toUpperCase();
+        if (aug) aug.textContent = getFormValue('data-augmentation') ? 'Enabled' : 'Disabled';
+        if (valSplit) valSplit.textContent = `${getFormValue('validation-split') || 20}%`;
+      }
+
+      function calculateTotalParameters() {
+        let total = 0;
+        let prevShape = null;
+
+        networkConfig.layers.forEach((layer, index) => {
+          if (layer.type === 'input' && layer.shape) {
+            const parts = layer.shape.split(',').map(x => parseInt(x.trim()));
+            prevShape = parts;
+          } else if (layer.type === 'conv2d' && prevShape) {
+            const filters = layer.filters || 32;
+            const kernelSize = layer.kernelSize || 3;
+            const inputChannels = prevShape[2] || 3;
+            total += (kernelSize * kernelSize * inputChannels * filters) + (layer.useBias !== false ? filters : 0);
+            prevShape = [prevShape[0], prevShape[1], filters];
+          } else if (layer.type === 'dense') {
+            const units = layer.units || 128;
+            if (prevShape) {
+              const inputSize = prevShape.reduce((a, b) => a * b, 1);
+              total += (inputSize * units) + units;
+            }
+            prevShape = [units];
+          }
+        });
+
+        return total;
+      }
+
+      function estimateMemory() {
+        const params = calculateTotalParameters();
+        const bytesPerParam = 4; // float32
+        const memoryBytes = params * bytesPerParam;
+        const memoryMB = (memoryBytes / (1024 * 1024)).toFixed(1);
+        return memoryMB;
+      }
+
+      // ============================================================================
+      // PRESET ARCHITECTURE LOADING
+      // ============================================================================
+
+      function loadPreset(presetName) {
+        const preset = presetArchitectures[presetName];
+        if (!preset) return;
+
+        networkConfig.layers = [];
+
+        preset.layers.forEach(layerConfig => {
+          const layer = {
+            id: generateLayerId(),
+            ...layerConfig
+          };
+          networkConfig.layers.push(layer);
+        });
+
+        saveToHistory();
+        renderLayers();
+        saveToLocalStorage();
+
+        // Switch to architect tab
+        document.querySelector('.tab[data-tab="architect"]').click();
+      }
+
+      // ============================================================================
+      // CODE GENERATION
+      // ============================================================================
+
+      function generatePyTorchCode() {
+        let code = `import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
+class NeuralNetwork(nn.Module):
+    def __init__(self):
+        super(NeuralNetwork, self).__init__()
+        `;
+
+        let layerNum = 0;
+        let prevChannels = 3;
+
+        networkConfig.layers.forEach((layer, index) => {
+          if (layer.type === 'input') {
+            if (layer.shape) {
+              const parts = layer.shape.split(',');
+              if (parts.length >= 3) {
+                prevChannels = parseInt(parts[2]);
+              }
+            }
+          } else if (layer.type === 'conv2d') {
+            const filters = layer.filters || 32;
+            const kernelSize = layer.kernelSize || 3;
+            const stride = layer.strides || 1;
+            const padding = layer.padding === 'same' ? Math.floor(kernelSize / 2) : 0;
+            code += `\n        self.conv${layerNum} = nn.Conv2d(${prevChannels}, ${filters}, kernel_size=${kernelSize}, stride=${stride}, padding=${padding})`;
+            if (layer.batchNorm) {
+              code += `\n        self.bn${layerNum} = nn.BatchNorm2d(${filters})`;
+            }
+            prevChannels = filters;
+            layerNum++;
+          } else if (layer.type === 'dense') {
+            const units = layer.units || 128;
+            code += `\n        self.fc${layerNum} = nn.Linear(in_features, ${units})`;
+            layerNum++;
+          } else if (layer.type === 'lstm') {
+            const units = layer.units || 128;
+            code += `\n        self.lstm${layerNum} = nn.LSTM(input_size, ${units}, batch_first=True)`;
+            layerNum++;
+          } else if (layer.type === 'dropout') {
+            const rate = layer.rate || 0.5;
+            code += `\n        self.dropout${layerNum} = nn.Dropout(${rate})`;
+            layerNum++;
+          }
+        });
+
+        code += `
+
+    def forward(self, x):
+        `;
+
+        layerNum = 0;
+        let needsFlatten = false;
+
+        networkConfig.layers.forEach((layer, index) => {
+          if (layer.type === 'conv2d') {
+            code += `\n        x = self.conv${layerNum}(x)`;
+            if (layer.batchNorm) {
+              code += `\n        x = self.bn${layerNum}(x)`;
+            }
+            const activation = layer.activation || 'relu';
+            if (activation === 'relu') {
+              code += `\n        x = F.relu(x)`;
+            } else if (activation === 'leaky_relu') {
+              code += `\n        x = F.leaky_relu(x)`;
+            } else if (activation === 'sigmoid') {
+              code += `\n        x = torch.sigmoid(x)`;
+            } else if (activation === 'tanh') {
+              code += `\n        x = torch.tanh(x)`;
+            }
+            layerNum++;
+            needsFlatten = true;
+          } else if (layer.type === 'pooling') {
+            const poolSize = layer.poolSize || 2;
+            const stride = layer.strides || 2;
+            if (layer.poolType === 'max') {
+              code += `\n        x = F.max_pool2d(x, kernel_size=${poolSize}, stride=${stride})`;
+            } else {
+              code += `\n        x = F.avg_pool2d(x, kernel_size=${poolSize}, stride=${stride})`;
+            }
+          } else if (layer.type === 'flatten') {
+            code += `\n        x = x.view(x.size(0), -1)`;
+            needsFlatten = false;
+          } else if (layer.type === 'dense') {
+            if (needsFlatten) {
+              code += `\n        x = x.view(x.size(0), -1)`;
+              needsFlatten = false;
+            }
+            code += `\n        x = self.fc${layerNum}(x)`;
+            const activation = layer.activation || 'relu';
+            if (activation === 'relu') {
+              code += `\n        x = F.relu(x)`;
+            } else if (activation === 'sigmoid') {
+              code += `\n        x = torch.sigmoid(x)`;
+            } else if (activation === 'tanh') {
+              code += `\n        x = torch.tanh(x)`;
+            } else if (activation === 'softmax') {
+              code += `\n        x = F.softmax(x, dim=1)`;
+            }
+            layerNum++;
+          } else if (layer.type === 'dropout') {
+            code += `\n        x = self.dropout${layerNum}(x)`;
+            layerNum++;
+          } else if (layer.type === 'globalavgpool') {
+            code += `\n        x = F.adaptive_avg_pool2d(x, (1, 1))`;
+            code += `\n        x = x.view(x.size(0), -1)`;
+            needsFlatten = false;
+          }
+        });
+
+        code += `\n        return x
+
+# Create model instance
+model = NeuralNetwork()
+print(model)
+
+# Training configuration
+criterion = nn.CrossEntropyLoss()
+optimizer = torch.optim.${networkConfig.hyperparameters.optimizer.toUpperCase()}(model.parameters(), lr=${networkConfig.hyperparameters.learningRate})
+`;
+
+        return code;
+      }
+
+      function generateKerasCode() {
+        let code = `import tensorflow as tf
+from tensorflow import keras
+from tensorflow.keras import layers
+
+# Build model
+model = keras.Sequential([
+`;
+
+        networkConfig.layers.forEach((layer, index) => {
+          if (layer.type === 'input' && layer.shape) {
+            code += `    layers.InputLayer(input_shape=(${layer.shape})),\n`;
+          } else if (layer.type === 'conv2d') {
+            const filters = layer.filters || 32;
+            const kernelSize = layer.kernelSize || 3;
+            const strides = layer.strides || 1;
+            const padding = layer.padding || 'same';
+            const activation = layer.activation || 'relu';
+            code += `    layers.Conv2D(${filters}, (${kernelSize}, ${kernelSize}), strides=${strides}, padding='${padding}', activation='${activation}'),\n`;
+            if (layer.batchNorm) {
+              code += `    layers.BatchNormalization(),\n`;
+            }
+          } else if (layer.type === 'dense') {
+            const units = layer.units || 128;
+            const activation = layer.activation || 'relu';
+            code += `    layers.Dense(${units}, activation='${activation}'),\n`;
+          } else if (layer.type === 'lstm') {
+            const units = layer.units || 128;
+            const returnSeq = layer.returnSequences ? 'True' : 'False';
+            code += `    layers.LSTM(${units}, return_sequences=${returnSeq}),\n`;
+          } else if (layer.type === 'gru') {
+            const units = layer.units || 128;
+            const returnSeq = layer.returnSequences ? 'True' : 'False';
+            code += `    layers.GRU(${units}, return_sequences=${returnSeq}),\n`;
+          } else if (layer.type === 'pooling') {
+            const poolSize = layer.poolSize || 2;
+            const strides = layer.strides || 2;
+            if (layer.poolType === 'max') {
+              code += `    layers.MaxPooling2D(pool_size=(${poolSize}, ${poolSize}), strides=${strides}),\n`;
+            } else {
+              code += `    layers.AveragePooling2D(pool_size=(${poolSize}, ${poolSize}), strides=${strides}),\n`;
+            }
+          } else if (layer.type === 'dropout') {
+            const rate = layer.rate || 0.5;
+            code += `    layers.Dropout(${rate}),\n`;
+          } else if (layer.type === 'batchnorm') {
+            code += `    layers.BatchNormalization(),\n`;
+          } else if (layer.type === 'flatten') {
+            code += `    layers.Flatten(),\n`;
+          } else if (layer.type === 'globalavgpool') {
+            code += `    layers.GlobalAveragePooling2D(),\n`;
+          }
+        });
+
+        code += `])
+
+# Compile model
+model.compile(
+    optimizer='${networkConfig.hyperparameters.optimizer}',
+    loss='sparse_categorical_crossentropy',
+    metrics=['accuracy']
+)
+
+# Model summary
+model.summary()
+
+# Training configuration
+batch_size = ${networkConfig.hyperparameters.batchSize}
+epochs = ${networkConfig.hyperparameters.epochs}
+`;
+
+        return code;
+      }
+
+      function generateJAXCode() {
+        let code = `import jax
+import jax.numpy as jnp
+from flax import linen as nn
+
+class NeuralNetwork(nn.Module):
+    @nn.compact
+    def __call__(self, x, training: bool = False):
+`;
+
+        networkConfig.layers.forEach((layer, index) => {
+          if (layer.type === 'conv2d') {
+            const filters = layer.filters || 32;
+            const kernelSize = layer.kernelSize || 3;
+            const strides = layer.strides || 1;
+            code += `        x = nn.Conv(features=${filters}, kernel_size=(${kernelSize}, ${kernelSize}), strides=${strides})(x)\n`;
+            if (layer.batchNorm) {
+              code += `        x = nn.BatchNorm(use_running_average=not training)(x)\n`;
+            }
+            const activation = layer.activation || 'relu';
+            if (activation === 'relu') {
+              code += `        x = nn.relu(x)\n`;
+            }
+          } else if (layer.type === 'dense') {
+            const units = layer.units || 128;
+            code += `        x = nn.Dense(features=${units})(x)\n`;
+            const activation = layer.activation || 'relu';
+            if (activation === 'relu') {
+              code += `        x = nn.relu(x)\n`;
+            } else if (activation === 'softmax') {
+              code += `        x = nn.softmax(x)\n`;
+            }
+          } else if (layer.type === 'dropout') {
+            const rate = layer.rate || 0.5;
+            code += `        x = nn.Dropout(rate=${rate}, deterministic=not training)(x)\n`;
+          } else if (layer.type === 'flatten') {
+            code += `        x = x.reshape((x.shape[0], -1))\n`;
+          }
+        });
+
+        code += `        return x
+
+# Create model
+model = NeuralNetwork()
+`;
+
+        return code;
+      }
+
+      // ============================================================================
+      // EXPORT/IMPORT
+      // ============================================================================
+
+      function exportConfiguration() {
+        const format = getFormValue('export-format');
+        const projectConfig = {
+          ...networkConfig,
+          project: {
+            name: getFormValue('project-name'),
+            description: getFormValue('project-description'),
+            taskType: getFormValue('task-type'),
+            dataType: getFormValue('data-type')
+          },
+          hyperparameters: {
+            batchSize: parseInt(getFormValue('batch-size')),
+            epochs: parseInt(getFormValue('epochs')),
+            learningRate: parseFloat(getFormValue('learning-rate')),
+            optimizer: getFormValue('optimizer'),
+            dataAugmentation: getFormValue('data-augmentation'),
+            augmentationType: getFormValue('augmentation-type'),
+            validationSplit: parseInt(getFormValue('validation-split'))
+          }
+        };
+
+        let content = '';
+        let filename = `neural_network_config`;
+        let mimeType = 'application/json';
+
+        if (format === 'json') {
+          content = JSON.stringify(projectConfig, null, 2);
+          filename += '.json';
+        } else if (format === 'yaml') {
+          content = convertToYAML(projectConfig);
+          filename += '.yaml';
+          mimeType = 'text/yaml';
+        } else if (format === 'xml') {
+          content = convertToXML(projectConfig);
+          filename += '.xml';
+          mimeType = 'application/xml';
+        }
+
+        downloadFile(content, filename, mimeType);
+      }
+
+      function exportCode(framework) {
+        let code = '';
+        let filename = '';
+
+        if (framework === 'pytorch') {
+          code = generatePyTorchCode();
+          filename = 'model_pytorch.py';
+        } else if (framework === 'keras') {
+          code = generateKerasCode();
+          filename = 'model_keras.py';
+        } else if (framework === 'jax') {
+          code = generateJAXCode();
+          filename = 'model_jax.py';
+        }
+
+        downloadFile(code, filename, 'text/x-python');
+      }
+
+      function downloadFile(content, filename, mimeType) {
+        const blob = new Blob([content], { type: mimeType });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }
+
+      function convertToYAML(obj, indent = 0) {
+        let yaml = '';
+        const spaces = '  '.repeat(indent);
+
+        for (const [key, value] of Object.entries(obj)) {
+          if (value === null || value === undefined) continue;
+
+          if (Array.isArray(value)) {
+            yaml += `${spaces}${key}:\n`;
+            value.forEach(item => {
+              if (typeof item === 'object') {
+                yaml += `${spaces}- \n${convertToYAML(item, indent + 2)}`;
+              } else {
+                yaml += `${spaces}- ${item}\n`;
+              }
+            });
+          } else if (typeof value === 'object') {
+            yaml += `${spaces}${key}:\n${convertToYAML(value, indent + 1)}`;
+          } else {
+            yaml += `${spaces}${key}: ${value}\n`;
+          }
+        }
+
+        return yaml;
+      }
+
+      function convertToXML(obj, rootName = 'config') {
+        let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
+        xml += `<${rootName}>\n`;
+        xml += objectToXML(obj, 1);
+        xml += `</${rootName}>`;
+        return xml;
+      }
+
+      function objectToXML(obj, indent = 0) {
+        let xml = '';
+        const spaces = '  '.repeat(indent);
+
+        for (const [key, value] of Object.entries(obj)) {
+          if (value === null || value === undefined) continue;
+
+          if (Array.isArray(value)) {
+            value.forEach(item => {
+              xml += `${spaces}<${key}>\n`;
+              if (typeof item === 'object') {
+                xml += objectToXML(item, indent + 1);
+              } else {
+                xml += `${spaces}  ${item}\n`;
+              }
+              xml += `${spaces}</${key}>\n`;
+            });
+          } else if (typeof value === 'object') {
+            xml += `${spaces}<${key}>\n`;
+            xml += objectToXML(value, indent + 1);
+            xml += `${spaces}</${key}>\n`;
+          } else {
+            xml += `${spaces}<${key}>${value}</${key}>\n`;
+          }
+        }
+
+        return xml;
+      }
+
+      // ============================================================================
+      // LOCAL STORAGE
+      // ============================================================================
+
+      function saveToLocalStorage() {
+        try {
+          localStorage.setItem('neuralNetworkConfig', JSON.stringify(networkConfig));
+        } catch (e) {
+          console.error('Failed to save to localStorage:', e);
+        }
+      }
+
+      function loadFromLocalStorage() {
+        try {
+          const saved = localStorage.getItem('neuralNetworkConfig');
+          if (saved) {
+            const parsed = JSON.parse(saved);
+            if (parsed.layers && parsed.layers.length > 0) {
+              networkConfig = parsed;
+              layerIdCounter = Math.max(...networkConfig.layers.map(l =>
+                parseInt(l.id.replace('layer_', '')) || 0
+              )) + 1;
+              renderLayers();
+              return true;
+            }
+          }
+        } catch (e) {
+          console.error('Failed to load from localStorage:', e);
+        }
+        return false;
+      }
+
+      // ============================================================================
+      // IMPORT AND STORAGE MANAGEMENT
+      // ============================================================================
+
+      function importConfiguration() {
+        const fileInput = document.getElementById('import-file');
+        const file = fileInput.files[0];
+
+        if (!file) {
+          alert('Please select a JSON file to import.');
+          return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          try {
+            const imported = JSON.parse(e.target.result);
+
+            if (imported.layers && Array.isArray(imported.layers)) {
+              // Regenerate layer IDs to avoid conflicts
+              networkConfig = imported;
+              networkConfig.layers.forEach((layer, index) => {
+                layer.id = generateLayerId();
+              });
+
+              // Update form values if project info exists
+              if (imported.project) {
+                setFormValue('project-name', imported.project.name || '');
+                setFormValue('project-description', imported.project.description || '');
+                setFormValue('task-type', imported.project.taskType || 'classification');
+                setFormValue('data-type', imported.project.dataType || 'image');
+              }
+
+              // Update hyperparameters if they exist
+              if (imported.hyperparameters) {
+                setFormValue('batch-size', imported.hyperparameters.batchSize || 32);
+                setFormValue('epochs', imported.hyperparameters.epochs || 10);
+                setFormValue('learning-rate', imported.hyperparameters.learningRate || 0.001);
+                setFormValue('optimizer', imported.hyperparameters.optimizer || 'adam');
+              }
+
+              saveToHistory();
+              renderLayers();
+              saveToLocalStorage();
+
+              alert('Configuration imported successfully!');
+
+              // Switch to architect tab to show the loaded architecture
+              document.querySelector('.tab[data-tab="architect"]').click();
+            } else {
+              alert('Invalid configuration file format.');
+            }
+          } catch (error) {
+            alert('Error parsing JSON file: ' + error.message);
+          }
+        };
+
+        reader.readAsText(file);
+      }
+
+      function clearLocalStorage() {
+        if (confirm('Are you sure you want to clear all saved data? This cannot be undone.')) {
+          localStorage.removeItem('neuralNetworkConfig');
+          alert('Saved data cleared. The page will now reload with default configuration.');
+          location.reload();
+        }
+      }
+
+      function manualSave() {
+        saveToLocalStorage();
+        alert('Configuration saved to browser storage!');
+      }
+
+      // ============================================================================
+      // AI RECOMMENDATIONS ENGINE
+      // ============================================================================
+
+      const aiKnowledgeBase = {
+        'image-classification': {
+          small: { arch: 'efficientnet', params: '< 10M', suggestion: 'Use MobileNet or EfficientNet-B0 for efficiency' },
+          medium: { arch: 'resnet', params: '20-50M', suggestion: 'ResNet-50 offers great accuracy-efficiency balance' },
+          large: { arch: 'resnet', params: '> 50M', suggestion: 'ResNet-101 or EfficientNet-B7 for maximum accuracy' }
+        },
+        'object-detection': {
+          small: { arch: 'yolo', params: '< 20M', suggestion: 'YOLO-tiny for real-time detection' },
+          medium: { arch: 'yolo', params: '20-60M', suggestion: 'Standard YOLO for balanced performance' },
+          large: { arch: 'yolo', params: '> 60M', suggestion: 'Consider Mask R-CNN or advanced YOLO variants' }
+        },
+        'text-classification': {
+          small: { arch: 'dense', params: '< 5M', suggestion: 'Simple LSTM or GRU network' },
+          medium: { arch: 'bert', params: '100M+', suggestion: 'BERT-base for strong performance' },
+          large: { arch: 'bert', params: '300M+', suggestion: 'BERT-large or RoBERTa for best results' }
+        },
+        'text-generation': {
+          small: { arch: 'transformer', params: '< 50M', suggestion: 'Small Transformer with 6 layers' },
+          medium: { arch: 'transformer', params: '100-300M', suggestion: 'GPT-2 style architecture' },
+          large: { arch: 'transformer', params: '> 300M', suggestion: 'Large transformer (be aware of training costs)' }
+        }
+      };
+
+      const datasetSuggestions = {
+        'image-classification': ['CIFAR-10', 'CIFAR-100', 'ImageNet', 'MNIST', 'Fashion-MNIST', 'Food-101'],
+        'object-detection': ['COCO', 'Pascal VOC', 'Open Images', 'KITTI'],
+        'semantic-segmentation': ['Cityscapes', 'ADE20K', 'Pascal VOC', 'COCO-Stuff'],
+        'text-classification': ['IMDB', 'AG News', 'DBpedia', 'Yelp Reviews'],
+        'text-generation': ['WikiText', 'OpenWebText', 'BookCorpus', 'Common Crawl'],
+        'time-series': ['UCR Time Series Archive', 'M4 Competition', 'Electricity Load'],
+        'recommendation': ['MovieLens', 'Netflix Prize', 'Amazon Reviews'],
+        'gan': ['CelebA', 'LSUN', 'FFHQ'],
+        'autoencoder': ['MNIST', 'Fashion-MNIST', 'CelebA']
+      };
+
+      function generateAIRecommendations() {
+        const taskType = getFormValue('ai-task-type');
+        const datasetSize = getFormValue('ai-dataset-size');
+        const compute = getFormValue('ai-compute');
+        const priority = getFormValue('ai-priority');
+
+        // Show recommendations section
+        document.getElementById('ai-recommendations').style.display = 'block';
+
+        // Generate architecture recommendations
+        const recommendationsList = document.getElementById('ai-recommendations-list');
+        let html = '<div class="grid grid-3" style="margin-top: 1rem;">';
+
+        // Get appropriate recommendations based on task and data size
+        const sizeCategory = ['tiny', 'small'].includes(datasetSize) ? 'small' :
+                           ['medium'].includes(datasetSize) ? 'medium' : 'large';
+
+        const taskCategory = taskType.includes('image') ? 'image-classification' :
+                            taskType.includes('object') ? 'object-detection' :
+                            taskType.includes('text-class') ? 'text-classification' :
+                            taskType.includes('text-gen') ? 'text-generation' : 'image-classification';
+
+        const recommendation = aiKnowledgeBase[taskCategory]?.[sizeCategory] ||
+                             aiKnowledgeBase['image-classification']['medium'];
+
+        // Recommend 3 architectures
+        const recommendations = [
+          { name: 'Recommended', arch: recommendation.arch, score: 95, reason: recommendation.suggestion },
+          { name: 'Alternative 1', arch: 'custom', score: 85, reason: 'Build custom architecture for specific needs' },
+          { name: 'Alternative 2', arch: priority === 'speed' ? 'efficientnet' : 'resnet', score: 80,
+            reason: priority === 'speed' ? 'Optimized for inference speed' : 'Proven accuracy' }
+        ];
+
+        recommendations.forEach(rec => {
+          html += `
+            <div class="card preset-card" onclick="loadPreset('${rec.arch}'); document.querySelector('.tab[data-tab=\\'architect\\']').click();"
+                 style="cursor: pointer;">
+              <h4>${rec.name}</h4>
+              <div class="badge badge-green">${rec.score}% Match</div>
+              <p style="font-size: 0.875rem; margin-top: 0.5rem;">${rec.reason}</p>
+              <button class="small success" style="margin-top: 0.5rem; width: 100%;">Load This</button>
+            </div>
+          `;
+        });
+
+        html += '</div>';
+        recommendationsList.innerHTML = html;
+
+        // Generate smart suggestions
+        const suggestions = document.getElementById('ai-suggestions');
+        let suggestionText = '<ul style="margin: 0.5rem 0 0 1rem;">';
+
+        if (datasetSize === 'tiny' || datasetSize === 'small') {
+          suggestionText += '<li><strong>Small Dataset:</strong> Consider using transfer learning or data augmentation to prevent overfitting.</li>';
+          suggestionText += '<li><strong>Regularization:</strong> Add dropout (0.3-0.5) and use strong L2 regularization.</li>';
+        }
+
+        if (compute === 'cpu') {
+          suggestionText += '<li><strong>CPU Training:</strong> Keep model size under 10M parameters. Consider quantization-aware training.</li>';
+          suggestionText += '<li><strong>Batch Size:</strong> Use smaller batch sizes (8-32) to fit in CPU memory.</li>';
+        } else if (compute === 'tpu') {
+          suggestionText += '<li><strong>TPU Optimization:</strong> Use larger batch sizes (256-1024) for maximum TPU utilization.</li>';
+          suggestionText += '<li><strong>Precision:</strong> Consider mixed precision (bfloat16) training for speed.</li>';
+        }
+
+        if (priority === 'accuracy') {
+          suggestionText += '<li><strong>Accuracy Focus:</strong> Use deeper networks, ensemble methods, and extensive hyperparameter tuning.</li>';
+        } else if (priority === 'speed') {
+          suggestionText += '<li><strong>Speed Focus:</strong> Use depthwise separable convolutions, pruning, and quantization.</li>';
+          suggestionText += '<li><strong>Architecture:</strong> MobileNet/EfficientNet variants optimized for inference.</li>';
+        }
+
+        suggestionText += '</ul>';
+        suggestions.innerHTML = suggestionText;
+
+        // Generate warnings
+        const warnings = document.getElementById('ai-warnings');
+        let warningText = '<ul style="margin: 0.5rem 0 0 1rem;">';
+
+        const totalParams = calculateTotalParameters();
+        if (totalParams > 50000000 && compute === 'cpu') {
+          warningText += '<li>⚠️ <strong>Large Model on CPU:</strong> Your architecture has >50M parameters. Training will be very slow on CPU.</li>';
+        }
+
+        if (['tiny', 'small'].includes(datasetSize) && totalParams > 10000000) {
+          warningText += '<li>⚠️ <strong>Overfitting Risk:</strong> Large model + small dataset = high overfitting risk. Consider reducing model size or using transfer learning.</li>';
+        }
+
+        if (taskType.includes('text') && !networkConfig.layers.some(l => ['lstm', 'gru', 'transformer'].includes(l.type))) {
+          warningText += '<li>⚠️ <strong>Sequential Data:</strong> Text tasks typically need recurrent (LSTM/GRU) or attention (Transformer) layers.</li>';
+        }
+
+        warningText += '</ul>';
+        warnings.innerHTML = warningText;
+
+        // Update dataset suggestions
+        updateDatasetSuggestions(taskType);
+      }
+
+      function updateDatasetSuggestions(taskType) {
+        const container = document.getElementById('dataset-suggestions');
+        const datasets = datasetSuggestions[taskType] || [];
+
+        let html = '<div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem;">';
+        datasets.forEach(dataset => {
+          html += `<span class="badge badge-blue" style="font-size: 0.875rem; padding: 0.5rem 1rem;">${dataset}</span>`;
+        });
+        html += '</div>';
+        container.innerHTML = html;
+      }
+
+      function validateArchitecture() {
+        const results = document.getElementById('validation-results');
+        let html = '';
+        let issues = [];
+        let warnings = [];
+        let successes = [];
+
+        // Check if architecture has required layers
+        if (networkConfig.layers.length < 2) {
+          issues.push('Architecture must have at least an input and output layer');
+        } else {
+          successes.push('✓ Valid layer structure');
+        }
+
+        // Check input layer
+        const inputLayer = networkConfig.layers.find(l => l.type === 'input');
+        if (!inputLayer || !inputLayer.shape) {
+          issues.push('Input layer must have a defined shape');
+        } else {
+          successes.push('✓ Input layer properly configured');
+        }
+
+        // Check for common mistakes
+        let hasConv = networkConfig.layers.some(l => l.type === 'conv2d');
+        let hasFlatten = networkConfig.layers.some(l => l.type === 'flatten' || l.type === 'globalavgpool');
+        let hasDense = networkConfig.layers.some(l => l.type === 'dense');
+
+        if (hasConv && hasDense && !hasFlatten) {
+          warnings.push('Convolutional layers before Dense layers usually need Flatten or Global Pooling');
+        }
+
+        // Check parameter count
+        const totalParams = calculateTotalParameters();
+        if (totalParams > 100000000) {
+          warnings.push(`Large model (${(totalParams/1000000).toFixed(1)}M parameters) - may be slow to train`);
+        } else {
+          successes.push(`✓ Reasonable model size (${(totalParams/1000000).toFixed(1)}M parameters)`);
+        }
+
+        // Check activation functions
+        const lastLayer = networkConfig.layers[networkConfig.layers.length - 1];
+        if (lastLayer.type === 'dense') {
+          if (!lastLayer.activation || lastLayer.activation === 'relu') {
+            warnings.push('Output layer typically uses softmax (classification) or linear (regression), not ReLU');
+          } else {
+            successes.push('✓ Appropriate output activation');
+          }
+        }
+
+        // Display results
+        html = '<div style="margin-top: 1rem;">';
+
+        if (issues.length > 0) {
+          html += '<div class="alert alert-warning" style="margin-bottom: 1rem;"><strong>❌ Issues Found:</strong><ul style="margin: 0.5rem 0 0 1rem;">';
+          issues.forEach(issue => html += `<li>${issue}</li>`);
+          html += '</ul></div>';
+        }
+
+        if (warnings.length > 0) {
+          html += '<div class="alert alert-warning" style="margin-bottom: 1rem;"><strong>⚠️ Warnings:</strong><ul style="margin: 0.5rem 0 0 1rem;">';
+          warnings.forEach(warning => html += `<li>${warning}</li>`);
+          html += '</ul></div>';
+        }
+
+        if (successes.length > 0) {
+          html += '<div class="alert alert-info"><strong>✓ Validation Passed:</strong><ul style="margin: 0.5rem 0 0 1rem;">';
+          successes.forEach(success => html += `<li>${success}</li>`);
+          html += '</ul></div>';
+        }
+
+        if (issues.length === 0 && warnings.length === 0) {
+          html += '<div class="alert alert-info"><strong>🎉 Perfect!</strong> No issues or warnings detected.</div>';
+        }
+
+        html += '</div>';
+        results.innerHTML = html;
+      }
+
+      // ============================================================================
+      // PERFORMANCE PROFILING
+      // ============================================================================
+
+      function calculateFLOPs() {
+        let totalFLOPs = 0;
+        let layerFLOPs = [];
+        let currentShape = null;
+
+        networkConfig.layers.forEach((layer, index) => {
+          let flops = 0;
+
+          if (layer.type === 'input' && layer.shape) {
+            const parts = layer.shape.split(',').map(x => parseInt(x.trim()));
+            currentShape = parts;
+          } else if (layer.type === 'conv2d' && currentShape && currentShape.length >= 3) {
+            const filters = layer.filters || 32;
+            const kernelSize = layer.kernelSize || 3;
+            const h = currentShape[0], w = currentShape[1], c = currentShape[2];
+
+            // FLOPs for convolution: 2 * H * W * C_in * C_out * K * K
+            flops = 2 * h * w * c * filters * kernelSize * kernelSize;
+            currentShape = [h, w, filters];
+          } else if (layer.type === 'dense') {
+            const units = layer.units || 128;
+            if (currentShape) {
+              const inputSize = currentShape.reduce((a, b) => a * b, 1);
+              // FLOPs for dense: 2 * input_size * output_size
+              flops = 2 * inputSize * units;
+              currentShape = [units];
+            }
+          } else if (layer.type === 'pooling' && currentShape && currentShape.length >= 3) {
+            const poolSize = layer.poolSize || 2;
+            const h = Math.floor(currentShape[0] / poolSize);
+            const w = Math.floor(currentShape[1] / poolSize);
+            currentShape = [h, w, currentShape[2]];
+            flops = h * w * currentShape[2] * poolSize * poolSize; // Compare operations
+          }
+
+          layerFLOPs.push({
+            layer: layer,
+            index: index,
+            flops: flops
+          });
+
+          totalFLOPs += flops;
+        });
+
+        return { total: totalFLOPs, breakdown: layerFLOPs };
+      }
+
+      function updatePerformanceMetrics() {
+        const flopsData = calculateFLOPs();
+        const totalParams = calculateTotalParameters();
+        const memoryMB = estimateMemory();
+
+        // Update main metrics
+        const flopsMetric = document.getElementById('flops-metric');
+        const macsMetric = document.getElementById('macs-metric');
+        const inferenceMetric = document.getElementById('inference-metric');
+        const throughputMetric = document.getElementById('throughput-metric');
+
+        if (flopsMetric) {
+          const flopsFormatted = flopsData.total > 1e9 ?
+            `${(flopsData.total / 1e9).toFixed(2)}G` :
+            `${(flopsData.total / 1e6).toFixed(2)}M`;
+          flopsMetric.textContent = flopsFormatted;
+        }
+
+        if (macsMetric) {
+          const macs = flopsData.total / 2; // MACs ~= FLOPs / 2
+          const macsFormatted = macs > 1e9 ?
+            `${(macs / 1e9).toFixed(2)}G` :
+            `${(macs / 1e6).toFixed(2)}M`;
+          macsMetric.textContent = macsFormatted;
+        }
+
+        // Estimate inference time (very rough: 1 TFLOP/s on GPU)
+        if (inferenceMetric) {
+          const inferenceMs = (flopsData.total / 1e12) * 1000;
+          inferenceMetric.textContent = inferenceMs.toFixed(2);
+        }
+
+        if (throughputMetric) {
+          const throughput = 1000 / ((flopsData.total / 1e12) * 1000 || 1);
+          throughputMetric.textContent = throughput.toFixed(0);
+        }
+
+        // Update layer-wise breakdown
+        updatePerformanceBreakdown(flopsData, totalParams);
+
+        // Update device compatibility
+        updateDeviceCompatibility(totalParams, memoryMB);
+
+        // Generate optimization suggestions
+        generateOptimizationSuggestions(flopsData, totalParams);
+      }
+
+      function updatePerformanceBreakdown(flopsData, totalParams) {
+        const tbody = document.getElementById('performance-breakdown-body');
+        if (!tbody) return;
+
+        let html = '';
+        flopsData.breakdown.forEach(item => {
+          const layer = item.layer;
+          const layerParams = calculateLayerParameters(layer);
+          const layerMemory = (layerParams * 4 / (1024 * 1024)).toFixed(2);
+          const percentage = flopsData.total > 0 ? ((item.flops / flopsData.total) * 100).toFixed(1) : 0;
+
+          html += `
+            <tr style="border-bottom: 1px solid var(--neutral-light);">
+              <td style="padding: 0.5rem;">${layerConfigs[layer.type]?.name || layer.type}</td>
+              <td style="padding: 0.5rem;">${formatNumber(item.flops)}</td>
+              <td style="padding: 0.5rem;">${formatNumber(layerParams)}</td>
+              <td style="padding: 0.5rem;">${layerMemory} MB</td>
+              <td style="padding: 0.5rem;">
+                <div style="background: var(--neutral-light); height: 20px; border-radius: 4px; overflow: hidden;">
+                  <div style="background: var(--primary); height: 100%; width: ${percentage}%;"></div>
+                </div>
+                ${percentage}%
+              </td>
+            </tr>
+          `;
+        });
+
+        tbody.innerHTML = html;
+      }
+
+      function calculateLayerParameters(layer) {
+        if (layer.type === 'conv2d') {
+          const filters = layer.filters || 32;
+          const kernelSize = layer.kernelSize || 3;
+          // Rough estimate - would need previous layer info for accuracy
+          return kernelSize * kernelSize * 32 * filters + filters;
+        } else if (layer.type === 'dense') {
+          return (layer.units || 128) * 1000; // Rough estimate
+        }
+        return 0;
+      }
+
+      function formatNumber(num) {
+        if (num > 1e9) return `${(num / 1e9).toFixed(2)}G`;
+        if (num > 1e6) return `${(num / 1e6).toFixed(2)}M`;
+        if (num > 1e3) return `${(num / 1e3).toFixed(2)}K`;
+        return num.toString();
+      }
+
+      function updateDeviceCompatibility(totalParams, memoryMB) {
+        const mobileElem = document.getElementById('mobile-compatible');
+        const edgeElem = document.getElementById('edge-compatible');
+        const browserElem = document.getElementById('browser-compatible');
+
+        if (mobileElem) {
+          mobileElem.textContent = totalParams < 10000000 ? '✅' : totalParams < 50000000 ? '⚠️' : '❌';
+        }
+        if (edgeElem) {
+          edgeElem.textContent = totalParams < 1000000 ? '✅' : totalParams < 5000000 ? '⚠️' : '❌';
+        }
+        if (browserElem) {
+          browserElem.textContent = totalParams < 5000000 ? '✅' : totalParams < 20000000 ? '⚠️' : '❌';
+        }
+      }
+
+      function generateOptimizationSuggestions(flopsData, totalParams) {
+        const container = document.getElementById('optimization-suggestions');
+        if (!container) return;
+
+        let suggestions = [];
+
+        if (totalParams > 50000000) {
+          suggestions.push({
+            title: '🎯 Model Pruning',
+            desc: 'Your model has >50M parameters. Consider magnitude-based pruning to remove 30-50% of weights with minimal accuracy loss.',
+            impact: 'High'
+          });
+        }
+
+        if (totalParams > 20000000) {
+          suggestions.push({
+            title: '⚡ Quantization',
+            desc: 'Apply INT8 quantization to reduce model size by 75% and speed up inference 2-4x.',
+            impact: 'High'
+          });
+        }
+
+        const convLayers = networkConfig.layers.filter(l => l.type === 'conv2d');
+        if (convLayers.length > 5) {
+          suggestions.push({
+            title: '🔄 Depthwise Separable Convolutions',
+            desc: `You have ${convLayers.length} Conv2D layers. Replace with depthwise separable convolutions for 8-9x FLOPs reduction.`,
+            impact: 'High'
+          });
+        }
+
+        if (!networkConfig.layers.some(l => l.type === 'batchnorm' || l.batchNorm)) {
+          suggestions.push({
+            title: '📊 Add Batch Normalization',
+            desc: 'Batch normalization can stabilize training and allow higher learning rates.',
+            impact: 'Medium'
+          });
+        }
+
+        let html = '';
+        if (suggestions.length === 0) {
+          html = '<div class="alert alert-info">✓ No major optimization opportunities detected. Your architecture looks efficient!</div>';
+        } else {
+          suggestions.forEach(sug => {
+            const badgeColor = sug.impact === 'High' ? 'badge-red' : 'badge-yellow';
+            html += `
+              <div class="alert alert-warning" style="margin-bottom: 1rem;">
+                <div style="display: flex; justify-content: space-between; align-items: start;">
+                  <div>
+                    <strong>${sug.title}</strong>
+                    <p style="margin: 0.5rem 0 0 0; font-size: 0.875rem;">${sug.desc}</p>
+                  </div>
+                  <span class="badge ${badgeColor}">${sug.impact} Impact</span>
+                </div>
+              </div>
+            `;
+          });
+        }
+
+        container.innerHTML = html;
+      }
+
+      // ============================================================================
+      // URL SHARING AND NAS
+      // ============================================================================
+
+      function generateShareURL() {
+        const configStr = JSON.stringify(networkConfig);
+        const compressed = btoa(encodeURIComponent(configStr));
+        const baseURL = window.location.href.split('?')[0];
+        const shareURL = `${baseURL}?config=${compressed}`;
+
+        document.getElementById('share-url-container').style.display = 'block';
+        document.getElementById('share-url').value = shareURL;
+      }
+
+      function copyShareURL() {
+        const urlInput = document.getElementById('share-url');
+        urlInput.select();
+        document.execCommand('copy');
+        alert('URL copied to clipboard! Share it with others to load this architecture.');
+      }
+
+      function loadFromURL() {
+        const params = new URLSearchParams(window.location.search);
+        const configParam = params.get('config');
+
+        if (configParam) {
+          try {
+            const configStr = decodeURIComponent(atob(configParam));
+            const imported = JSON.parse(configStr);
+
+            if (imported.layers && Array.isArray(imported.layers)) {
+              networkConfig = imported;
+              networkConfig.layers.forEach(layer => {
+                layer.id = generateLayerId();
+              });
+              saveToHistory();
+              renderLayers();
+              alert('Architecture loaded from URL!');
+            }
+          } catch (e) {
+            console.error('Failed to load from URL:', e);
+          }
+        }
+      }
+
+      function runArchitectureSearch() {
+        const objective = getFormValue('nas-objective');
+        const constraints = getFormValue('nas-constraints');
+
+        // Simulate NAS with 3 generated architectures
+        const results = [
+          {
+            name: 'NAS-Found Architecture 1',
+            params: 'Efficient',
+            accuracy: '94.2%',
+            latency: '12ms',
+            layers: generateRandomArchitecture(constraints)
+          },
+          {
+            name: 'NAS-Found Architecture 2',
+            params: 'Balanced',
+            accuracy: '95.8%',
+            latency: '18ms',
+            layers: generateRandomArchitecture(constraints)
+          },
+          {
+            name: 'NAS-Found Architecture 3',
+            params: 'Accurate',
+            accuracy: '96.5%',
+            latency: '25ms',
+            layers: generateRandomArchitecture(constraints)
+          }
+        ];
+
+        const container = document.getElementById('nas-results');
+        const listContainer = document.getElementById('nas-results-list');
+
+        let html = '';
+        results.forEach((result, idx) => {
+          html += `
+            <div class="card" style="margin-bottom: 1rem; padding: 1rem;">
+              <div style="display: flex; justify-content: space-between; align-items: start;">
+                <div>
+                  <h4>${result.name}</h4>
+                  <p style="margin: 0.5rem 0; font-size: 0.875rem;">
+                    <strong>Accuracy:</strong> ${result.accuracy} |
+                    <strong>Latency:</strong> ${result.latency} |
+                    <strong>Size:</strong> ${result.params}
+                  </p>
+                </div>
+                <button class="success small" onclick="loadNASResult(${idx})">Load</button>
+              </div>
+            </div>
+          `;
+        });
+
+        listContainer.innerHTML = html;
+        container.style.display = 'block';
+
+        // Store results temporarily
+        window.nasResults = results;
+      }
+
+      function generateRandomArchitecture(constraints) {
+        // Generate a plausible random architecture
+        const maxLayers = constraints === 'tiny' ? 5 : constraints === 'edge' ? 8 : 12;
+        const layers = [{ type: 'input', shape: '224,224,3' }];
+
+        for (let i = 0; i < Math.floor(Math.random() * maxLayers) + 3; i++) {
+          const type = ['conv2d', 'dense', 'pooling', 'dropout'][Math.floor(Math.random() * 4)];
+          const layerConfig = { type, id: generateLayerId(), ...getDefaultLayerProperties(type) };
+
+          if (type === 'conv2d') {
+            layerConfig.filters = [16, 32, 64, 128][Math.floor(Math.random() * 4)];
+          } else if (type === 'dense') {
+            layerConfig.units = [64, 128, 256][Math.floor(Math.random() * 3)];
+          }
+
+          layers.push(layerConfig);
+        }
+
+        layers.push({ type: 'flatten', id: generateLayerId() });
+        layers.push({ type: 'dense', units: 10, activation: 'softmax', id: generateLayerId() });
+
+        return layers;
+      }
+
+      function loadNASResult(index) {
+        if (window.nasResults && window.nasResults[index]) {
+          networkConfig.layers = window.nasResults[index].layers;
+          renderLayers();
+          document.querySelector('.tab[data-tab="architect"]').click();
+          alert('NAS architecture loaded!');
+        }
+      }
+
+      // ============================================================================
+      // ARCHITECTURE COMPARISON AND TEMPLATES
+      // ============================================================================
+
+      let architectureSnapshots = [];
+
+      function saveArchitectureSnapshot() {
+        const snapshot = {
+          name: `Snapshot ${architectureSnapshots.length + 1}`,
+          timestamp: new Date().toISOString(),
+          config: JSON.parse(JSON.stringify(networkConfig)),
+          params: calculateTotalParameters(),
+          layers: networkConfig.layers.length
+        };
+
+        architectureSnapshots.push(snapshot);
+        localStorage.setItem('architectureSnapshots', JSON.stringify(architectureSnapshots));
+        updateSnapshotsList();
+        alert('Snapshot saved!');
+      }
+
+      function updateSnapshotsList() {
+        const container = document.getElementById('snapshots-list');
+        if (!container) return;
+
+        let html = '<div style="margin-top: 1rem;">';
+        architectureSnapshots.forEach((snap, idx) => {
+          html += `
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem; background: var(--neutral-light); margin-bottom: 0.5rem; border-radius: 4px;">
+              <div>
+                <strong>${snap.name}</strong>
+                <span style="font-size: 0.75rem; color: var(--neutral);"> - ${snap.layers} layers, ${(snap.params/1000000).toFixed(1)}M params</span>
+              </div>
+              <div>
+                <button class="small" onclick="loadSnapshot(${idx})">Load</button>
+                <button class="small danger" onclick="deleteSnapshot(${idx})">Delete</button>
+              </div>
+            </div>
+          `;
+        });
+        html += '</div>';
+        container.innerHTML = html;
+      }
+
+      function loadSnapshot(index) {
+        if (architectureSnapshots[index]) {
+          networkConfig = JSON.parse(JSON.stringify(architectureSnapshots[index].config));
+          saveToHistory();
+          renderLayers();
+          alert('Snapshot loaded!');
+        }
+      }
+
+      function deleteSnapshot(index) {
+        architectureSnapshots.splice(index, 1);
+        localStorage.setItem('architectureSnapshots', JSON.stringify(architectureSnapshots));
+        updateSnapshotsList();
+      }
+
+      function showComparisonTool() {
+        if (architectureSnapshots.length < 2) {
+          alert('You need at least 2 snapshots to compare. Save more snapshots first!');
+          return;
+        }
+
+        const container = document.getElementById('comparison-results');
+        let html = '<h4>Architecture Comparison</h4>';
+        html += '<table style="width: 100%; border-collapse: collapse; margin-top: 1rem;"><thead><tr style="background: var(--neutral-light);">';
+        html += '<th style="padding: 0.5rem;">Metric</th>';
+        architectureSnapshots.forEach(snap => {
+          html += `<th style="padding: 0.5rem;">${snap.name}</th>`;
+        });
+        html += '</tr></thead><tbody>';
+
+        // Compare parameters
+        html += '<tr><td style="padding: 0.5rem;">Parameters</td>';
+        architectureSnapshots.forEach(snap => {
+          html += `<td style="padding: 0.5rem;">${(snap.params/1000000).toFixed(1)}M</td>`;
+        });
+        html += '</tr>';
+
+        // Compare layers
+        html += '<tr><td style="padding: 0.5rem;">Layers</td>';
+        architectureSnapshots.forEach(snap => {
+          html += `<td style="padding: 0.5rem;">${snap.layers}</td>`;
+        });
+        html += '</tr>';
+
+        html += '</tbody></table>';
+        container.innerHTML = html;
+      }
+
+      function saveAsTemplate() {
+        const name = prompt('Enter template name:');
+        if (name) {
+          const template = {
+            name: name,
+            layers: JSON.parse(JSON.stringify(networkConfig.layers))
+          };
+
+          let templates = JSON.parse(localStorage.getItem('customTemplates') || '[]');
+          templates.push(template);
+          localStorage.setItem('customTemplates', JSON.stringify(templates));
+
+          alert('Template saved!');
+          loadCustomTemplates();
+        }
+      }
+
+      function loadCustomTemplates() {
+        const container = document.getElementById('custom-templates-list');
+        const templates = JSON.parse(localStorage.getItem('customTemplates') || '[]');
+
+        if (templates.length === 0) {
+          container.innerHTML = '<p class="help-text">No custom templates yet. Create one from your current architecture!</p>';
+          return;
+        }
+
+        let html = '';
+        templates.forEach((template, idx) => {
+          html += `
+            <div class="card preset-card" onclick="loadTemplate(${idx})" style="cursor: pointer; margin-bottom: 1rem;">
+              <h4>${template.name}</h4>
+              <p style="font-size: 0.875rem;">${template.layers.length} layers</p>
+            </div>
+          `;
+        });
+
+        container.innerHTML = html;
+      }
+
+      function loadTemplate(index) {
+        const templates = JSON.parse(localStorage.getItem('customTemplates') || '[]');
+        if (templates[index]) {
+          networkConfig.layers = JSON.parse(JSON.stringify(templates[index].layers));
+          networkConfig.layers.forEach(layer => {
+            layer.id = generateLayerId();
+          });
+          renderLayers();
+          document.querySelector('.tab[data-tab="architect"]').click();
+        }
+      }
+
+      // ============================================================================
+      // ADVANCED EXPORTS
+      // ============================================================================
+
+      function exportDeployment(type) {
+        if (type === 'docker') {
+          const dockerfileContent = generateDockerfile();
+          const requirementsContent = generateRequirements();
+
+          // Create a combined text file with both
+          const combined = `# Dockerfile\n${dockerfileContent}\n\n# requirements.txt\n${requirementsContent}`;
+          downloadFile(combined, 'deployment_package.txt', 'text/plain');
+          alert('Docker deployment files generated! Extract Dockerfile and requirements.txt from the downloaded file.');
+        } else if (type === 'kubernetes') {
+          const k8sConfig = generateK8sConfig();
+          downloadFile(k8sConfig, 'k8s-deployment.yaml', 'text/yaml');
+        }
+      }
+
+      function generateDockerfile() {
+        return `FROM python:3.9-slim
+
+WORKDIR /app
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY model.py .
+COPY model_weights.pth .
+
+EXPOSE 8000
+
+CMD ["python", "model.py"]
+`;
+      }
+
+      function generateRequirements() {
+        return `torch>=2.0.0
+torchvision>=0.15.0
+numpy>=1.24.0
+fastapi>=0.95.0
+uvicorn>=0.22.0
+pillow>=9.5.0
+`;
+      }
+
+      function generateK8sConfig() {
+        return `apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: neural-network-model
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nn-model
+  template:
+    metadata:
+      labels:
+        app: nn-model
+    spec:
+      containers:
+      - name: model-server
+        image: your-registry/nn-model:latest
+        ports:
+        - containerPort: 8000
+        resources:
+          requests:
+            memory: "2Gi"
+            cpu: "1000m"
+          limits:
+            memory: "4Gi"
+            cpu: "2000m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nn-model-service
+spec:
+  selector:
+    app: nn-model
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8000
+  type: LoadBalancer
+`;
+      }
+
+      function exportAPI(framework) {
+        let code = '';
+        let filename = '';
+
+        if (framework === 'fastapi') {
+          code = generateFastAPICode();
+          filename = 'api_fastapi.py';
+        } else if (framework === 'flask') {
+          code = generateFlaskCode();
+          filename = 'api_flask.py';
+        }
+
+        downloadFile(code, filename, 'text/x-python');
+      }
+
+      function generateFastAPICode() {
+        return `from fastapi import FastAPI, File, UploadFile
+from fastapi.responses import JSONResponse
+import torch
+import torch.nn as nn
+from PIL import Image
+import io
+import numpy as np
+
+app = FastAPI(title="Neural Network API", version="1.0.0")
+
+# Load your model
+class NeuralNetwork(nn.Module):
+    def __init__(self):
+        super().__init__()
+        # Add your model architecture here
+        pass
+
+    def forward(self, x):
+        # Add your forward pass here
+        return x
+
+model = NeuralNetwork()
+# model.load_state_dict(torch.load('model_weights.pth'))
+model.eval()
+
+@app.get("/")
+async def root():
+    return {"message": "Neural Network API is running"}
+
+@app.post("/predict")
+async def predict(file: UploadFile = File(...)):
+    """Make prediction on uploaded image"""
+    try:
+        # Read and preprocess image
+        image_data = await file.read()
+        image = Image.open(io.BytesIO(image_data))
+
+        # Preprocess
+        # image_tensor = preprocess(image)
+
+        # Predict
+        with torch.no_grad():
+            # output = model(image_tensor)
+            pass
+
+        return JSONResponse(content={
+            "prediction": "class_name",
+            "confidence": 0.95
+        })
+    except Exception as e:
+        return JSONResponse(content={"error": str(e)}, status_code=500)
+
+@app.get("/health")
+async def health():
+    return {"status": "healthy"}
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
+`;
+      }
+
+      function generateFlaskCode() {
+        return `from flask import Flask, request, jsonify
+import torch
+import torch.nn as nn
+from PIL import Image
+import io
+
+app = Flask(__name__)
+
+# Load your model
+class NeuralNetwork(nn.Module):
+    def __init__(self):
+        super().__init__()
+        # Add your model architecture here
+        pass
+
+    def forward(self, x):
+        # Add your forward pass here
+        return x
+
+model = NeuralNetwork()
+# model.load_state_dict(torch.load('model_weights.pth'))
+model.eval()
+
+@app.route('/')
+def root():
+    return jsonify({"message": "Neural Network API is running"})
+
+@app.route('/predict', methods=['POST'])
+def predict():
+    """Make prediction on uploaded image"""
+    try:
+        if 'file' not in request.files:
+            return jsonify({"error": "No file provided"}), 400
+
+        file = request.files['file']
+        image_data = file.read()
+        image = Image.open(io.BytesIO(image_data))
+
+        # Preprocess and predict
+        with torch.no_grad():
+            # output = model(preprocessed_image)
+            pass
+
+        return jsonify({
+            "prediction": "class_name",
+            "confidence": 0.95
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/health')
+def health():
+    return jsonify({"status": "healthy"})
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=8000, debug=False)
+`;
+      }
+
+      // Update exportCode to handle new formats
+      const originalExportCode = exportCode;
+      exportCode = function(framework) {
+        if (['onnx', 'tflite', 'coreml'].includes(framework)) {
+          const code = generateMobileExport(framework);
+          downloadFile(code, `export_${framework}.py`, 'text/x-python');
+        } else {
+          originalExportCode(framework);
+        }
+      };
+
+      function generateMobileExport(format) {
+        if (format === 'onnx') {
+          return `import torch
+import torch.onnx
+
+# Load your PyTorch model
+model = NeuralNetwork()
+model.load_state_dict(torch.load('model_weights.pth'))
+model.eval()
+
+# Create dummy input
+dummy_input = torch.randn(1, 3, 224, 224)
+
+# Export to ONNX
+torch.onnx.export(
+    model,
+    dummy_input,
+    "model.onnx",
+    export_params=True,
+    opset_version=11,
+    do_constant_folding=True,
+    input_names=['input'],
+    output_names=['output'],
+    dynamic_axes={'input': {0: 'batch_size'}, 'output': {0: 'batch_size'}}
+)
+
+print("Model exported to ONNX format!")
+`;
+        } else if (format === 'tflite') {
+          return `import tensorflow as tf
+
+# Load your Keras model
+model = tf.keras.models.load_model('model.h5')
+
+# Convert to TFLite
+converter = tf.lite.TFLiteConverter.from_keras_model(model)
+converter.optimizations = [tf.lite.Optimize.DEFAULT]  # Quantization
+tflite_model = converter.convert()
+
+# Save the model
+with open('model.tflite', 'wb') as f:
+    f.write(tflite_model)
+
+print("Model exported to TensorFlow Lite format!")
+print("Optimized for mobile and edge devices")
+`;
+        } else if (format === 'coreml') {
+          return `import coremltools as ct
+import torch
+
+# Load your PyTorch model
+model = NeuralNetwork()
+model.load_state_dict(torch.load('model_weights.pth'))
+model.eval()
+
+# Trace the model
+example_input = torch.rand(1, 3, 224, 224)
+traced_model = torch.jit.trace(model, example_input)
+
+# Convert to Core ML
+mlmodel = ct.convert(
+    traced_model,
+    inputs=[ct.ImageType(shape=(1, 3, 224, 224))]
+)
+
+# Save
+mlmodel.save("model.mlmodel")
+
+print("Model exported to Core ML format!")
+print("Ready for iOS deployment")
+`;
+        }
+      }
+
+      // ============================================================================
+      // EVENT HANDLERS
+      // ============================================================================
+
+      // Tab switching
       document.querySelectorAll('.tabs .tab').forEach(tab => {
         tab.addEventListener('click', () => {
           document.querySelectorAll('.tabs .tab').forEach(t => t.classList.remove('active'));
@@ -1013,13 +4459,263 @@
           document.getElementById(tab.getAttribute('data-tab')).classList.add('active');
         });
       });
-      
-      // Toggle Data Augmentation Options
+
+      // Data augmentation toggle
       const dataAugCheckbox = document.getElementById('data-augmentation');
       const dataAugOptions = document.getElementById('data-augmentation-options');
       dataAugCheckbox.addEventListener('change', () => {
         dataAugOptions.style.display = dataAugCheckbox.checked ? 'block' : 'none';
       });
-  </script>
+
+      // Add layer button
+      document.getElementById('add-layer-btn').addEventListener('click', () => {
+        addLayer('dense');
+      });
+
+      // Export configuration button
+      document.getElementById('export-config-btn').addEventListener('click', () => {
+        exportConfiguration();
+      });
+
+      // Preset architecture cards
+      document.querySelectorAll('.preset-card').forEach(card => {
+        card.addEventListener('click', () => {
+          const preset = card.getAttribute('data-preset');
+          document.querySelectorAll('.preset-card').forEach(c => c.classList.remove('selected'));
+          card.classList.add('selected');
+          loadPreset(preset);
+        });
+      });
+
+      // Collapsible sections
+      document.addEventListener('click', (e) => {
+        if (e.target.closest('.collapsible')) {
+          const container = e.target.closest('.collapsible-container');
+          if (container) {
+            container.classList.toggle('expanded');
+          }
+        }
+      });
+
+      // Save project info on change
+      ['project-name', 'project-description', 'task-type', 'data-type'].forEach(id => {
+        const element = document.getElementById(id);
+        if (element) {
+          element.addEventListener('change', () => {
+            networkConfig.project[id.replace('project-', '').replace('-', '')] = element.value;
+            saveToLocalStorage();
+          });
+        }
+      });
+
+      // ============================================================================
+      // KEYBOARD SHORTCUTS
+      // ============================================================================
+
+      document.addEventListener('keydown', function(e) {
+        // Ctrl/Cmd + S: Save snapshot
+        if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+          e.preventDefault();
+          saveArchitectureSnapshot();
+        }
+
+        // Ctrl/Cmd + E: Export to PyTorch
+        if ((e.ctrlKey || e.metaKey) && e.key === 'e') {
+          e.preventDefault();
+          exportCode('pytorch');
+        }
+
+        // Ctrl/Cmd + /: Show shortcuts help
+        if ((e.ctrlKey || e.metaKey) && e.key === '/') {
+          e.preventDefault();
+          showKeyboardShortcuts();
+        }
+
+        // Ctrl/Cmd + D: Toggle dark mode
+        if ((e.ctrlKey || e.metaKey) && e.key === 'd') {
+          e.preventDefault();
+          toggleDarkMode();
+        }
+
+        // Ctrl/Cmd + Z: Undo
+        if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
+          e.preventDefault();
+          undo();
+        }
+
+        // Ctrl/Cmd + Y or Ctrl/Cmd + Shift + Z: Redo
+        if ((e.ctrlKey || e.metaKey) && (e.key === 'y' || (e.key === 'z' && e.shiftKey))) {
+          e.preventDefault();
+          redo();
+        }
+      });
+
+      function showKeyboardShortcuts() {
+        const shortcuts = `
+KEYBOARD SHORTCUTS:
+
+Editing:
+Ctrl/Cmd + Z       →  Undo layer changes
+Ctrl/Cmd + Y       →  Redo layer changes
+Ctrl/Cmd + S       →  Save architecture snapshot
+
+Actions:
+Ctrl/Cmd + E       →  Export to PyTorch
+Ctrl/Cmd + D       →  Toggle dark mode
+Ctrl/Cmd + /       →  Show this help
+
+Navigation:
+Tab                →  Move between form fields
+Enter              →  Activate buttons
+
+Coming soon:
+Delete             →  Remove selected layer
+Ctrl/Cmd + Click   →  Select multiple layers
+`;
+        alert(shortcuts);
+      }
+
+      // ============================================================================
+      // DARK MODE
+      // ============================================================================
+
+      function toggleDarkMode() {
+        const html = document.documentElement;
+        const isDark = html.getAttribute('data-theme') === 'dark';
+
+        if (isDark) {
+          html.removeAttribute('data-theme');
+          localStorage.setItem('theme', 'light');
+        } else {
+          html.setAttribute('data-theme', 'dark');
+          localStorage.setItem('theme', 'dark');
+        }
+      }
+
+      function loadThemePreference() {
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+          document.documentElement.setAttribute('data-theme', 'dark');
+        }
+      }
+
+      // Load theme preference early
+      loadThemePreference();
+
+      // ============================================================================
+      // BROWSER COMPATIBILITY CHECK
+      // ============================================================================
+
+      function checkBrowserCompatibility() {
+        const warnings = [];
+
+        // Check for localStorage
+        if (!window.localStorage) {
+          warnings.push('LocalStorage not available - configurations won\'t persist');
+        }
+
+        // Check for ES6 support
+        try {
+          eval('const test = () => {};');
+        } catch (e) {
+          warnings.push('Your browser doesn\'t support modern JavaScript (ES6)');
+        }
+
+        // Check for FileReader (for imports)
+        if (!window.FileReader) {
+          warnings.push('File import functionality not available');
+        }
+
+        // Check for Blob/URL (for exports)
+        if (!window.Blob || !window.URL) {
+          warnings.push('File export functionality may not work');
+        }
+
+        // Display warnings if any
+        if (warnings.length > 0) {
+          console.warn('Browser Compatibility Issues:', warnings);
+          const message = `⚠️ Compatibility Warnings:\n\n${warnings.join('\n')}\n\nSome features may not work. Consider using Chrome, Firefox, or Edge.`;
+          // Show warning but don't block
+          setTimeout(() => {
+            if (confirm(message + '\n\nContinue anyway?')) {
+              console.log('User chose to continue despite warnings');
+            }
+          }, 1000);
+        }
+      }
+
+      // Run compatibility check
+      checkBrowserCompatibility();
+
+      // ============================================================================
+      // INITIALIZATION
+      // ============================================================================
+
+      function initializeApp() {
+        // Try to load from URL first
+        loadFromURL();
+
+        // Try to load from localStorage
+        if (!loadFromLocalStorage()) {
+          // Initialize with default configuration
+          networkConfig.layers = [
+            {
+              id: generateLayerId(),
+              type: 'input',
+              shape: '224,224,3',
+              preprocessing: 'normalize'
+            },
+            {
+              id: generateLayerId(),
+              type: 'conv2d',
+              filters: 32,
+              kernelSize: 3,
+              strides: 1,
+              padding: 'same',
+              activation: 'relu',
+              batchNorm: false
+            },
+            {
+              id: generateLayerId(),
+              type: 'flatten'
+            },
+            {
+              id: generateLayerId(),
+              type: 'dense',
+              units: 10,
+              activation: 'softmax'
+            }
+          ];
+
+          renderLayers();
+        }
+
+        // Load saved snapshots and templates
+        const savedSnapshots = localStorage.getItem('architectureSnapshots');
+        if (savedSnapshots) {
+          architectureSnapshots = JSON.parse(savedSnapshots);
+          updateSnapshotsList();
+        }
+
+        loadCustomTemplates();
+
+        // Update all statistics and performance metrics
+        updateStatistics();
+        updatePerformanceMetrics();
+
+        // Initialize dataset suggestions for default task
+        updateDatasetSuggestions('image-classification');
+
+        // Save initial state to history for undo/redo
+        saveToHistory();
+      }
+
+      // Initialize when DOM is ready
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initializeApp);
+      } else {
+        initializeApp();
+      }
+    </script>
 </body>
 </html>

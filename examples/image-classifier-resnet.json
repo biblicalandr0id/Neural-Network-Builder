@@ -1,0 +1,66 @@
+{
+  "project": {
+    "name": "Image Classifier - ResNet Style",
+    "description": "ResNet-inspired architecture for image classification with residual connections",
+    "taskType": "classification",
+    "dataType": "image"
+  },
+  "layers": [
+    {
+      "type": "input",
+      "shape": "224,224,3",
+      "preprocessing": "normalize"
+    },
+    {
+      "type": "conv2d",
+      "filters": 64,
+      "kernelSize": 7,
+      "strides": 2,
+      "padding": "same",
+      "activation": "relu",
+      "batchNorm": true
+    },
+    {
+      "type": "pooling",
+      "poolType": "max",
+      "poolSize": 3,
+      "strides": 2
+    },
+    {
+      "type": "residual",
+      "filters": 64,
+      "kernelSize": 3,
+      "activation": "relu"
+    },
+    {
+      "type": "residual",
+      "filters": 128,
+      "kernelSize": 3,
+      "activation": "relu"
+    },
+    {
+      "type": "residual",
+      "filters": 256,
+      "kernelSize": 3,
+      "activation": "relu"
+    },
+    {
+      "type": "globalavgpool"
+    },
+    {
+      "type": "dense",
+      "units": 1000,
+      "activation": "softmax"
+    }
+  ],
+  "hyperparameters": {
+    "batchSize": 32,
+    "epochs": 100,
+    "learningRate": 0.001,
+    "optimizer": "adam",
+    "dataAugmentation": true,
+    "augmentationType": "flip",
+    "validationSplit": 20,
+    "callbacks": ["early_stopping", "checkpoint"]
+  }
+}

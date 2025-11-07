@@ -1,0 +1,73 @@
+{
+  "project": {
+    "name": "Mobile Image Classifier - EfficientNet",
+    "description": "Lightweight architecture optimized for mobile deployment (<10M parameters)",
+    "taskType": "classification",
+    "dataType": "image"
+  },
+  "layers": [
+    {
+      "type": "input",
+      "shape": "224,224,3",
+      "preprocessing": "normalize"
+    },
+    {
+      "type": "conv2d",
+      "filters": 32,
+      "kernelSize": 3,
+      "strides": 2,
+      "padding": "same",
+      "activation": "swish",
+      "batchNorm": true
+    },
+    {
+      "type": "conv2d",
+      "filters": 16,
+      "kernelSize": 1,
+      "strides": 1,
+      "padding": "same",
+      "activation": "swish",
+      "batchNorm": true
+    },
+    {
+      "type": "conv2d",
+      "filters": 24,
+      "kernelSize": 3,
+      "strides": 1,
+      "padding": "same",
+      "activation": "swish",
+      "batchNorm": true
+    },
+    {
+      "type": "conv2d",
+      "filters": 40,
+      "kernelSize": 5,
+      "strides": 2,
+      "padding": "same",
+      "activation": "swish",
+      "batchNorm": true
+    },
+    {
+      "type": "globalavgpool"
+    },
+    {
+      "type": "dropout",
+      "rate": 0.2
+    },
+    {
+      "type": "dense",
+      "units": 10,
+      "activation": "softmax"
+    }
+  ],
+  "hyperparameters": {
+    "batchSize": 64,
+    "epochs": 50,
+    "learningRate": 0.001,
+    "optimizer": "adam",
+    "dataAugmentation": true,
+    "augmentationType": "flip",
+    "validationSplit": 20,
+    "callbacks": ["early_stopping"]
+  }
+}
