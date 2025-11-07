@@ -18,8 +18,65 @@
       --neutral-dark: #1f2937;
       --white: #ffffff;
       --black: #000000;
+      --bg-primary: #f9fafb;
+      --bg-card: #ffffff;
+      --text-primary: #1f2937;
+      --text-secondary: #6b7280;
+      --border-color: #e5e7eb;
     }
-    
+
+    /* Dark Mode Theme */
+    [data-theme="dark"] {
+      --primary: #6366f1;
+      --primary-hover: #4f46e5;
+      --neutral-light: #374151;
+      --neutral-dark: #f9fafb;
+      --bg-primary: #111827;
+      --bg-card: #1f2937;
+      --text-primary: #f9fafb;
+      --text-secondary: #d1d5db;
+      --border-color: #374151;
+    }
+
+    [data-theme="dark"] body {
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+    }
+
+    [data-theme="dark"] .card,
+    [data-theme="dark"] .layer-card,
+    [data-theme="dark"] .preset-card {
+      background-color: var(--bg-card);
+      border-color: var(--border-color);
+    }
+
+    [data-theme="dark"] input[type="text"],
+    [data-theme="dark"] input[type="number"],
+    [data-theme="dark"] select,
+    [data-theme="dark"] textarea {
+      background-color: #374151;
+      color: var(--text-primary);
+      border-color: var(--border-color);
+    }
+
+    [data-theme="dark"] .tab {
+      color: var(--text-secondary);
+    }
+
+    [data-theme="dark"] .tab.active {
+      background-color: var(--primary);
+      color: white;
+    }
+
+    [data-theme="dark"] .help-text {
+      color: var(--text-secondary);
+    }
+
+    [data-theme="dark"] .alert {
+      background-color: #374151;
+      border-color: var(--border-color);
+    }
+
     * {
       box-sizing: border-box;
       margin: 0;
@@ -563,6 +620,14 @@
     <div class="container">
       <div class="flex space-between align-center">
         <h1>Neural Network Architect - Advanced Builder</h1>
+        <div style="display: flex; gap: 1rem; align-items: center;">
+          <button onclick="toggleDarkMode()" class="secondary small" style="cursor: pointer;" title="Toggle Dark Mode (Ctrl/Cmd + D)">
+            🌓 Dark Mode
+          </button>
+          <button onclick="showKeyboardShortcuts()" class="secondary small" style="cursor: pointer;" title="Keyboard Shortcuts (Ctrl/Cmd + /)">
+            ⌨️ Shortcuts
+          </button>
+        </div>
       </div>
     </div>
   </header>
@@ -3806,6 +3871,130 @@ print("Ready for iOS deployment")
           });
         }
       });
+
+      // ============================================================================
+      // KEYBOARD SHORTCUTS
+      // ============================================================================
+
+      document.addEventListener('keydown', function(e) {
+        // Ctrl/Cmd + S: Save snapshot
+        if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+          e.preventDefault();
+          saveArchitectureSnapshot();
+        }
+
+        // Ctrl/Cmd + E: Export to PyTorch
+        if ((e.ctrlKey || e.metaKey) && e.key === 'e') {
+          e.preventDefault();
+          exportCode('pytorch');
+        }
+
+        // Ctrl/Cmd + /: Show shortcuts help
+        if ((e.ctrlKey || e.metaKey) && e.key === '/') {
+          e.preventDefault();
+          showKeyboardShortcuts();
+        }
+
+        // Ctrl/Cmd + D: Toggle dark mode
+        if ((e.ctrlKey || e.metaKey) && e.key === 'd') {
+          e.preventDefault();
+          toggleDarkMode();
+        }
+      });
+
+      function showKeyboardShortcuts() {
+        const shortcuts = `
+KEYBOARD SHORTCUTS:
+
+Ctrl/Cmd + S  →  Save architecture snapshot
+Ctrl/Cmd + E  →  Export to PyTorch
+Ctrl/Cmd + D  →  Toggle dark mode
+Ctrl/Cmd + /  →  Show this help
+
+Navigation:
+Tab           →  Move between form fields
+Enter         →  Activate buttons
+Esc           →  Close dialogs (when implemented)
+
+Coming in future updates:
+Ctrl/Cmd + Z  →  Undo layer changes
+Ctrl/Cmd + Y  →  Redo layer changes
+Delete        →  Remove selected layer
+`;
+        alert(shortcuts);
+      }
+
+      // ============================================================================
+      // DARK MODE
+      // ============================================================================
+
+      function toggleDarkMode() {
+        const html = document.documentElement;
+        const isDark = html.getAttribute('data-theme') === 'dark';
+
+        if (isDark) {
+          html.removeAttribute('data-theme');
+          localStorage.setItem('theme', 'light');
+        } else {
+          html.setAttribute('data-theme', 'dark');
+          localStorage.setItem('theme', 'dark');
+        }
+      }
+
+      function loadThemePreference() {
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+          document.documentElement.setAttribute('data-theme', 'dark');
+        }
+      }
+
+      // Load theme preference early
+      loadThemePreference();
+
+      // ============================================================================
+      // BROWSER COMPATIBILITY CHECK
+      // ============================================================================
+
+      function checkBrowserCompatibility() {
+        const warnings = [];
+
+        // Check for localStorage
+        if (!window.localStorage) {
+          warnings.push('LocalStorage not available - configurations won\'t persist');
+        }
+
+        // Check for ES6 support
+        try {
+          eval('const test = () => {};');
+        } catch (e) {
+          warnings.push('Your browser doesn\'t support modern JavaScript (ES6)');
+        }
+
+        // Check for FileReader (for imports)
+        if (!window.FileReader) {
+          warnings.push('File import functionality not available');
+        }
+
+        // Check for Blob/URL (for exports)
+        if (!window.Blob || !window.URL) {
+          warnings.push('File export functionality may not work');
+        }
+
+        // Display warnings if any
+        if (warnings.length > 0) {
+          console.warn('Browser Compatibility Issues:', warnings);
+          const message = `⚠️ Compatibility Warnings:\n\n${warnings.join('\n')}\n\nSome features may not work. Consider using Chrome, Firefox, or Edge.`;
+          // Show warning but don't block
+          setTimeout(() => {
+            if (confirm(message + '\n\nContinue anyway?')) {
+              console.log('User chose to continue despite warnings');
+            }
+          }, 1000);
+        }
+      }
+
+      // Run compatibility check
+      checkBrowserCompatibility();
 
       // ============================================================================
       // INITIALIZATION

@@ -1,0 +1,62 @@
+{
+  "project": {
+    "name": "Text Classifier - Transformer",
+    "description": "Transformer-based architecture for text classification (sentiment, topic, etc.)",
+    "taskType": "nlp-classification",
+    "dataType": "text"
+  },
+  "layers": [
+    {
+      "type": "input",
+      "shape": "512,768",
+      "preprocessing": "none"
+    },
+    {
+      "type": "transformer",
+      "heads": 8,
+      "keyDim": 64,
+      "ffDim": 2048,
+      "dropout": 0.1
+    },
+    {
+      "type": "transformer",
+      "heads": 8,
+      "keyDim": 64,
+      "ffDim": 2048,
+      "dropout": 0.1
+    },
+    {
+      "type": "transformer",
+      "heads": 8,
+      "keyDim": 64,
+      "ffDim": 2048,
+      "dropout": 0.1
+    },
+    {
+      "type": "globalavgpool"
+    },
+    {
+      "type": "dense",
+      "units": 512,
+      "activation": "relu"
+    },
+    {
+      "type": "dropout",
+      "rate": 0.3
+    },
+    {
+      "type": "dense",
+      "units": 2,
+      "activation": "softmax"
+    }
+  ],
+  "hyperparameters": {
+    "batchSize": 16,
+    "epochs": 10,
+    "learningRate": 0.0001,
+    "optimizer": "adam",
+    "dataAugmentation": false,
+    "validationSplit": 20,
+    "callbacks": ["early_stopping", "reduce_lr"]
+  }
+}
