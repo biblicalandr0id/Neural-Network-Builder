@@ -718,6 +718,40 @@
       box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.7);
       transition: all 0.3s ease-out;
     }
+
+    /* Drag and Drop */
+    .layer-card {
+      cursor: grab;
+      transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s;
+    }
+
+    .layer-card.dragging {
+      opacity: 0.5;
+      cursor: grabbing;
+      transform: scale(0.95);
+    }
+
+    .layer-card.drag-over {
+      border-top: 3px solid var(--primary);
+      transform: translateY(5px);
+    }
+
+    .layer-card:active {
+      cursor: grabbing;
+    }
+
+    .drag-handle {
+      cursor: grab;
+      display: inline-block;
+      padding: 0.25rem 0.5rem;
+      margin-right: 0.5rem;
+      opacity: 0.6;
+      user-select: none;
+    }
+
+    .drag-handle:hover {
+      opacity: 1;
+    }
   </style>
 </head>
 <body>
@@ -2051,10 +2085,19 @@
       function createLayerHTML(layer, index) {
         const isInput = layer.type === 'input';
         const isOutput = index === networkConfig.layers.length - 1 && !isInput;
+        const isDraggable = !isInput; // Can't drag input layer
 
         let html = `
-          <div class="layer-card" data-layer-id="${layer.id}" data-layer-index="${index}">
-            <div class="layer-tools">`;
+          <div class="layer-card"
+               data-layer-id="${layer.id}"
+               data-layer-index="${index}"
+               ${isDraggable ? 'draggable="true"' : ''}
+               ondragstart="${isDraggable ? 'handleDragStart(event)' : 'return false;'}"
+               ondragend="${isDraggable ? 'handleDragEnd(event)' : ''}"
+               ondragover="${isDraggable ? 'handleDragOver(event)' : ''}"
+               ondrop="${isDraggable ? 'handleDrop(event)' : ''}">
+            <div class="layer-tools">
+              ${isDraggable ? '<span class="drag-handle" title="Drag to reorder">⋮⋮</span>' : ''}`;
 
         if (isInput) {
           html += `<button class="small" disabled>Input</button>`;
@@ -2367,6 +2410,101 @@
         saveToHistory();
         updateLayerVisualizer();
         updateStatistics();
+        saveToLocalStorage();
+      }
+
+      // ============================================================================
+      // DRAG AND DROP LAYER REORDERING
+      // ============================================================================
+
+      let draggedElement = null;
+      let draggedIndex = null;
+
+      function handleDragStart(event) {
+        draggedElement = event.target.closest('.layer-card');
+        draggedIndex = parseInt(draggedElement.getAttribute('data-layer-index'));
+
+        draggedElement.classList.add('dragging');
+
+        // Set drag data
+        event.dataTransfer.effectAllowed = 'move';
+        event.dataTransfer.setData('text/html', draggedElement.innerHTML);
+      }
+
+      function handleDragEnd(event) {
+        if (draggedElement) {
+          draggedElement.classList.remove('dragging');
+        }
+
+        // Remove drag-over class from all layer cards
+        document.querySelectorAll('.layer-card').forEach(card => {
+          card.classList.remove('drag-over');
+        });
+
+        draggedElement = null;
+        draggedIndex = null;
+      }
+
+      function handleDragOver(event) {
+        if (event.preventDefault) {
+          event.preventDefault();
+        }
+
+        event.dataTransfer.dropEffect = 'move';
+
+        const targetCard = event.target.closest('.layer-card');
+        if (targetCard && targetCard !== draggedElement) {
+          // Remove drag-over from all cards
+          document.querySelectorAll('.layer-card').forEach(card => {
+            card.classList.remove('drag-over');
+          });
+
+          // Add drag-over to target card
+          targetCard.classList.add('drag-over');
+        }
+
+        return false;
+      }
+
+      function handleDrop(event) {
+        if (event.stopPropagation) {
+          event.stopPropagation();
+        }
+
+        event.preventDefault();
+
+        const targetCard = event.target.closest('.layer-card');
+        if (!targetCard || targetCard === draggedElement) {
+          return false;
+        }
+
+        const targetIndex = parseInt(targetCard.getAttribute('data-layer-index'));
+
+        // Don't allow dropping on input layer (index 0)
+        if (targetIndex === 0) {
+          return false;
+        }
+
+        // Reorder the layers
+        reorderLayer(draggedIndex, targetIndex);
+
+        return false;
+      }
+
+      function reorderLayer(fromIndex, toIndex) {
+        if (fromIndex === toIndex || fromIndex === 0) {
+          return; // Can't reorder input layer
+        }
+
+        // Remove the layer from its current position
+        const [movedLayer] = networkConfig.layers.splice(fromIndex, 1);
+
+        // Insert it at the new position
+        networkConfig.layers.splice(toIndex, 0, movedLayer);
+
+        // Save and update
+        saveToHistory();
+        renderLayers();
         saveToLocalStorage();
       }
 
