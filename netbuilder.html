@@ -977,8 +977,107 @@
             </div>
           </div>
         </div>
+
+        <div class="card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; margin-top: 2rem;">
+          <h2 style="color: white;">🎯 Transfer Learning Hub</h2>
+          <p style="color: rgba(255,255,255,0.9);">Start with pre-trained models and fine-tune for your task - the fastest path to high accuracy!</p>
+
+          <div class="grid grid-3" style="margin-top: 1.5rem;">
+            <div style="background: rgba(255,255,255,0.15); padding: 1.5rem; border-radius: 0.5rem; backdrop-filter: blur(10px);">
+              <h4 style="color: white; margin-top: 0;">ImageNet Models</h4>
+              <p style="font-size: 0.875rem; color: rgba(255,255,255,0.9);">Pre-trained on 1.4M images</p>
+              <select id="imagenet-model" style="width: 100%; margin-bottom: 0.5rem;">
+                <option value="">Select Model...</option>
+                <option value="resnet50">ResNet-50 (94% top-5)</option>
+                <option value="efficientnetb0">EfficientNet-B0 (92% top-5)</option>
+                <option value="mobilenetv2">MobileNet-V2 (90% top-5)</option>
+                <option value="vgg16">VGG-16 (91% top-5)</option>
+              </select>
+              <button class="small" style="width: 100%; background: white; color: #667eea;" onclick="loadTransferLearning(document.getElementById('imagenet-model').value, 'imagenet')">Load Model</button>
+            </div>
+
+            <div style="background: rgba(255,255,255,0.15); padding: 1.5rem; border-radius: 0.5rem; backdrop-filter: blur(10px);">
+              <h4 style="color: white; margin-top: 0;">NLP Models</h4>
+              <p style="font-size: 0.875rem; color: rgba(255,255,255,0.9);">Pre-trained on massive text corpora</p>
+              <select id="nlp-model" style="width: 100%; margin-bottom: 0.5rem;">
+                <option value="">Select Model...</option>
+                <option value="bert-base">BERT-Base (110M params)</option>
+                <option value="gpt2">GPT-2 (124M params)</option>
+                <option value="distilbert">DistilBERT (66M params)</option>
+                <option value="roberta">RoBERTa-Base (125M params)</option>
+              </select>
+              <button class="small" style="width: 100%; background: white; color: #667eea;" onclick="loadTransferLearning(document.getElementById('nlp-model').value, 'nlp')">Load Model</button>
+            </div>
+
+            <div style="background: rgba(255,255,255,0.15); padding: 1.5rem; border-radius: 0.5rem; backdrop-filter: blur(10px);">
+              <h4 style="color: white; margin-top: 0;">Domain-Specific</h4>
+              <p style="font-size: 0.875rem; color: rgba(255,255,255,0.9);">Specialized pre-trained models</p>
+              <select id="domain-model" style="width: 100%; margin-bottom: 0.5rem;">
+                <option value="">Select Model...</option>
+                <option value="yolov5">YOLO-V5 (Object Detection)</option>
+                <option value="unet-medical">U-Net (Medical Imaging)</option>
+                <option value="wav2vec">Wav2Vec 2.0 (Speech)</option>
+                <option value="clip">CLIP (Vision-Language)</option>
+              </select>
+              <button class="small" style="width: 100%; background: white; color: #667eea;" onclick="loadTransferLearning(document.getElementById('domain-model').value, 'domain')">Load Model</button>
+            </div>
+          </div>
+
+          <div style="margin-top: 1.5rem; padding: 1rem; background: rgba(255,255,255,0.1); border-radius: 0.5rem;">
+            <strong style="color: white;">💡 Why Transfer Learning?</strong>
+            <ul style="margin: 0.5rem 0; padding-left: 1.5rem; color: rgba(255,255,255,0.9);">
+              <li>Train 10-100x faster than from scratch</li>
+              <li>Achieve higher accuracy with less data</li>
+              <li>Leverage billions of training examples</li>
+              <li>Production-ready starting point</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top: 2rem;">
+          <h2>🧩 Architecture Building Blocks</h2>
+          <p class="help-text">Add common patterns and proven architectures components to your network</p>
+
+          <div class="grid grid-2">
+            <div>
+              <h3>Convolutional Blocks</h3>
+              <div style="display: grid; gap: 0.5rem;">
+                <button class="small" onclick="addArchitecturePattern('resnet_block')" style="text-align: left; justify-content: flex-start;">
+                  <strong>ResNet Block</strong> - Conv + BatchNorm + ReLU + Skip
+                </button>
+                <button class="small" onclick="addArchitecturePattern('inception_module')" style="text-align: left; justify-content: flex-start;">
+                  <strong>Inception Module</strong> - Multi-scale parallel convolutions
+                </button>
+                <button class="small" onclick="addArchitecturePattern('depthwise_sep')" style="text-align: left; justify-content: flex-start;">
+                  <strong>Depthwise Separable</strong> - Mobile-efficient convolution
+                </button>
+                <button class="small" onclick="addArchitecturePattern('squeeze_excite')" style="text-align: left; justify-content: flex-start;">
+                  <strong>Squeeze-and-Excitation</strong> - Channel attention mechanism
+                </button>
+              </div>
+            </div>
+
+            <div>
+              <h3>Encoder-Decoder Patterns</h3>
+              <div style="display: grid; gap: 0.5rem;">
+                <button class="small" onclick="addArchitecturePattern('encoder_block')" style="text-align: left; justify-content: flex-start;">
+                  <strong>Encoder Block</strong> - Downsample + feature extraction
+                </button>
+                <button class="small" onclick="addArchitecturePattern('decoder_block')" style="text-align: left; justify-content: flex-start;">
+                  <strong>Decoder Block</strong> - Upsample + reconstruction
+                </button>
+                <button class="small" onclick="addArchitecturePattern('unet_skip')" style="text-align: left; justify-content: flex-start;">
+                  <strong>U-Net Skip Connection</strong> - Encoder to decoder bridge
+                </button>
+                <button class="small" onclick="addArchitecturePattern('attention_block')" style="text-align: left; justify-content: flex-start;">
+                  <strong>Self-Attention Block</strong> - Multi-head attention mechanism
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-      
+
       <div class="tab-content" id="architect">
         <div class="card">
           <div class="card-header">
@@ -1388,8 +1487,23 @@
     
     <div class="tab-content" id="visualization">
       <div class="card">
-        <h2>Model Architecture</h2>
-        <p class="help-text">Visual representation of your neural network layers.</p>
+        <h2>Interactive Architecture Graph</h2>
+        <p class="help-text">Click on layers to see details. Hover for quick info.</p>
+
+        <div style="margin-bottom: 1rem; display: flex; gap: 0.5rem;">
+          <button class="small" onclick="renderArchitectureGraph('vertical')">Vertical Layout</button>
+          <button class="small" onclick="renderArchitectureGraph('horizontal')">Horizontal Layout</button>
+          <button class="small success" onclick="downloadArchitectureImage()">📸 Download Image</button>
+        </div>
+
+        <div id="architecture-graph" style="background: var(--bg-card); border: 2px solid var(--neutral-light); border-radius: 0.5rem; padding: 2rem; min-height: 400px; overflow: auto;">
+          <!-- Interactive graph will be rendered here -->
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Model Architecture Flow</h2>
+        <p class="help-text">Sequential visualization of your neural network layers.</p>
         <div class="layer-visualizer" id="viz-layer-visualizer" style="margin: 2rem 0;">
           <!-- Dynamically generated layer flow -->
         </div>
@@ -5178,6 +5292,288 @@ print("Ready for iOS deployment")
       }
 
       // ============================================================================
+      // VISUAL ARCHITECTURE GRAPH
+      // ============================================================================
+
+      function renderArchitectureGraph(layout = 'vertical') {
+        const container = document.getElementById('architecture-graph');
+        if (!container) return;
+
+        if (networkConfig.layers.length === 0) {
+          container.innerHTML = '<div style="text-align: center; padding: 3rem; color: var(--text-muted);">Build a network to see the graph visualization</div>';
+          return;
+        }
+
+        let html = '<svg width="100%" height="600" style="background: var(--bg-card);">';
+
+        const isVertical = layout === 'vertical';
+        const layerWidth = 160;
+        const layerHeight = 80;
+        const spacing = isVertical ? 100 : 200;
+
+        networkConfig.layers.forEach((layer, index) => {
+          const x = isVertical ? 300 : 50 + index * spacing;
+          const y = isVertical ? 50 + index * spacing : 250;
+
+          // Layer box
+          const color = getLayerColor(layer.type);
+          html += `
+            <g class="layer-node" style="cursor: pointer;" onclick="showLayerDetails(${index})">
+              <rect x="${x}" y="${y}" width="${layerWidth}" height="${layerHeight}"
+                    rx="8" fill="${color}" stroke="var(--primary)" stroke-width="2"
+                    opacity="0.9" />
+              <text x="${x + layerWidth/2}" y="${y + 25}" text-anchor="middle"
+                    font-size="14" font-weight="bold" fill="white">
+                ${layerConfigs[layer.type]?.name || layer.type}
+              </text>
+              <text x="${x + layerWidth/2}" y="${y + 45}" text-anchor="middle"
+                    font-size="11" fill="white" opacity="0.9">
+                ${getLayerParams(layer)}
+              </text>
+              <text x="${x + layerWidth/2}" y="${y + 65}" text-anchor="middle"
+                    font-size="10" fill="white" opacity="0.8">
+                ${calculateOutputShape(layer, index)}
+              </text>
+            </g>
+          `;
+
+          // Connection line to next layer
+          if (index < networkConfig.layers.length - 1) {
+            const nextX = isVertical ? 300 : 50 + (index + 1) * spacing;
+            const nextY = isVertical ? 50 + (index + 1) * spacing : 250;
+
+            html += `
+              <line x1="${x + layerWidth/2}" y1="${y + layerHeight}"
+                    x2="${nextX + layerWidth/2}" y2="${nextY}"
+                    stroke="var(--primary)" stroke-width="2" opacity="0.5"
+                    marker-end="url(#arrowhead)" />
+            `;
+          }
+        });
+
+        // Arrow marker
+        html += `
+          <defs>
+            <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+              <polygon points="0 0, 10 3, 0 6" fill="var(--primary)" opacity="0.5" />
+            </marker>
+          </defs>
+        `;
+
+        html += '</svg>';
+        container.innerHTML = html;
+      }
+
+      function getLayerColor(type) {
+        const colors = {
+          input: '#4CAF50',
+          conv2d: '#2196F3',
+          dense: '#9C27B0',
+          lstm: '#FF9800',
+          gru: '#FF5722',
+          pooling: '#00BCD4',
+          dropout: '#795548',
+          batchnorm: '#607D8B',
+          flatten: '#3F51B5',
+          transformer: '#E91E63',
+          attention: '#F44336',
+          residual: '#009688'
+        };
+        return colors[type] || '#757575';
+      }
+
+      function getLayerParams(layer) {
+        if (layer.type === 'conv2d') return `${layer.filters || 32} filters`;
+        if (layer.type === 'dense') return `${layer.units || 128} units`;
+        if (layer.type === 'lstm' || layer.type === 'gru') return `${layer.units || 128} units`;
+        if (layer.type === 'pooling') return `${layer.poolSize || 2}x${layer.poolSize || 2}`;
+        if (layer.type === 'dropout') return `${(layer.rate || 0.5) * 100}%`;
+        return '';
+      }
+
+      function showLayerDetails(index) {
+        const layer = networkConfig.layers[index];
+        const details = JSON.stringify(layer, null, 2);
+        alert(`Layer ${index + 1}: ${layerConfigs[layer.type]?.name || layer.type}\n\n${details}`);
+      }
+
+      function downloadArchitectureImage() {
+        alert('To download: Right-click the graph and select "Save Image As..."\n\nFor higher quality, use browser screenshot tools or export to SVG.');
+      }
+
+      // ============================================================================
+      // TRANSFER LEARNING & PRE-TRAINED MODELS
+      // ============================================================================
+
+      function loadTransferLearning(modelName, category) {
+        if (!modelName) {
+          alert('Please select a model first!');
+          return;
+        }
+
+        const transferModels = {
+          // ImageNet models
+          'resnet50': {
+            description: 'ResNet-50 pre-trained on ImageNet',
+            layers: [
+              { type: 'input', shape: '224,224,3', preprocessing: 'normalize' },
+              { type: 'conv2d', filters: 64, kernelSize: 7, strides: 2, activation: 'relu', batchNorm: true },
+              { type: 'pooling', poolType: 'max', poolSize: 3, strides: 2 },
+              { type: 'residual', filters: 256, kernelSize: 3, activation: 'relu' },
+              { type: 'residual', filters: 512, kernelSize: 3, activation: 'relu' },
+              { type: 'globalavgpool' },
+              { type: 'dense', units: 1000, activation: 'softmax' }
+            ],
+            fineTuneTip: 'Replace last dense layer with your number of classes (e.g., 10 for CIFAR-10)'
+          },
+          'efficientnetb0': {
+            description: 'EfficientNet-B0 - Mobile-optimized',
+            layers: [
+              { type: 'input', shape: '224,224,3', preprocessing: 'normalize' },
+              { type: 'conv2d', filters: 32, kernelSize: 3, strides: 2, activation: 'relu', batchNorm: true },
+              { type: 'conv2d', filters: 64, kernelSize: 3, activation: 'relu', batchNorm: true },
+              { type: 'conv2d', filters: 128, kernelSize: 3, activation: 'relu', batchNorm: true },
+              { type: 'globalavgpool' },
+              { type: 'dense', units: 1000, activation: 'softmax' }
+            ],
+            fineTuneTip: 'Efficient for mobile deployment. Freeze first 3 conv layers for transfer learning.'
+          },
+          'mobilenetv2': {
+            description: 'MobileNet V2 - Lightweight CNN',
+            layers: [
+              { type: 'input', shape: '224,224,3', preprocessing: 'normalize' },
+              { type: 'conv2d', filters: 32, kernelSize: 3, strides: 2, activation: 'relu', batchNorm: true },
+              { type: 'conv2d', filters: 96, kernelSize: 1, activation: 'relu', batchNorm: true },
+              { type: 'conv2d', filters: 144, kernelSize: 1, activation: 'relu', batchNorm: true },
+              { type: 'globalavgpool' },
+              { type: 'dense', units: 1000, activation: 'softmax' }
+            ],
+            fineTuneTip: 'Perfect for mobile apps. Very fast inference with good accuracy.'
+          },
+          // NLP models
+          'bert-base': {
+            description: 'BERT-Base: Bidirectional transformer',
+            layers: [
+              { type: 'input', shape: '512,768', preprocessing: 'none' },
+              { type: 'transformer', heads: 12, keyDim: 64, ffDim: 3072, dropout: 0.1 },
+              { type: 'transformer', heads: 12, keyDim: 64, ffDim: 3072, dropout: 0.1 },
+              { type: 'dense', units: 768, activation: 'gelu' },
+              { type: 'dense', units: 2, activation: 'softmax' }
+            ],
+            fineTuneTip: 'Add task-specific head on top. Fine-tune last 2-4 transformer layers.'
+          },
+          'gpt2': {
+            description: 'GPT-2: Generative pre-trained transformer',
+            layers: [
+              { type: 'input', shape: '1024,768', preprocessing: 'none' },
+              { type: 'transformer', heads: 12, keyDim: 64, ffDim: 3072, dropout: 0.1 },
+              { type: 'transformer', heads: 12, keyDim: 64, ffDim: 3072, dropout: 0.1 },
+              { type: 'dense', units: 50257, activation: 'softmax' }
+            ],
+            fineTuneTip: 'For text generation. Fine-tune on your domain corpus.'
+          }
+        };
+
+        const model = transferModels[modelName];
+        if (!model) {
+          alert('Model configuration not available yet. Coming soon!');
+          return;
+        }
+
+        // Confirm before loading
+        const confirmed = confirm(
+          `Load ${model.description}?\n\n` +
+          `This will replace your current architecture with ${model.layers.length} layers.\n\n` +
+          `💡 Fine-tuning Tip:\n${model.fineTuneTip}`
+        );
+
+        if (!confirmed) return;
+
+        // Load the model
+        networkConfig.layers = model.layers.map(layerConfig => ({
+          id: generateLayerId(),
+          ...layerConfig
+        }));
+
+        saveToHistory();
+        renderLayers();
+        saveToLocalStorage();
+
+        // Switch to architect tab
+        document.querySelector('.tab[data-tab="architect"]').click();
+
+        alert(`✅ ${model.description} loaded successfully!\n\nGo to the Architect tab to customize it for your task.`);
+      }
+
+      // ============================================================================
+      // ARCHITECTURE BUILDING BLOCKS
+      // ============================================================================
+
+      function addArchitecturePattern(patternType) {
+        const patterns = {
+          'resnet_block': [
+            { type: 'conv2d', filters: 64, kernelSize: 3, padding: 'same', activation: 'relu', batchNorm: true },
+            { type: 'conv2d', filters: 64, kernelSize: 3, padding: 'same', activation: 'relu', batchNorm: true },
+            { type: 'residual', filters: 64, kernelSize: 1, activation: 'relu' }
+          ],
+          'inception_module': [
+            { type: 'conv2d', filters: 64, kernelSize: 1, activation: 'relu' },
+            { type: 'conv2d', filters: 96, kernelSize: 3, activation: 'relu' },
+            { type: 'conv2d', filters: 128, kernelSize: 5, activation: 'relu' }
+          ],
+          'depthwise_sep': [
+            { type: 'conv2d', filters: 64, kernelSize: 3, padding: 'same', activation: 'relu' },
+            { type: 'conv2d', filters: 64, kernelSize: 1, activation: 'relu' }
+          ],
+          'squeeze_excite': [
+            { type: 'globalavgpool' },
+            { type: 'dense', units: 16, activation: 'relu' },
+            { type: 'dense', units: 64, activation: 'sigmoid' }
+          ],
+          'encoder_block': [
+            { type: 'conv2d', filters: 64, kernelSize: 3, activation: 'relu', batchNorm: true },
+            { type: 'conv2d', filters: 64, kernelSize: 3, activation: 'relu', batchNorm: true },
+            { type: 'pooling', poolType: 'max', poolSize: 2, strides: 2 }
+          ],
+          'decoder_block': [
+            { type: 'conv2d', filters: 64, kernelSize: 3, activation: 'relu', batchNorm: true },
+            { type: 'conv2d', filters: 64, kernelSize: 3, activation: 'relu', batchNorm: true }
+          ],
+          'unet_skip': [
+            { type: 'conv2d', filters: 64, kernelSize: 3, activation: 'relu' }
+          ],
+          'attention_block': [
+            { type: 'attention', heads: 8, keyDim: 64, dropout: 0.1 },
+            { type: 'dense', units: 512, activation: 'relu' },
+            { type: 'dropout', rate: 0.1 }
+          ]
+        };
+
+        const pattern = patterns[patternType];
+        if (!pattern) {
+          alert('Pattern not implemented yet!');
+          return;
+        }
+
+        // Add pattern layers
+        pattern.forEach(layerConfig => {
+          networkConfig.layers.push({
+            id: generateLayerId(),
+            ...layerConfig
+          });
+        });
+
+        saveToHistory();
+        renderLayers();
+        saveToLocalStorage();
+
+        // Switch to architect tab
+        document.querySelector('.tab[data-tab="architect"]').click();
+
+        alert(`✅ Added ${pattern.length} layers from the ${patternType.replace('_', ' ')} pattern!`);
+      }
+
+      // ============================================================================
       // EVENT HANDLERS
       // ============================================================================
 
@@ -5187,7 +5583,13 @@ print("Ready for iOS deployment")
           document.querySelectorAll('.tabs .tab').forEach(t => t.classList.remove('active'));
           document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
           tab.classList.add('active');
-          document.getElementById(tab.getAttribute('data-tab')).classList.add('active');
+          const tabName = tab.getAttribute('data-tab');
+          document.getElementById(tabName).classList.add('active');
+
+          // Auto-render visualizations when switching to visualization tab
+          if (tabName === 'visualization') {
+            setTimeout(() => renderArchitectureGraph('vertical'), 100);
+          }
         });
       });
 
