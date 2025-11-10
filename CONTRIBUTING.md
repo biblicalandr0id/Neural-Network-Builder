@@ -1,574 +1,436 @@
 # Contributing to Neural Network Builder
 
-Thank you for your interest in contributing! This document provides guidelines for contributing to the Neural Network Builder project.
+Thank you for your interest in contributing to Neural Network Builder! This document provides guidelines and instructions for contributing to the project.
 
-## 🎯 Ways to Contribute
+## 🌟 Code of Conduct
 
-- **Bug Reports**: Found a bug? Open an issue with detailed steps to reproduce
-- **Feature Requests**: Have an idea? Share it in GitHub issues
-- **Code Contributions**: Submit pull requests for bug fixes or new features
-- **Documentation**: Improve README, guides, or code comments
-- **Examples**: Create and share architecture configurations
-- **Testing**: Test on different browsers and report compatibility issues
-
----
+By participating in this project, you agree to maintain a respectful, inclusive, and collaborative environment for all contributors.
 
 ## 🚀 Getting Started
 
 ### Prerequisites
 
-- Modern web browser (Chrome 60+, Firefox 55+, Safari 12+, Edge 16+)
-- Text editor (VS Code, Sublime, Atom, etc.)
-- Basic knowledge of HTML, CSS, and JavaScript (ES6+)
-- Git for version control
+- Node.js 20 or higher
+- pnpm 8+ (recommended) or npm
+- Git
+- A code editor (VS Code recommended)
 
-### Development Setup
+### Setting Up Development Environment
 
-1. **Fork the Repository**
-   ```bash
-   # On GitHub, click "Fork" button
-   ```
-
-2. **Clone Your Fork**
+1. **Fork and clone the repository**
    ```bash
    git clone https://github.com/YOUR_USERNAME/Neural-Network-Builder.git
    cd Neural-Network-Builder
    ```
 
-3. **Create a Branch**
+2. **Install dependencies**
+   ```bash
+   pnpm install
+   ```
+
+3. **Create a new branch**
    ```bash
    git checkout -b feature/your-feature-name
    # or
-   git checkout -b fix/bug-description
+   git checkout -b fix/your-bug-fix
    ```
 
-4. **Start Developing**
+4. **Start development servers**
    ```bash
-   # Simply open netbuilder.html in your browser
-   # No build process required!
+   pnpm dev
    ```
 
----
+## 📝 Development Workflow
 
-## 📋 Development Guidelines
+### Project Structure
 
-### Code Style
+This is a monorepo with three main packages:
 
-#### JavaScript
-```javascript
-// Use descriptive variable names
-const architectureConfig = { };  // Good
-const ac = { };                  // Bad
+- **`packages/frontend`**: React application
+- **`packages/backend`**: Express API server
+- **`packages/shared`**: Shared types and utilities
 
-// Use ES6+ features
-const myFunction = () => { };    // Good
-function myFunction() { }         // Acceptable
+### Working on Features
 
-// Comment complex logic
-// Calculate FLOPs for convolutional layer
-// FLOPs = 2 * H * W * C_in * C_out * K * K
-const flops = 2 * h * w * c * filters * kernelSize * kernelSize;
+1. **Choose an issue** or create one describing what you want to work on
+2. **Assign yourself** to the issue to avoid duplicate work
+3. **Create a branch** following the naming convention:
+   - `feature/description` for new features
+   - `fix/description` for bug fixes
+   - `refactor/description` for refactoring
+   - `docs/description` for documentation
 
-// Use consistent indentation (2 spaces)
-function example() {
-  if (condition) {
-    doSomething();
-  }
+4. **Make your changes** following our coding standards (see below)
+5. **Write tests** for your changes
+6. **Update documentation** if needed
+7. **Submit a pull request**
+
+## 💻 Coding Standards
+
+### TypeScript
+
+- Use TypeScript for all code (no `.js` or `.jsx` files)
+- Prefer interfaces over types for object shapes
+- Use explicit return types for functions
+- Enable strict mode in tsconfig.json
+
+```typescript
+// Good
+interface UserProps {
+  name: string
+  age: number
+}
+
+function greetUser(user: UserProps): string {
+  return `Hello, ${user.name}!`
+}
+
+// Avoid
+const greetUser = (user: any) => {
+  return `Hello, ${user.name}!`
 }
 ```
 
-#### HTML
-```html
-<!-- Use semantic elements -->
-<section class="card">
-  <h2>Title</h2>
-  <p>Content</p>
-</section>
+### React Components
 
-<!-- Use descriptive IDs and classes -->
-<button id="export-pytorch-btn" class="success">  <!-- Good -->
-<button id="btn1" class="b">                      <!-- Bad -->
-```
+- Use functional components with hooks
+- Prefer named exports over default exports
+- Use TypeScript interfaces for props
+- Extract complex logic into custom hooks
+- Keep components small and focused
 
-#### CSS
-```css
-/* Use CSS variables for theming */
-.card {
-  background-color: var(--bg-card);  /* Good */
-  background-color: #ffffff;         /* Avoid hardcoding */
+```typescript
+// Good
+interface ButtonProps {
+  label: string
+  onClick: () => void
+  variant?: 'primary' | 'secondary'
 }
 
-/* Support dark mode */
-[data-theme="dark"] .custom-element {
-  background-color: var(--bg-dark);
+export function Button({ label, onClick, variant = 'primary' }: ButtonProps) {
+  return (
+    <button className={`btn-${variant}`} onClick={onClick}>
+      {label}
+    </button>
+  )
 }
 ```
 
-### Architecture
+### State Management
 
-The project follows a simple, modular structure:
+- Use Zustand for global state
+- Use React hooks (useState, useReducer) for local state
+- Keep state as close to where it's used as possible
+- Use immer middleware for complex state updates
 
-```
-Neural-Network-Builder/
-├── netbuilder.html          # Main application (all-in-one file)
-├── README.md                # Project documentation
-├── CHANGELOG.md             # Version history
-├── GETTING_STARTED.md       # User quick start guide
-├── CONTRIBUTING.md          # This file
-└── examples/                # Example configurations
-    ├── image-classifier-resnet.json
-    ├── mobile-efficient-net.json
-    └── text-classifier-transformer.json
-```
-
-### JavaScript Organization
-
-The code is organized into logical sections:
-
-```javascript
-// ============================================================================
-// STATE MANAGEMENT
-// ============================================================================
-// All global state and configuration
-
-// ============================================================================
-// UTILITY FUNCTIONS
-// ============================================================================
-// Helper functions
-
-// ============================================================================
-// LAYER MANAGEMENT
-// ============================================================================
-// Add, remove, modify layers
-
-// ============================================================================
-// CODE GENERATION
-// ============================================================================
-// Export to PyTorch, Keras, JAX
-
-// ... etc
+```typescript
+// Good - Zustand store with immer
+export const useNetworkStore = create<NetworkState>()(
+  persist(
+    immer((set) => ({
+      layers: [],
+      addLayer: (layer) =>
+        set((state) => {
+          state.layers.push(layer)
+        }),
+    })),
+    { name: 'network-storage' }
+  )
+)
 ```
 
----
+### File Organization
 
-## 🎨 Adding New Features
+- One component per file
+- Co-locate related files (component + styles + tests)
+- Use index files for cleaner imports
+- Group by feature, not by type
 
-### Adding a New Layer Type
-
-1. **Add to layerConfigs**:
-```javascript
-const layerConfigs = {
-  // ... existing layers
-  mylayer: {
-    name: 'My Custom Layer',
-    fields: ['param1', 'param2', 'activation']
-  }
-};
+```
+components/
+├── architect/
+│   ├── LayerBuilder/
+│   │   ├── LayerBuilder.tsx
+│   │   ├── LayerBuilder.test.tsx
+│   │   ├── LayerCard.tsx
+│   │   └── index.ts
+│   └── index.ts
 ```
 
-2. **Add to createLayerFieldsHTML**:
-```javascript
-else if (layer.type === 'mylayer') {
-  html += `
-    <div>
-      <label>Parameter 1</label>
-      <input type="number" id="param1-${layer.id}" value="${layer.param1 || 10}">
-    </div>
-  `;
-}
+### Styling
+
+- Use Tailwind CSS utility classes
+- Follow shadcn/ui component patterns
+- Use CSS variables for theming
+- Keep responsive design in mind
+
+```tsx
+// Good - Tailwind utilities
+<div className="flex items-center gap-4 p-4 rounded-lg bg-card">
+  <h2 className="text-2xl font-bold">Title</h2>
+</div>
 ```
 
-3. **Add to getDefaultLayerProperties**:
-```javascript
-const defaults = {
-  // ... existing defaults
-  mylayer: { param1: 10, param2: 20, activation: 'relu' }
-};
-```
+### Naming Conventions
 
-4. **Add code generation** for PyTorch/Keras/JAX in respective functions
-
-### Adding a New Export Format
-
-1. **Add button to Export tab** in HTML:
-```html
-<button class="success" onclick="exportCode('newformat')">
-  <strong>New Format</strong>
-</button>
-```
-
-2. **Add generation function**:
-```javascript
-function generateNewFormatCode() {
-  let code = `# Generated code for New Format\n`;
-  networkConfig.layers.forEach(layer => {
-    // Generate code for each layer
-  });
-  return code;
-}
-```
-
-3. **Update exportCode function**:
-```javascript
-exportCode = function(framework) {
-  if (framework === 'newformat') {
-    const code = generateNewFormatCode();
-    downloadFile(code, 'model_newformat.ext', 'text/plain');
-  } else {
-    // ... existing code
-  }
-};
-```
-
-### Adding New AI Recommendations
-
-1. **Update aiKnowledgeBase**:
-```javascript
-const aiKnowledgeBase = {
-  'new-task-type': {
-    small: { arch: 'architecture', params: '< 10M', suggestion: 'Your advice' },
-    medium: { arch: 'architecture', params: '10-50M', suggestion: 'Your advice' },
-    large: { arch: 'architecture', params: '> 50M', suggestion: 'Your advice' }
-  }
-};
-```
-
-2. **Add datasets**:
-```javascript
-const datasetSuggestions = {
-  'new-task-type': ['Dataset1', 'Dataset2', 'Dataset3']
-};
-```
-
----
+- **Components**: PascalCase (`LayerBuilder.tsx`)
+- **Files**: kebab-case (`layer-builder.ts`)
+- **Functions**: camelCase (`addLayer`)
+- **Constants**: UPPER_SNAKE_CASE (`MAX_LAYERS`)
+- **Interfaces**: PascalCase with descriptive names (`LayerConfig`, `NetworkState`)
+- **Types**: PascalCase (`LayerType`)
 
 ## 🧪 Testing
 
-### Before Submitting
+### Writing Tests
 
-1. **Test in Multiple Browsers**
-   - Chrome/Edge
-   - Firefox
-   - Safari (if available)
+- Write tests for all new features
+- Use React Testing Library for component tests
+- Use Vitest for unit tests
+- Aim for >80% code coverage
 
-2. **Test Core Functionality**
-   - [ ] Layer add/remove/duplicate
-   - [ ] Preset architecture loading
-   - [ ] Configuration export (JSON, YAML, XML)
-   - [ ] Code export (PyTorch, Keras, JAX)
-   - [ ] Performance calculations
-   - [ ] Dark mode toggle
-   - [ ] Keyboard shortcuts
+```typescript
+// Example component test
+import { render, screen, fireEvent } from '@testing-library/react'
+import { Button } from './Button'
 
-3. **Test New Features**
-   - [ ] Test with valid inputs
-   - [ ] Test with edge cases
-   - [ ] Test error handling
-   - [ ] Test UI responsiveness
+describe('Button', () => {
+  it('calls onClick when clicked', () => {
+    const handleClick = vi.fn()
+    render(<Button label="Click me" onClick={handleClick} />)
+    
+    fireEvent.click(screen.getByText('Click me'))
+    
+    expect(handleClick).toHaveBeenCalledTimes(1)
+  })
+})
+```
 
-4. **Check Console**
-   - No JavaScript errors
-   - No console warnings (except expected)
+### Running Tests
 
-### Manual Testing Checklist
+```bash
+# Run all tests
+pnpm test
+
+# Run tests in watch mode
+pnpm test:watch
+
+# Run tests with coverage
+pnpm test:coverage
+
+# Run tests for specific package
+pnpm --filter frontend test
+```
+
+## 📋 Commit Convention
+
+We follow the [Conventional Commits](https://www.conventionalcommits.org/) specification:
 
 ```
-Quick Start:
-[ ] All preset cards load correctly
-[ ] Clicking preset loads architecture
-[ ] Architecture appears in Architect tab
+<type>(<scope>): <subject>
 
-Architect:
-[ ] Add Layer button works
-[ ] Remove/Duplicate buttons work
-[ ] Layer type changes update form
-[ ] All layer parameters save correctly
+<body>
 
-AI Assistant:
-[ ] Recommendations generate
-[ ] Validation runs without errors
-[ ] Dataset suggestions display
-
-Performance:
-[ ] FLOPs calculate correctly
-[ ] Layer breakdown shows all layers
-[ ] Device compatibility updates
-
-Export:
-[ ] All export buttons download files
-[ ] Generated code is valid
-[ ] Import loads configurations
-
-Advanced:
-[ ] URL sharing works
-[ ] Snapshots save/load
-[ ] Templates save/load
-[ ] NAS generates architectures
+<footer>
 ```
+
+### Types
+
+- `feat`: New feature
+- `fix`: Bug fix
+- `docs`: Documentation changes
+- `style`: Code style changes (formatting, etc.)
+- `refactor`: Code refactoring
+- `test`: Adding or updating tests
+- `chore`: Build process or auxiliary tool changes
+
+### Examples
+
+```bash
+feat(architect): add drag-and-drop layer reordering
+
+- Implement drag-and-drop using @dnd-kit
+- Add visual feedback during drag
+- Update layer order in store
+
+Closes #123
 
 ---
 
-## 📝 Pull Request Process
+fix(training): resolve memory leak in training loop
 
-### 1. Prepare Your PR
+The training visualization was not cleaning up TensorFlow.js tensors,
+causing memory to grow unbounded during long training sessions.
 
-```bash
-# Ensure your branch is up to date
-git checkout main
-git pull upstream main
-git checkout your-feature-branch
-git rebase main
-
-# Test thoroughly
-# Open netbuilder.html and test all functionality
+Fixes #456
 ```
 
-### 2. Commit Guidelines
+## 🔍 Code Review Process
 
-Use clear, descriptive commit messages:
+### Submitting a Pull Request
 
-```bash
-# Good commit messages
-git commit -m "Add depthwise separable convolution layer type"
-git commit -m "Fix FLOPs calculation for LSTM layers"
-git commit -m "Improve dark mode contrast for input fields"
+1. **Update your branch** with the latest main
+   ```bash
+   git fetch origin
+   git rebase origin/main
+   ```
 
-# Bad commit messages
-git commit -m "Update file"
-git commit -m "Fix bug"
-git commit -m "WIP"
-```
+2. **Run checks locally**
+   ```bash
+   pnpm lint
+   pnpm type-check
+   pnpm test
+   pnpm build
+   ```
 
-### 3. Create Pull Request
+3. **Push your branch**
+   ```bash
+   git push origin feature/your-feature-name
+   ```
 
-**Title Format:**
-```
-[Feature] Add depthwise separable convolution support
-[Fix] Correct FLOPs calculation for recurrent layers
-[Docs] Update README with mobile export instructions
-```
+4. **Create a pull request** on GitHub with:
+   - Clear title following commit convention
+   - Description of changes
+   - Screenshots/videos for UI changes
+   - Link to related issue(s)
+   - Test plan
 
-**Description Template:**
+### Pull Request Template
+
 ```markdown
 ## Description
-Brief description of changes
+Brief description of the changes
 
 ## Type of Change
 - [ ] Bug fix
 - [ ] New feature
+- [ ] Breaking change
 - [ ] Documentation update
-- [ ] Code refactoring
 
-## Testing Done
-- Tested in Chrome 120, Firefox 121
-- Verified layer add/remove functionality
-- Checked export for PyTorch and Keras
+## Related Issue
+Closes #123
 
-## Screenshots (if UI changes)
-[Add screenshots here]
+## Changes Made
+- Change 1
+- Change 2
+- Change 3
+
+## Screenshots
+(if applicable)
+
+## Test Plan
+- [ ] Unit tests pass
+- [ ] Integration tests pass
+- [ ] Manually tested feature X
+- [ ] Tested on different browsers
 
 ## Checklist
 - [ ] Code follows style guidelines
-- [ ] Self-review completed
-- [ ] Comments added for complex logic
-- [ ] No console errors
-- [ ] Tested in multiple browsers
-- [ ] Documentation updated (if needed)
+- [ ] Self-reviewed code
+- [ ] Commented complex code
+- [ ] Updated documentation
+- [ ] No new warnings
+- [ ] Added tests
+- [ ] All tests pass
 ```
 
-### 4. Review Process
+### Review Guidelines
 
-- Maintainers will review within 3-7 days
-- Address feedback promptly
-- Keep PRs focused (one feature/fix per PR)
-- Be open to suggestions and improvements
+- Be respectful and constructive
+- Focus on the code, not the person
+- Explain the "why" behind suggestions
+- Approve when the code is good enough, not perfect
+- Request changes only for serious issues
 
----
+## 🏗️ Architecture Guidelines
 
-## 🎯 Priority Areas
+### Adding New Features
 
-We're especially interested in contributions in these areas:
+1. **Plan first**: Create an issue with design proposal
+2. **Type definitions**: Add types to `packages/shared/src/types`
+3. **Backend API**: Add routes in `packages/backend/src/routes`
+4. **Frontend components**: Create in appropriate feature folder
+5. **State management**: Add to Zustand store if needed
+6. **Documentation**: Update relevant docs
 
-### High Priority
-- [ ] Real-time training with TensorFlow.js
-- [ ] Multi-input/multi-output graph builder
-- [ ] More preset architectures (ViT, ConvNeXt, etc.)
-- [ ] Enhanced mobile optimizations
-- [ ] Improved FLOPs calculation accuracy
+### State Management Rules
 
-### Medium Priority
-- [ ] Gradient flow visualization
-- [ ] Model compression tools
-- [ ] Transfer learning presets
-- [ ] Cloud training integration
-- [ ] Collaborative editing
+- **Local state**: Use `useState` for component-only state
+- **Shared state**: Use Zustand for cross-component state
+- **Server state**: Consider React Query for API data
+- **Form state**: Use React Hook Form for complex forms
 
-### Low Priority
-- [ ] Additional export formats
-- [ ] More activation functions
-- [ ] Custom layer definitions
-- [ ] Architecture animations
+### Performance Considerations
 
----
+- Use `React.memo` for expensive components
+- Use `useMemo` and `useCallback` appropriately
+- Implement virtual scrolling for large lists
+- Code split by route
+- Lazy load heavy components
+- Dispose TensorFlow.js tensors properly
 
-## 🐛 Bug Reports
+## 🐛 Reporting Bugs
 
-### Good Bug Report Example
+### Before Reporting
+
+1. Check existing issues
+2. Try to reproduce in latest version
+3. Gather relevant information
+
+### Bug Report Template
 
 ```markdown
-**Title:** FLOPs calculation incorrect for LSTM layers
+**Describe the bug**
+A clear description of what the bug is.
 
-**Description:**
-When calculating FLOPs for LSTM layers, the result appears to be 10x lower than expected.
+**To Reproduce**
+Steps to reproduce:
+1. Go to '...'
+2. Click on '...'
+3. See error
 
-**Steps to Reproduce:**
-1. Go to Architect tab
-2. Add LSTM layer with 128 units
-3. Go to Performance tab
-4. Observe FLOPs value
+**Expected behavior**
+What you expected to happen.
 
-**Expected Behavior:**
-FLOPs should be approximately 500M for LSTM-128
+**Screenshots**
+If applicable, add screenshots.
 
-**Actual Behavior:**
-FLOPs shows as 50M
+**Environment**
+- OS: [e.g. macOS 14.0]
+- Browser: [e.g. Chrome 120]
+- Version: [e.g. 2.0.0]
 
-**Environment:**
-- Browser: Chrome 120
-- OS: macOS 14.0
-- Version: 3.0.0
-
-**Screenshots:**
-[Attach if helpful]
+**Additional context**
+Any other relevant information.
 ```
-
----
 
 ## 💡 Feature Requests
 
-### Good Feature Request Example
+We welcome feature requests! Please:
 
-```markdown
-**Title:** Add support for attention visualization
+1. Check if it's already requested
+2. Describe the problem it solves
+3. Provide use cases
+4. Consider implementation complexity
 
-**Description:**
-It would be helpful to visualize attention weights for transformer layers during architecture design.
+## 📚 Resources
 
-**Use Case:**
-When designing transformer architectures, I want to see which parts of the input the model would attend to, so I can validate the architecture makes sense for my task.
-
-**Proposed Solution:**
-Add a "Visualize Attention" button in transformer layer cards that shows a sample attention heatmap.
-
-**Alternatives Considered:**
-- Export attention weights for external visualization
-- Link to external attention visualization tools
-
-**Additional Context:**
-Similar to how TensorBoard visualizes attention.
-```
-
----
-
-## 📚 Documentation
-
-### Updating Documentation
-
-When adding features, update:
-
-1. **README.md**: Add to features list and usage examples
-2. **CHANGELOG.md**: Add entry for next version
-3. **GETTING_STARTED.md**: Add to workflows if applicable
-4. **Code Comments**: Explain complex logic
-
-### Documentation Style
-
-```markdown
-# Use clear headings
-## Second level
-### Third level
-
-# Use code blocks with language
-\`\`\`javascript
-const example = 'code';
-\`\`\`
-
-# Use lists for steps
-1. First step
-2. Second step
-3. Third step
-
-# Use checkboxes for requirements
-- [ ] Requirement 1
-- [x] Requirement 2 (completed)
-```
-
----
-
-## 🔒 Security
-
-### Reporting Security Issues
-
-**DO NOT** open public issues for security vulnerabilities.
-
-Instead, email security concerns to: [email to be added]
-
-Include:
-- Description of vulnerability
-- Steps to reproduce
-- Potential impact
-- Suggested fix (if any)
-
----
-
-## 📜 License
-
-By contributing, you agree that your contributions will be licensed under the same license as the project (MIT License).
-
----
+- [React Documentation](https://react.dev)
+- [TypeScript Handbook](https://www.typescriptlang.org/docs/)
+- [TensorFlow.js Guide](https://www.tensorflow.org/js/guide)
+- [Tailwind CSS Docs](https://tailwindcss.com/docs)
+- [Zustand Documentation](https://zustand-demo.pmnd.rs/)
 
 ## ❓ Questions?
 
-- **General Questions**: Open a GitHub Discussion
-- **Bug Reports**: Open a GitHub Issue
-- **Feature Requests**: Open a GitHub Issue with [Feature Request] tag
-- **Code Questions**: Comment on relevant pull request
+- Open a discussion on GitHub
+- Check existing documentation
+- Review closed issues for similar questions
+
+## 📄 License
+
+By contributing, you agree that your contributions will be licensed under the project's MIT License.
 
 ---
 
-## 🙏 Thank You!
-
-Every contribution, no matter how small, makes this project better. We appreciate your time and effort!
-
-**Happy Contributing!** 🚀
-
----
-
-## Code of Conduct
-
-### Our Pledge
-
-We pledge to make participation in our project a harassment-free experience for everyone.
-
-### Our Standards
-
-**Positive behavior:**
-- Using welcoming and inclusive language
-- Being respectful of differing viewpoints
-- Gracefully accepting constructive criticism
-- Focusing on what's best for the community
-
-**Unacceptable behavior:**
-- Trolling, insulting/derogatory comments
-- Public or private harassment
-- Publishing others' private information
-- Other conduct inappropriate in a professional setting
-
-### Enforcement
-
-Report unacceptable behavior to project maintainers. All complaints will be reviewed and investigated.
-
----
-
-**Version**: 1.0
-**Last Updated**: November 2025
+Thank you for contributing to Neural Network Builder! 🎉
