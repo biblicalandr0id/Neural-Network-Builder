@@ -13,7 +13,8 @@ interface NetworkState {
   addLayer: (layer: Layer) => void
   updateLayer: (id: string, updates: Partial<Layer>) => void
   deleteLayer: (id: string) => void
-  reorderLayers: (startIndex: number, endIndex: number) => void
+  duplicateLayer: (id: string) => void
+  reorderLayers: (newLayers: Layer[]) => void
   selectLayer: (id: string | null) => void
   undo: () => void
   redo: () => void
@@ -66,12 +67,28 @@ export const useNetworkStore = create<NetworkState>()(
       deleteLayer: (id) =>
         set((state) => {
           state.config.layers = state.config.layers.filter((l) => l.id !== id)
+          if (state.selectedLayerId === id) {
+            state.selectedLayerId = null
+          }
         }),
 
-      reorderLayers: (startIndex, endIndex) =>
+      duplicateLayer: (id) =>
         set((state) => {
-          const [removed] = state.config.layers.splice(startIndex, 1)
-          state.config.layers.splice(endIndex, 0, removed)
+          const layerIndex = state.config.layers.findIndex((l) => l.id === id)
+          if (layerIndex !== -1) {
+            const layer = state.config.layers[layerIndex]
+            const duplicate = {
+              ...JSON.parse(JSON.stringify(layer)),
+              id: `layer-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+              name: layer.name ? `${layer.name}_copy` : undefined,
+            }
+            state.config.layers.splice(layerIndex + 1, 0, duplicate)
+          }
+        }),
+
+      reorderLayers: (newLayers) =>
+        set((state) => {
+          state.config.layers = newLayers
         }),
 
       selectLayer: (id) => set({ selectedLayerId: id }),
