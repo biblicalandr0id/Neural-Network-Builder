@@ -40,7 +40,7 @@ const initialConfig: NetworkConfig = {
 
 export const useNetworkStore = create<NetworkState>()(
   persist(
-    immer((set, get) => ({
+    immer((set) => ({
       config: initialConfig,
       selectedLayerId: null,
       history: [initialConfig],
