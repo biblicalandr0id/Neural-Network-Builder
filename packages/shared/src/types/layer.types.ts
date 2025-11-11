@@ -125,6 +125,20 @@ export interface LSTMLayer extends BaseLayer {
 }
 
 /**
+ * GRU Layer
+ */
+export interface GRULayer extends BaseLayer {
+  type: 'gru'
+  units: number
+  returnSequences?: boolean
+  returnState?: boolean
+  goBackwards?: boolean
+  stateful?: boolean
+  dropout?: number
+  recurrentDropout?: number
+}
+
+/**
  * Transformer Layer
  */
 export interface TransformerLayer extends BaseLayer {
@@ -134,6 +148,78 @@ export interface TransformerLayer extends BaseLayer {
   ffDim: number
   dropout?: number
   usePositionalEncoding?: boolean
+}
+
+/**
+ * Attention Layer
+ */
+export interface AttentionLayer extends BaseLayer {
+  type: 'attention'
+  heads: number
+  keyDim: number
+  dropout?: number
+  useCausalMask?: boolean
+}
+
+/**
+ * Conv3D Layer
+ */
+export interface Conv3DLayer extends BaseLayer {
+  type: 'conv3d'
+  filters?: number
+  kernelSize?: number
+  strides?: number
+  padding?: PaddingType
+  activation?: ActivationType
+}
+
+/**
+ * Flatten Layer
+ */
+export interface FlattenLayer extends BaseLayer {
+  type: 'flatten'
+}
+
+/**
+ * Batch Normalization Layer
+ */
+export interface BatchNormLayer extends BaseLayer {
+  type: 'batchnorm'
+  momentum?: number
+  epsilon?: number
+  center?: boolean
+  scale?: boolean
+}
+
+/**
+ * Embedding Layer
+ */
+export interface EmbeddingLayer extends BaseLayer {
+  type: 'embedding'
+  inputDim?: number
+  outputDim?: number
+  inputLength?: number
+}
+
+/**
+ * Residual Layer
+ */
+export interface ResidualLayer extends BaseLayer {
+  type: 'residual'
+}
+
+/**
+ * Global Average Pooling Layer
+ */
+export interface GlobalAvgPoolLayer extends BaseLayer {
+  type: 'globalavgpool'
+}
+
+/**
+ * Global Max Pooling Layer
+ */
+export interface GlobalMaxPoolLayer extends BaseLayer {
+  type: 'globalmaxpool'
 }
 
 /**
@@ -151,11 +237,20 @@ export interface RegularizerConfig {
 export type Layer =
   | InputLayer
   | Conv2DLayer
+  | Conv3DLayer
   | DenseLayer
   | DropoutLayer
   | PoolingLayer
+  | FlattenLayer
+  | BatchNormLayer
   | LSTMLayer
+  | GRULayer
   | TransformerLayer
+  | AttentionLayer
+  | EmbeddingLayer
+  | ResidualLayer
+  | GlobalAvgPoolLayer
+  | GlobalMaxPoolLayer
   | BaseLayer
 
 /**

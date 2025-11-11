@@ -55,7 +55,7 @@ export interface DatasetSplit {
 
 export interface PreprocessingPipeline {
   steps: PreprocessingStep[]
-  config: PreprocessingConfig
+  config: DatasetPreprocessingConfig
 }
 
 export interface PreprocessingStep {
@@ -77,7 +77,7 @@ export type PreprocessingStepType =
   | 'noise'
   | 'blur'
 
-export interface PreprocessingConfig {
+export interface DatasetPreprocessingConfig {
   resize?: {
     width: number
     height: number
