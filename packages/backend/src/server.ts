@@ -3,6 +3,8 @@ import cors from 'cors'
 import helmet from 'helmet'
 import morgan from 'morgan'
 import dotenv from 'dotenv'
+import modelsRouter from './routes/models.js'
+import datasetsRouter from './routes/datasets.js'
 
 dotenv.config()
 
@@ -36,6 +38,9 @@ app.get('/api/v1', (req, res) => {
     },
   })
 })
+
+app.use('/api/v1/models', modelsRouter)
+app.use('/api/v1/datasets', datasetsRouter)
 
 // 404 Handler
 app.use((req, res) => {
