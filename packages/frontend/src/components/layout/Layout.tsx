@@ -28,6 +28,9 @@ export function Layout() {
               <Link to="/evaluate" className="hover:underline">
                 Evaluate
               </Link>
+              <Link to="/export" className="hover:underline">
+                Export
+              </Link>
             </div>
           </div>
         </nav>
