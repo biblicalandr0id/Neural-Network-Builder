@@ -7,6 +7,7 @@ import { ArchitectPage } from '@/pages/ArchitectPage'
 import { DatasetPage } from '@/pages/DatasetPage'
 import { TrainingPage } from '@/pages/TrainingPage'
 import { EvaluationPage } from '@/pages/EvaluationPage'
+import { ExportPage } from '@/pages/ExportPage'
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
           <Route path="dataset" element={<DatasetPage />} />
           <Route path="train" element={<TrainingPage />} />
           <Route path="evaluate" element={<EvaluationPage />} />
+          <Route path="export" element={<ExportPage />} />
         </Route>
       </Routes>
       <Toaster />
